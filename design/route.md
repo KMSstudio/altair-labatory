@@ -7,8 +7,8 @@
 /pi/:pi_id: PI 메인 페이지
 /pi/edit/:pi_id: PI 수정 페이지
 
-/admin/pi/application
-/admin/pi
+/admin/pi/application: PI 신청 대기자 리스트
+/admin/pi: PI 목록
 
 /api/pi/new
 /api/pi/edit

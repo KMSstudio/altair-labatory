@@ -3,10 +3,15 @@
 
 ### PI
 
-users
-user_credentials
-pi
-테이블 고려해서 만들어야 함
+/pi/new: PI 신청 페이지
+/pi/:pi_id: PI 메인 페이지
+/pi/edit/:pi_id: PI 수정 페이지
+
+/admin/pi/application
+/admin/pi
+
+/api/pi/new
+/api/pi/edit
 
 ### Labatories
 

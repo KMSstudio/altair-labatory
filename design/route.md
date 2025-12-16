@@ -1,4 +1,17 @@
 
+## Users
+
+/user/oauth/google: google callback 처리
+/user/apply: 회원가입 페이지
+/user/login: 로그인 페이지
+/user/me: 내 정보 조회 및 수정 페이지
+
+/admin/user/:user_id: 유저 정보 페이지
+/admin/user 전체 유저 조회 및 로그 페이지
+
+/api/user/me: 내 정보 조회
+/api/user/edit: 내 정보 수정
+
 ## Labatory
 
 ### PI
@@ -46,7 +59,7 @@
 
 /api/subj/new: 연구주제 생성
 /api/subj/edit: 연구주제 내용 수정
-/api/sibj/merge: 연구주제 병합
+/api/subj/merge: 두 연구주제 병합
 
 ## Bulletin Board System
 

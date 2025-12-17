@@ -61,13 +61,15 @@
 /api/subj/edit: 연구주제 내용 수정
 /api/subj/merge: 두 연구주제 병합
 
-## Bulletin Board System
+## Builetin Board System
 
-/bbs/[id]/read
-/bbs/[id]/create
+/bbs/:bbs_id/list
+/bbs/:bbs_id/new
 
-/article/[id]/read
-/article/[id]/update
-/article/[id]/comment/create
+/article/:article_id/
+/article/:article_id/update
 
-대응
+/api/article/update
+/api/article/new
+/api/article/comment/new
+

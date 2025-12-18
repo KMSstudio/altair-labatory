@@ -16,6 +16,7 @@
     "prisma:migrate:dev": "npm -w @labatory/db run prisma:migrate:dev",
     "prisma:migrate:deploy": "npm -w @labatory/db run prisma:migrate:deploy",
     "prisma:studio": "npm -w @labatory/db run prisma:studio",
+    "prisma:seed": "npm -w @labatory/db run seed",
 
     "auth:build": "npm -w @labatory/auth run build",
     

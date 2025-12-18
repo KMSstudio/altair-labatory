@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@labatory/db",
   "private": true,
   "type": "module",
@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "seed": "npx tsx prisma/seed.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
@@ -24,7 +25,8 @@
     "@prisma/client": "^7.2.0",
     "@types/pg": "^8.16.0",
     "dotenv": "^17.2.3",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "styled-jsx": "^5.1.7"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",

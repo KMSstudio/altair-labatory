@@ -1,6 +1,9 @@
 services:
   db:
-    image: postgres:16
+    build:
+      context: ./docker/db
+      dockerfile: Dockerfile
+    image: labatory-postgres:16
     container_name: labatory-postgres
     restart: unless-stopped
     environment:
@@ -16,6 +19,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    pull_policy: never
 
 volumes:
   labatory_pgdata:

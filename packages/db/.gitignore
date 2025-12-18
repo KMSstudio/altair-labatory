@@ -1,0 +1,39 @@
+# ======================
+# DEPENDENCIES
+# ======================
+node_modules/
+
+# ======================
+# BUILD OUTPUT
+# ======================
+dist/
+*.tsbuildinfo
+
+# ======================
+# PRISMA
+# ======================
+prisma/generated/
+
+# ======================
+# ENV / SECRETS
+# ======================
+.env
+.env.*
+!.env.example
+
+# ======================
+# LOGS / TEMP
+# ======================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+
+# ======================
+# IDE / EDITOR
+# ======================
+.vscode/
+.idea/

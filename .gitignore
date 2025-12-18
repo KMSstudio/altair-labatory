@@ -1,0 +1,34 @@
+# .gitignore
+
+# Dependencies
+node_modules/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Git
+*.orig
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS junk
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.iml
+
+# Misc temp files
+*.swp
+*.swo

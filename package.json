@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f db",
+    "db:reset": "docker compose down -v",
+
+    "prisma:build": "npm -w @labatory/db run build",
+    "prisma:generate": "npm -w @labatory/db run prisma:generate",
+    "prisma:migrate:dev": "npm -w @labatory/db run prisma:migrate:dev",
+    "prisma:migrate:deploy": "npm -w @labatory/db run prisma:migrate:deploy",
+    "prisma:studio": "npm -w @labatory/db run prisma:studio"
+  }
+}

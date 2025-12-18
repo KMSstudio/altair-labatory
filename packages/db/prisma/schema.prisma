@@ -54,9 +54,6 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
-  createdLabs Lab[] @relation("Lab_CreatedBy")
-  updatedLabs Lab[] @relation("Lab_UpdatedBy")
-
   reviews        LabReview[]
   reviewReports  LabReviewReport[]
 
@@ -95,9 +92,6 @@ model University {
   websiteUrl String? @db.VarChar(1024) @map("website_url")
 
   labs Lab[]
-  pis  PI[]
-
-  piApplications PIApplication[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -114,25 +108,19 @@ model University {
 model PI {
   id             BigInt   @id @default(autoincrement())
   name           String   @db.VarChar(100)
+  email          String   @db.VarChar(100)
   scholarUrl     String   @db.Text @map("scholar_url")
 
-  univId         BigInt?  @map("univ_id")
-  university University? @relation(fields: [univId], references: [id], onDelete: SetNull)
-
   userId BigInt? @unique @map("user_id")
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-
   labId  BigInt? @unique @map("lab_id")
-  lab    Lab?    @relation(fields: [labId], references: [id], onDelete: SetNull)
 
-  emails        PIEmail[]
-  applications  PIApplication[]
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  lab    Lab?    @relation(fields: [labId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   @@index([name],   map: "idx_pi_name")
-  @@index([univId], map: "idx_pi_univ")
   @@map("pi")
 }
 
@@ -142,11 +130,7 @@ model PIApplication {
   userId BigInt @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  piId BigInt? @map("pi_id")
-  pi   PI?     @relation(fields: [piId], references: [id], onDelete: SetNull)
-
   requestedName   String  @db.VarChar(100) @map("requested_name")
-  univId          BigInt? @map("univ_id")
   labId           BigInt? @map("lab_id")
   schoolEmail     String  @db.VarChar(255) @map("school_email")
   ScholarUrl      String  @db.Text @map("scholar_url")
@@ -157,35 +141,13 @@ model PIApplication {
   decidedBy BigInt? @map("decided_by")
   decidedAt DateTime? @map("decided_at")
 
-  university University? @relation(fields: [univId], references: [id], onDelete: SetNull)
-
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   @@index([status, createdAt], map: "idx_pi_applications_status_created")
   @@index([userId],            map: "idx_pi_applications_user")
-  @@index([piId],              map: "idx_pi_applications_pi")
   @@index([schoolEmail],       map: "idx_pi_applications_school_email")
   @@map("pi_applications")
-}
-
-model PIEmail {
-  id        BigInt  @id @default(autoincrement())
-  piId      BigInt  @map("pi_id")
-  email     String  @db.VarChar(255)
-  isPrimary Boolean @default(false) @map("is_primary")
-  validFrom DateTime? @db.Date @map("valid_from")
-  validTo   DateTime? @db.Date @map("valid_to")
-
-  pi PI @relation(fields: [piId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt      @map("updated_at")
-
-  @@unique([email],          map: "pi_emails_email_key")
-  @@unique([piId, email],    map: "pi_emails_pi_id_email_key")
-  @@index([piId],            map: "idx_pi_emails_pi")
-  @@map("pi_emails")
 }
 
 // =========================
@@ -201,15 +163,9 @@ model Lab {
   description String? @db.Text
 
   universityId BigInt? @map("university_id")
-  pi PI?
-
-  createdBy BigInt? @map("created_by")
-  updatedBy BigInt? @map("updated_by")
-
   university University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
-
-  creator User? @relation("Lab_CreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
-  updater User? @relation("Lab_UpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  
+  pi      PI?
 
   subjects LabSubject[]
   reviews  LabReview[]

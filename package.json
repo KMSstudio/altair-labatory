@@ -1,6 +1,10 @@
 {
+  "name": "labatory-a",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
@@ -11,6 +15,13 @@
     "prisma:generate": "npm -w @labatory/db run prisma:generate",
     "prisma:migrate:dev": "npm -w @labatory/db run prisma:migrate:dev",
     "prisma:migrate:deploy": "npm -w @labatory/db run prisma:migrate:deploy",
-    "prisma:studio": "npm -w @labatory/db run prisma:studio"
+    "prisma:studio": "npm -w @labatory/db run prisma:studio",
+    
+    "web:dev": "npm -w @labatory/web run dev",
+    "web:build": "npm -w @labatory/web run build",
+    "web:start": "npm -w @labatory/web run start",
+    "web:lint": "npm -w @labatory/web run lint",
+
+    "dev": "npm run db:up && npm run web:dev"
   }
 }

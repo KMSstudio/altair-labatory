@@ -20,14 +20,6 @@ enum UserRole {
   @@map("user_role")
 }
 
-enum PIStatus {
-  UNCLAIMED
-  PENDING
-  VERIFIED
-
-  @@map("pi_status")
-}
-
 enum PIApplicationStatus {
   PENDING
   APPROVED
@@ -36,11 +28,12 @@ enum PIApplicationStatus {
   @@map("pi_application_status")
 }
 
-enum LabReviewVisibility {
+enum Visibility {
   PUBLIC
   PRIVATE
+  PROTECT
 
-  @@map("lab_review_visibility")
+  @@map("visibility")
 }
 
 // =========================
@@ -53,8 +46,7 @@ model User {
   role         UserRole @default(USER)
   primaryEmail String?  @db.VarChar(255) @map("primary_email")
 
-  piId       BigInt? @unique @map("pi_id")
-  piByPiId   PI?     @relation("UserPIByPiId", fields: [piId], references: [id], onDelete: SetNull)
+  pi           PI?
 
   credentials UserCredential[]
   piApplications PIApplication[]
@@ -62,16 +54,11 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
-  // Reverse relations (audit)
-  createdPIs    PI[]           @relation("PI_CreatedBy")
-
   createdLabs Lab[] @relation("Lab_CreatedBy")
   updatedLabs Lab[] @relation("Lab_UpdatedBy")
 
   reviews        LabReview[]
   reviewReports  LabReviewReport[]
-
-  mergedSubjectEvents SubjectMergeEvent[] @relation("SubjectMerge_MergedBy")
 
   @@map("users")
 }
@@ -127,33 +114,25 @@ model University {
 model PI {
   id             BigInt   @id @default(autoincrement())
   name           String   @db.VarChar(100)
+  scholarUrl     String   @db.Text @map("scholar_url")
+
   univId         BigInt?  @map("univ_id")
-  defaultLabId   BigInt?  @map("default_lab_id")
-  googleScholarUrl String @db.Text @map("google_scholar_url")
-  status         PIStatus @default(UNCLAIMED)
-
-  // Claim-linked user (pi.user_id)
-  userId BigInt? @unique @map("user_id")
-  usersByPiId User? @relation("UserPIByPiId")
-
-  // Creator (admin or applicant)
-  createdBy BigInt? @map("created_by")
-  creator   User?   @relation("PI_CreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
-
   university University? @relation(fields: [univId], references: [id], onDelete: SetNull)
 
-  defaultLab Lab? @relation("PI_DefaultLab", fields: [defaultLabId], references: [id], onDelete: SetNull)
+  userId BigInt? @unique @map("user_id")
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  labId  BigInt? @unique @map("lab_id")
+  lab    Lab?    @relation(fields: [labId], references: [id], onDelete: SetNull)
 
   emails        PIEmail[]
   applications  PIApplication[]
-  labs          Lab[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   @@index([name],   map: "idx_pi_name")
   @@index([univId], map: "idx_pi_univ")
-  @@index([status], map: "idx_pi_status")
   @@map("pi")
 }
 
@@ -170,15 +149,15 @@ model PIApplication {
   univId          BigInt? @map("univ_id")
   labId           BigInt? @map("lab_id")
   schoolEmail     String  @db.VarChar(255) @map("school_email")
-  googleScholarUrl String @db.Text @map("google_scholar_url")
+  ScholarUrl      String  @db.Text @map("scholar_url")
   note            String? @db.Text
 
   status    PIApplicationStatus @default(PENDING)
+
   decidedBy BigInt? @map("decided_by")
   decidedAt DateTime? @map("decided_at")
 
   university University? @relation(fields: [univId], references: [id], onDelete: SetNull)
-  lab        Lab?        @relation(fields: [labId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -222,13 +201,12 @@ model Lab {
   description String? @db.Text
 
   universityId BigInt? @map("university_id")
-  piId         BigInt? @map("pi_id")
+  pi PI?
 
   createdBy BigInt? @map("created_by")
   updatedBy BigInt? @map("updated_by")
 
   university University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
-  pi         PI?         @relation(fields: [piId], references: [id], onDelete: SetNull)
 
   creator User? @relation("Lab_CreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
   updater User? @relation("Lab_UpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
@@ -236,15 +214,11 @@ model Lab {
   subjects LabSubject[]
   reviews  LabReview[]
 
-  defaultForPI PI[] @relation("PI_DefaultLab")
-  piApplications PIApplication[]
-
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   @@index([nameKo],       map: "idx_labs_name_ko")
   @@index([universityId], map: "idx_labs_university")
-  @@index([piId],         map: "idx_labs_pi")
   @@map("labs")
 }
 
@@ -255,22 +229,17 @@ model Lab {
 model Subject {
   id          BigInt  @id @default(autoincrement())
   nameKo      String  @db.VarChar(200) @map("name_ko")
-  nameEn      String? @db.VarChar(200) @map("name_en")
+  nameEn      String  @db.VarChar(200) @map("name_en")
   description String? @db.Text
   isActive    Boolean @default(true) @map("is_active")
 
   labs LabSubject[]
 
-  mergeEventsFrom SubjectMergeEvent[] @relation("SubjectMerge_From")
-  mergeEventsTo   SubjectMergeEvent[] @relation("SubjectMerge_To")
-
-  mergeMapFrom SubjectMergeMap? @relation("SubjectMergeMap_From")
-  mergeMapTo   SubjectMergeMap[] @relation("SubjectMergeMap_To")
-
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   @@unique([nameKo], map: "subjects_name_ko_key")
+  @@unique([nameEn], map: "subjects_name_en_key")
   @@index([isActive], map: "idx_subjects_is_active")
   @@map("subjects")
 }
@@ -299,21 +268,27 @@ model LabReview {
   labId    BigInt @map("lab_id")
   authorId BigInt @map("author_id")
 
-  title      String? @db.VarChar(200)
-  content    String  @db.Text
-  rating     Int
-  visibility LabReviewVisibility @default(PUBLIC)
-
   lab    Lab  @relation(fields: [labId], references: [id], onDelete: Cascade)
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  reports LabReviewReport[]
+  content   String  @db.Text
+  recommend Boolean @map("recommend")
+
+  atmos     Int @map("atmos")   // 연구실 분위기
+  lectr     Int @map("lectr")   // 강의 전달력
+  paper     Int @map("paper")   // 논문 지도력
+  salry     Int @map("salry")   // 실질 인건비
+  persn     Int @map("persn")   // 인품
+
+  visib     Visibility @default(PUBLIC)
+  reports   LabReviewReport[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   @@index([labId, createdAt],    map: "idx_lab_reviews_lab_created")
   @@index([authorId, createdAt], map: "idx_lab_reviews_author_created")
+  @@index([recommend],           map: "idx_lab_reviews_recommend")
   @@map("lab_reviews")
 }
 
@@ -323,11 +298,11 @@ model LabReviewReport {
   reviewId   BigInt @map("review_id")
   reporterId BigInt @map("reporter_id")
 
-  reason String? @db.VarChar(200)
-  detail String? @db.Text
-
   review   LabReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   reporter User      @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  reason String? @db.VarChar(200)
+  detail String? @db.Text
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -335,42 +310,4 @@ model LabReviewReport {
   @@index([reviewId, createdAt],    map: "idx_review_reports_review_created")
   @@index([reporterId, createdAt],  map: "idx_review_reports_reporter_created")
   @@map("lab_review_reports")
-}
-
-// =========================
-// SUBJECT MERGE (EVENT LOG + CANONICAL MAP)
-// =========================
-
-model SubjectMergeEvent {
-  id BigInt @id @default(autoincrement())
-
-  fromSubjectId BigInt @map("from_subject_id")
-  toSubjectId   BigInt @map("to_subject_id")
-
-  mergedBy BigInt? @map("merged_by")
-  note     String? @db.Text
-
-  fromSubject Subject @relation("SubjectMerge_From", fields: [fromSubjectId], references: [id], onDelete: Restrict)
-  toSubject   Subject @relation("SubjectMerge_To",   fields: [toSubjectId],   references: [id], onDelete: Restrict)
-
-  merger User? @relation("SubjectMerge_MergedBy", fields: [mergedBy], references: [id], onDelete: SetNull)
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@index([toSubjectId, createdAt],   map: "idx_merge_events_to_created")
-  @@index([fromSubjectId, createdAt], map: "idx_merge_events_from_created")
-  @@map("subject_merge_events")
-}
-
-model SubjectMergeMap {
-  fromSubjectId BigInt @id @map("from_subject_id")
-  toSubjectId   BigInt @map("to_subject_id")
-
-  fromSubject Subject @relation("SubjectMergeMap_From", fields: [fromSubjectId], references: [id], onDelete: Restrict)
-  toSubject   Subject @relation("SubjectMergeMap_To",   fields: [toSubjectId],   references: [id], onDelete: Restrict)
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@index([toSubjectId], map: "idx_merge_map_to")
-  @@map("subject_merge_map")
 }

@@ -14,12 +14,11 @@ async function getUniversity(univId: bigint) {
 }
 
 export default async function EditUniversityPage({ params }: EditPageProps) {
-  const id = BigInt((await params).univ_id);
+  params = await params
+  let id: bigint;
+  try { id = BigInt(params.univ_id); } catch { notFound(); }
   const university = await getUniversity(id);
-
-  if (!university) {
-    notFound();
-  }
+  if (!university) { notFound(); }
 
   return (
     <main className="univ-form-shell">

@@ -25,12 +25,10 @@ async function getUniversity(univId: bigint) {
 
 export default async function UniversityDetailPage({ params }: UnivPageProps) {
   params = await params
-  const id = BigInt(params.univ_id);
+  let id: bigint;
+  try { id = BigInt(params.univ_id); } catch { notFound(); }
   const university = await getUniversity(id);
-
-  if (!university) {
-    notFound();
-  }
+  if (!university) { notFound(); }
 
   return (
     <main className="univ-shell">

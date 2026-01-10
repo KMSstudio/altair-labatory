@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@labatory/db";
 import { updateUniversity, deleteUniversity } from "../../actions";
+import styles from "../../univ.module.css";
 
 type EditPageProps = {
   params: { univ_id: string };
@@ -21,26 +22,26 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
   if (!university) { notFound(); }
 
   return (
-    <main className="univ-form-shell">
-      <header className="form-head">
+    <main className={styles.univFormShell}>
+      <header className={styles.formHead}>
         <div>
-          <p className="eyebrow">/univ/edit/{params.univ_id}</p>
+          <p className={styles.eyebrow}>/univ/edit/{params.univ_id}</p>
           <h1>Edit university</h1>
-          <p className="lede">
+          <p className={styles.lede}>
             Server action demo for updating and deleting a university through Prisma.
           </p>
         </div>
-        <div className="actions">
-          <Link href={`/univ/${params.univ_id}`} className="ghost">
+        <div className={styles.actions}>
+          <Link href={`/univ/${params.univ_id}`} className={styles.ghost}>
             ← Back to detail
           </Link>
-          <Link href="/univ" className="ghost">
+          <Link href="/univ" className={styles.ghost}>
             List
           </Link>
         </div>
       </header>
 
-      <form action={updateUniversity} className="form">
+      <form action={updateUniversity} className={styles.form}>
         <input type="hidden" name="id" value={university.id.toString()} />
         <label>
           Korean name *
@@ -59,15 +60,17 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
           <input name="websiteUrl" type="url" defaultValue={university.websiteUrl ?? ""} />
         </label>
 
-        <div className="actions space">
-          <button type="submit">Save changes</button>
+        <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
+          <button type="submit" className={styles.primary}>
+            Save changes
+          </button>
         </div>
       </form>
 
-      <form action={deleteUniversity} className="form danger-zone">
+      <form action={deleteUniversity} className={`${styles.form} ${styles.dangerZone}`}>
         <input type="hidden" name="id" value={university.id.toString()} />
-        <div className="actions space">
-          <button type="submit" className="danger">
+        <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
+          <button type="submit" className={styles.danger}>
             Delete university
           </button>
         </div>

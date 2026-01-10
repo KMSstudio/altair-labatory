@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@labatory/db";
 import { deleteUniversity } from "./actions";
+import styles from "./univ.module.css";
 
 async function getUniversities() {
   return prisma.university.findMany({
@@ -12,43 +13,43 @@ export default async function UniversityListPage() {
   const universities = await getUniversities();
 
   return (
-    <main className="univ-shell">
-      <header className="univ-header">
+    <main className={styles.univShell}>
+      <header className={styles.univHeader}>
         <div>
-          <p className="eyebrow">Universities CRUD sample</p>
+          <p className={styles.eyebrow}>Universities CRUD sample</p>
           <h1>Universities</h1>
-          <p className="lede">
+          <p className={styles.lede}>
             Minimal Prisma-powered flow showing how to create, read, update, and delete university
             rows from <code>@labatory/db</code>.
           </p>
         </div>
-        <Link className="primary" href="/univ/new">
+        <Link className={styles.primary} href="/univ/new">
           + Add university
         </Link>
       </header>
 
-      <section className="panel">
+      <section className={styles.panel}>
         {universities.length === 0 ? (
-          <p className="muted">No universities yet. Add one to get started.</p>
+          <p className={styles.muted}>No universities yet. Add one to get started.</p>
         ) : (
-          <ul className="univ-grid">
+          <ul className={styles.univGrid}>
             {universities.map((univ) => (
-              <li key={univ.id.toString()} className="card">
-                <div className="card-head">
+              <li key={univ.id.toString()} className={styles.card}>
+                <div className={styles.cardHead}>
                   <div>
-                    <p className="eyebrow">ID {univ.id.toString()}</p>
+                    <p className={styles.eyebrow}>ID {univ.id.toString()}</p>
                     <h3>{univ.nameKo}</h3>
-                    {univ.nameEn && <p className="muted">{univ.nameEn}</p>}
+                    {univ.nameEn && <p className={styles.muted}>{univ.nameEn}</p>}
                   </div>
-                  <div className="country-tag">{univ.country ?? "Unknown"}</div>
+                  <div className={styles.countryTag}>{univ.country ?? "Unknown"}</div>
                 </div>
-                <p className="muted">{univ.websiteUrl ?? "No website"}</p>
-                <div className="actions">
+                <p className={styles.muted}>{univ.websiteUrl ?? "No website"}</p>
+                <div className={styles.actions}>
                   <Link href={`/univ/${univ.id.toString()}`}>View</Link>
                   <Link href={`/univ/edit/${univ.id.toString()}`}>Edit</Link>
                   <form action={deleteUniversity}>
                     <input type="hidden" name="id" value={univ.id.toString()} />
-                    <button type="submit" className="ghost">
+                    <button type="submit" className={styles.ghost}>
                       Delete
                     </button>
                   </form>

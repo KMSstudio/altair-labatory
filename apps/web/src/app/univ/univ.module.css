@@ -1,0 +1,198 @@
+.univShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem 0 3rem;
+}
+
+.univFormShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem 0 3rem;
+}
+
+.univHeader,
+.formHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem 2rem;
+}
+
+.univGrid,
+.labGrid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+  display: grid;
+  gap: 0.65rem;
+  background: #f9fafb;
+  border: 1px solid #e6e9ef;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.countryTag {
+  background: #111827;
+  color: #ffffff;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actionsEnd {
+  justify-content: flex-end;
+}
+
+.space {
+  margin-top: 0.5rem;
+}
+
+.primary,
+.ghost,
+.danger {
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.primary {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+}
+
+.ghost {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.danger {
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.form input {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form input:focus {
+  outline: 2px solid #111827;
+  border-color: #111827;
+}
+
+.dangerZone {
+  border-color: #fecaca;
+  background: #fff5f5;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: #5f6b7a;
+  margin: 0;
+}
+
+.lede {
+  color: #4a5563;
+  max-width: 640px;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.value {
+  font-weight: 600;
+  color: #111827;
+  word-break: break-word;
+}
+
+@media (max-width: 700px) {
+  .univShell,
+  .univFormShell {
+    padding: 1.5rem 0 2rem;
+  }
+
+  .univHeader,
+  .formHead {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actionsEnd {
+    justify-content: flex-start;
+  }
+}

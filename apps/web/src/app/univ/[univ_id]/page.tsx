@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@labatory/db";
+import styles from "../univ.module.css";
 
 type UnivPageProps = {
   params: { univ_id: string };
@@ -31,65 +32,65 @@ export default async function UniversityDetailPage({ params }: UnivPageProps) {
   if (!university) { notFound(); }
 
   return (
-    <main className="univ-shell">
-      <header className="univ-header">
+    <main className={styles.univShell}>
+      <header className={styles.univHeader}>
         <div>
-          <p className="eyebrow">/univ/{params.univ_id}</p>
+          <p className={styles.eyebrow}>/univ/{params.univ_id}</p>
           <h1>{university.nameKo}</h1>
-          {university.nameEn && <p className="muted">{university.nameEn}</p>}
+          {university.nameEn && <p className={styles.muted}>{university.nameEn}</p>}
         </div>
-        <div className="actions">
-          <Link className="ghost" href="/univ">
+        <div className={styles.actions}>
+          <Link className={styles.ghost} href="/univ">
             ← Back to list
           </Link>
-          <Link className="primary" href={`/univ/edit/${params.univ_id}`}>
+          <Link className={styles.primary} href={`/univ/edit/${params.univ_id}`}>
             Edit
           </Link>
         </div>
       </header>
 
-      <section className="panel grid">
+      <section className={`${styles.panel} ${styles.grid}`}>
         <div>
-          <p className="eyebrow">Country</p>
-          <p className="value">{university.country ?? "Unknown"}</p>
+          <p className={styles.eyebrow}>Country</p>
+          <p className={styles.value}>{university.country ?? "Unknown"}</p>
         </div>
         <div>
-          <p className="eyebrow">Website</p>
+          <p className={styles.eyebrow}>Website</p>
           {university.websiteUrl ? (
-            <a className="value" href={university.websiteUrl} target="_blank" rel="noreferrer">
+            <a className={styles.value} href={university.websiteUrl} target="_blank" rel="noreferrer">
               {university.websiteUrl}
             </a>
           ) : (
-            <p className="value muted">No website</p>
+            <p className={`${styles.value} ${styles.muted}`}>No website</p>
           )}
         </div>
         <div>
-          <p className="eyebrow">ID</p>
-          <p className="value">{university.id.toString()}</p>
+          <p className={styles.eyebrow}>ID</p>
+          <p className={styles.value}>{university.id.toString()}</p>
         </div>
         <div>
-          <p className="eyebrow">Created</p>
-          <p className="value">{university.createdAt.toISOString()}</p>
+          <p className={styles.eyebrow}>Created</p>
+          <p className={styles.value}>{university.createdAt.toISOString()}</p>
         </div>
       </section>
 
-      <section className="panel">
-        <header className="panel-head">
+      <section className={styles.panel}>
+        <header className={styles.panelHead}>
           <div>
-            <p className="eyebrow">Labs linked</p>
+            <p className={styles.eyebrow}>Labs linked</p>
             <h3>{university.labs.length} lab(s)</h3>
           </div>
         </header>
         {university.labs.length === 0 ? (
-          <p className="muted">No labs have been associated with this university yet.</p>
+          <p className={styles.muted}>No labs have been associated with this university yet.</p>
         ) : (
-          <ul className="lab-grid">
+          <ul className={styles.labGrid}>
             {university.labs.map((lab) => (
-              <li key={lab.id.toString()} className="card">
-                <p className="eyebrow">Lab ID {lab.id.toString()}</p>
+              <li key={lab.id.toString()} className={styles.card}>
+                <p className={styles.eyebrow}>Lab ID {lab.id.toString()}</p>
                 <h4>{lab.nameKo}</h4>
-                {lab.nameEn && <p className="muted">{lab.nameEn}</p>}
-                <p className="muted">{lab.websiteUrl ?? "No website"}</p>
+                {lab.nameEn && <p className={styles.muted}>{lab.nameEn}</p>}
+                <p className={styles.muted}>{lab.websiteUrl ?? "No website"}</p>
               </li>
             ))}
           </ul>

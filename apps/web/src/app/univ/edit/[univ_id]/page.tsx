@@ -14,7 +14,7 @@ async function getUniversity(univId: bigint) {
 }
 
 export default async function EditUniversityPage({ params }: EditPageProps) {
-  const id = BigInt(params.univ_id);
+  const id = BigInt((await params).univ_id);
   const university = await getUniversity(id);
 
   if (!university) {
@@ -72,96 +72,7 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
             Delete university
           </button>
         </div>
-      </form>
-
-      <style jsx>{`
-        .univ-form-shell {
-          display: grid;
-          gap: 1.5rem;
-          padding: 2rem 0;
-        }
-        .form-head {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 1rem;
-        }
-        .form {
-          display: grid;
-          gap: 1rem;
-          background: #fff;
-          border: 1px solid #e0e4ea;
-          border-radius: 12px;
-          padding: 1.5rem;
-        }
-        label {
-          display: grid;
-          gap: 0.35rem;
-          font-weight: 600;
-        }
-        input {
-          padding: 0.7rem 0.8rem;
-          border: 1px solid #d1d5db;
-          border-radius: 8px;
-          font-size: 1rem;
-        }
-        input:focus {
-          outline: 2px solid #111827;
-          border-color: #111827;
-        }
-        .actions {
-          display: flex;
-          gap: 0.75rem;
-          flex-wrap: wrap;
-        }
-        .space {
-          justify-content: flex-end;
-        }
-        button {
-          border: none;
-          background: #111827;
-          color: #fff;
-          padding: 0.65rem 1rem;
-          border-radius: 10px;
-          cursor: pointer;
-          font-weight: 700;
-        }
-        .danger {
-          background: #b91c1c;
-        }
-        .danger-zone {
-          border-color: #fecdd3;
-          background: #fff1f2;
-        }
-        .ghost {
-          background: #f3f4f6;
-          color: #374151;
-          padding: 0.65rem 1rem;
-          border-radius: 10px;
-          text-decoration: none;
-          font-weight: 700;
-        }
-        .eyebrow {
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          font-size: 0.75rem;
-          color: #5f6b7a;
-          margin: 0;
-        }
-        .lede {
-          color: #4a5563;
-          max-width: 620px;
-        }
-        @media (max-width: 700px) {
-          .form-head {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-          .actions {
-            justify-content: stretch;
-          }
-        }
-      `}</style>
+      </form>=
     </main>
   );
 }

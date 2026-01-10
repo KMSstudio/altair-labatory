@@ -86,7 +86,7 @@ async function main() {
 
   const seoulUni = await prisma.university.create({
     data: {
-      nameKo: "������б�",
+      nameKo: "서울대학교",
       nameEn: "Seoul National University",
       country: "KR",
       websiteUrl: "https://www.snu.ac.kr",
@@ -95,7 +95,7 @@ async function main() {
 
   const kaist = await prisma.university.create({
     data: {
-      nameKo: "ī�̽�Ʈ",
+      nameKo: "카이스트",
       nameEn: "KAIST",
       country: "KR",
       websiteUrl: "https://www.kaist.ac.kr",
@@ -104,7 +104,7 @@ async function main() {
 
   const labAi = await prisma.lab.create({
     data: {
-      nameKo: "�ΰ����� ������",
+      nameKo: "인공지능 연구실",
       nameEn: "AI Research Lab",
       websiteUrl: "https://example.com/ai-lab",
       description: "Focuses on applied machine learning and systems.",
@@ -114,7 +114,7 @@ async function main() {
 
   const labBio = await prisma.lab.create({
     data: {
-      nameKo: "���������� ������",
+      nameKo: "생명과학 연구실",
       nameEn: "Bioinformatics Lab",
       websiteUrl: "https://example.com/bio-lab",
       description: "Computational biology and genomic data analysis.",
@@ -124,7 +124,7 @@ async function main() {
 
   const labRobotics = await prisma.lab.create({
     data: {
-      nameKo: "�κ�ƽ�� ������",
+      nameKo: "로보틱스 연구실",
       nameEn: "Robotics Lab",
       websiteUrl: "https://example.com/robotics-lab",
       description: "Human-robot interaction and autonomous systems.",
@@ -133,7 +133,7 @@ async function main() {
 
   const subjectAi = await prisma.subject.create({
     data: {
-      nameKo: "�ΰ�����",
+      nameKo: "인공지능",
       nameEn: "Artificial Intelligence",
       description: "Machine learning, deep learning, and AI systems.",
     },
@@ -141,7 +141,7 @@ async function main() {
 
   const subjectBio = await prisma.subject.create({
     data: {
-      nameKo: "����������",
+      nameKo: "생물정보학",
       nameEn: "Bioinformatics",
       description: "Genomics, proteomics, and computational biology.",
     },
@@ -149,7 +149,7 @@ async function main() {
 
   const subjectRobotics = await prisma.subject.create({
     data: {
-      nameKo: "�κ�ƽ��",
+      nameKo: "로봇공학",
       nameEn: "Robotics",
       description: "Robotics control, perception, and planning.",
     },

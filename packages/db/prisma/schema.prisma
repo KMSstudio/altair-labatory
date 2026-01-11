@@ -64,17 +64,18 @@ model UserCredential {
   id             BigInt  @id @default(autoincrement())
   userId         BigInt  @map("user_id")
   provider       String  @db.VarChar(50)
-  providerUserId String  @db.VarChar(255) @map("provider_user_id")
-  email          String? @db.VarChar(255)
+  providerUserId String  @db.VarChar(255) @map("provider_user_id")  // E-mail of direct credential and nickname of Google OAuth
+  email          String  @db.VarChar(255)
   emailVerified  Boolean @default(false) @map("email_verified")
   isPrimary      Boolean @default(false) @map("is_primary")
+  passwordHash   String? @db.VarChar(255) @map("password_hash")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
-  @@unique([provider, providerUserId], map: "user_credentials_provider_provider_user_id_key")
+  @@unique([provider, providerUserId], map: "user_credentials_provider_provider_id_key")
   @@index([userId], map: "idx_user_credentials_user_id")
   @@index([email],  map: "idx_user_credentials_email")
   @@map("user_credentials")

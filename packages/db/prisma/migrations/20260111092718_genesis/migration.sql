@@ -25,9 +25,10 @@ CREATE TABLE "user_credentials" (
     "user_id" BIGINT NOT NULL,
     "provider" VARCHAR(50) NOT NULL,
     "provider_user_id" VARCHAR(255) NOT NULL,
-    "email" VARCHAR(255),
+    "email" VARCHAR(255) NOT NULL,
     "email_verified" BOOLEAN NOT NULL DEFAULT false,
     "is_primary" BOOLEAN NOT NULL DEFAULT false,
+    "password_hash" VARCHAR(255),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -153,7 +154,7 @@ CREATE INDEX "idx_user_credentials_user_id" ON "user_credentials"("user_id");
 CREATE INDEX "idx_user_credentials_email" ON "user_credentials"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_credentials_provider_provider_user_id_key" ON "user_credentials"("provider", "provider_user_id");
+CREATE UNIQUE INDEX "user_credentials_provider_provider_id_key" ON "user_credentials"("provider", "provider_user_id");
 
 -- CreateIndex
 CREATE INDEX "idx_universities_country" ON "universities"("country");

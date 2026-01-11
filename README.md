@@ -39,9 +39,18 @@ npm run web:dev
 # open http://localhost:3000
 ```
 
-## Stopping and cleaning
+## Database utilities
+### Stop database
 - Stop containers: `npm run db:down`
-- Reset database (drops volume): `npm run db:reset`
+
+### Reset database
+- Drops the Postgres volume and removes all local data.
+- Run `npm run db:reset`, then re-apply migrations with `npm run prisma:migrate:dev`.
+- If you need sample data again, rerun `npm run prisma:seed`.
+
+### Open Prisma Studio
+- Make sure the DB is running (`npm run db:up`) and the client is generated.
+- Run `npm run prisma:studio` and open http://localhost:5555.
 
 ## Workspace layout
 - `apps/web` — Next.js 16 front-end

@@ -1,14 +1,14 @@
 
 # Labatory Monorepo
 
+> Last Revised: 01.12.2026  
+> Date Created: 01.12.2026  
+> Latest Reviser: Jiho Tyu  
+> Revisers: KMSStudio, Jihoon Kim, Jiho Ryu
+
 Monorepo for the Altair Labatory project.
 It contains a Next.js web app plus shared auth and database packages.
 Postgres runs locally via Docker Compose.
-
-> 최신개정일 01.12.2026  
-> 최초작성일 01.12.2026  
-> 최신개정자 류지호  
-> 개정자 강명석, 김지훈, 류지호    
 
 ## Prerequisites
 - Node.js 20+ and npm

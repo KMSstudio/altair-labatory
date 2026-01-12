@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { prisma } from "@labatory/db";
+import { UserRole,prisma } from "@labatory/db";
 import { updateUser,deleteUser } from "../../actions";
 type EditPageProps = {
   params: { user_id: string };
@@ -67,13 +67,14 @@ export default async function EditUserPage({ params }: EditPageProps) {
           />
         </label>
 
-        <label>
+        {user.role!=="ADMIN" && (
+          <label>
           Role
           <select name="role" defaultValue={user.role}>
             <option value="USER">USER</option>
             <option value="PI">PI</option>
           </select>
-        </label>
+        </label>)}
 
         <div>
           <button type="submit">

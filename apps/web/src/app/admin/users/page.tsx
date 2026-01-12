@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@labatory/db";
+import { prisma, UserRole } from "@labatory/db";
 
 /** =========================
  *  User query section
@@ -17,16 +17,49 @@ async function getUsers() {
   });
 }
 
+/** =========================
+ *  User list item
+ *  ========================= */
+type UserListItemProps = {
+  user: {
+    id: bigint;
+    displayName: string;
+    role: UserRole;
+    primaryEmail: string | null;
+    createdAt: Date;
+  };
+};
+
+function UserListItem({ user }: UserListItemProps) {
+  return (
+    <li>
+      <div>
+        <p>ID {user.id.toString()}</p>
+        <h3>{user.displayName}</h3>
+        {user.primaryEmail && <p>{user.primaryEmail}</p>}
+        <p>Role: {user.role}</p>
+        <p>Created at: {user.createdAt.toLocaleDateString()}</p>
+      </div>
+
+      <div>
+        <Link href={`/admin/users/${user.id.toString()}`}>
+          View
+        </Link>
+        <Link href={`/admin/users/edit/${user.id.toString()}`}>
+          Edit
+        </Link>
+      </div>
+    </li>
+  );
+}
+
+/** =========================
+ *  User list section
+ *  ========================= */
 function UserListSection({
   users,
 }: {
-  users: Array<{
-    id: bigint;
-    displayName: string;
-    role: string;
-    primaryEmail: string | null;
-    createdAt: Date;
-  }>;
+  users: UserListItemProps["user"][];
 }) {
   return (
     <section>
@@ -35,19 +68,10 @@ function UserListSection({
       ) : (
         <ul>
           {users.map((user) => (
-            <li key={user.id.toString()}>
-              <div>
-                <p>ID {user.id.toString()}</p>
-                <h3>{user.displayName}</h3>
-                {user.primaryEmail && <p>{user.primaryEmail}</p>}
-                <p>Role: {user.role}</p>
-                <p>Created at: {user.createdAt.toLocaleDateString()}</p>
-              </div>
-
-              <div>
-                <Link href={`/admin/users/edit/${user.id.toString()}`}>Edit</Link>
-              </div>
-            </li>
+            <UserListItem
+              key={user.id.toString()}
+              user={user}
+            />
           ))}
         </ul>
       )}

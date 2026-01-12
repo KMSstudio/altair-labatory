@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { prisma, UserRole } from "@labatory/db";
-
+import { UserSearchListSection } from "./client";
 /** =========================
  *  User query section
  *  ========================= */
 async function getUsers() {
-  return prisma.user.findMany({
+  const users= await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -15,71 +15,17 @@ async function getUsers() {
       createdAt: true,
     },
   });
+
+  return users.map((u)=>({
+    id: u.id.toString(),
+    displayName: u.displayName,
+    role: u.role,
+    primaryEmail: u.primaryEmail,
+    createdAt: u.createdAt.toISOString(),
+  }));
 }
 
-/** =========================
- *  User list item
- *  ========================= */
-type UserListItemProps = {
-  user: {
-    id: bigint;
-    displayName: string;
-    role: UserRole;
-    primaryEmail: string | null;
-    createdAt: Date;
-  };
-};
-
-function UserListItem({ user }: UserListItemProps) {
-  return (
-    <li>
-      <div>
-        <p>ID {user.id.toString()}</p>
-        <h3>{user.displayName}</h3>
-        {user.primaryEmail && <p>{user.primaryEmail}</p>}
-        <p>Role: {user.role}</p>
-        <p>Created at: {user.createdAt.toLocaleDateString()}</p>
-      </div>
-
-      <div>
-        <Link href={`/admin/users/${user.id.toString()}`}>
-          View
-        </Link>
-        <Link href={`/admin/users/edit/${user.id.toString()}`}>
-          Edit
-        </Link>
-      </div>
-    </li>
-  );
-}
-
-/** =========================
- *  User list section
- *  ========================= */
-function UserListSection({
-  users,
-}: {
-  users: UserListItemProps["user"][];
-}) {
-  return (
-    <section>
-      {users.length === 0 ? (
-        <p>No users found.</p>
-      ) : (
-        <ul>
-          {users.map((user) => (
-            <UserListItem
-              key={user.id.toString()}
-              user={user}
-            />
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
-
-export default async function AdminUserListPage() {
+export default async function AdminUserPage() {
   const users = await getUsers();
 
   return (
@@ -91,7 +37,7 @@ export default async function AdminUserListPage() {
       </header>
 
       {/* User query section */}
-      <UserListSection users={users} />
+      <UserSearchListSection initialUsers={users} />
 
       {/* 이후 확장용 섹션들 */}
       {/* <UserFiltersSection /> */}

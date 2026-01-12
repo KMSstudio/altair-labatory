@@ -51,9 +51,9 @@ export default async function UserDetailPage({ params }: UserPageProps) {
         </div>
 
         <div>
-          <Link href="/admin/users">← Back to list</Link>{" "}
+          <Link href="/admin/user">← Back to list</Link>{" "}
           |{" "}
-          <Link href={`/admin/users/edit/${params.user_id}`}>Edit</Link>
+          <Link href={`/admin/user/edit/${params.user_id}`}>Edit</Link>
         </div>
       </header>
 

@@ -35,11 +35,11 @@ export default async function EditUserPage({ params }: EditPageProps) {
         </div>
 
         <div>
-          <Link href={`/admin/users/${params.user_id}`}>
+          <Link href={`/admin/user/${params.user_id}`}>
             ← Back to detail
           </Link>{" "}
           |{" "}
-          <Link href="/admin/users">
+          <Link href="/admin/user">
             List
           </Link>
         </div>

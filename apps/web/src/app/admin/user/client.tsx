@@ -1,5 +1,6 @@
 "use client";
 
+import { UserRole } from "@labatory/db";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -11,7 +12,7 @@ type UserDTO = {
   createdAt: string;
 };
 
-type SearchField = "이름" | "이메일" | "전부";
+type SearchField = "name" | "email" | "all";
 
 function UserListItem({ user }: { user: UserDTO }) {
   return (
@@ -35,7 +36,7 @@ function UserListItem({ user }: { user: UserDTO }) {
   );
 }
 
-function UserListSection({ users }: { users: UserDTO[] }) {
+export function UserListSection({ users }: { users: UserDTO[] }) {
   return (
     <section>
       {users.length === 0 ? (
@@ -58,11 +59,10 @@ export function UserSearchListSection({
 }) {
   const [q, setQ] = useState("");
   const [users, setUsers] = useState<UserDTO[]>(initialUsers);
-  const [field, setField] = useState<SearchField>("이름");
+  const [field, setField] = useState<SearchField>("name");
   const [loading, setLoading] = useState(false);
 
   const trimmed = useMemo(() => q.trim(), [q]);
-
   useEffect(() => {
     if (!trimmed) {
       setUsers(initialUsers);
@@ -75,7 +75,7 @@ export function UserSearchListSection({
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/admin/user?search=${encodeURIComponent(trimmed)}`,
+          `/api/admin/user?search=${encodeURIComponent(trimmed)}&field=${encodeURIComponent(field)}`,
           { signal: controller.signal }
         );
         const data = (await res.json()) as { users: UserDTO[] };
@@ -110,9 +110,9 @@ export function UserSearchListSection({
         <label>
           Field{" "}
           <select value={field} onChange={(e) => setField(e.target.value as SearchField)}>
-            <option value="이름">Display name</option>
-            <option value="이메일">Primary email</option>
-            <option value="전부">Name + Email</option>
+            <option value="name">Display name</option>
+            <option value="email">Primary email</option>
+            <option value="all">Name + Email</option>
           </select>
         </label>{" "}
         <button type="button" onClick={() => setQ("")}>
@@ -124,3 +124,20 @@ export function UserSearchListSection({
     </section>
   );
 }
+
+export function UserListByRoleSection({
+  initialUsers,Role
+}: {
+  initialUsers: UserDTO[],Role:UserRole;
+}) {
+  const [users, setUsers] = useState<UserDTO[]>(initialUsers.filter((u)=>u.role===Role.toString()));
+  return (
+    <section>
+      <header>
+        <h2>{Role} List</h2>
+      </header>
+      <UserListSection users={users} />
+    </section>
+  );
+}
+

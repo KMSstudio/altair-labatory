@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma, UserRole } from "@labatory/db";
-import { UserSearchListSection } from "./client";
+import { UserListByRoleSection,UserSearchListSection } from "./client";
 /** =========================
  *  User query section
  *  ========================= */
@@ -38,7 +38,8 @@ export default async function AdminUserPage() {
 
       {/* User query section */}
       <UserSearchListSection initialUsers={users} />
-
+      <UserListByRoleSection initialUsers={users} Role="ADMIN" />
+      <UserListByRoleSection initialUsers={users} Role="PI" />
       {/* 이후 확장용 섹션들 */}
       {/* <UserFiltersSection /> */}
       {/* <UserStatsSection /> */}

@@ -104,3 +104,56 @@ export async function deleteUser(formData: FormData) {
   revalidatePath("/admin/user");
   redirect("/admin/user");
 }
+type UserDTO = {
+  id: string;
+  displayName: string;
+  role: UserRole;
+  primaryEmail: string | null;
+  createdAt: string;
+};
+function toDTO(u: {
+  id: bigint;
+  displayName: string;
+  role: UserRole;
+  primaryEmail: string | null;
+  createdAt: Date;
+}): UserDTO {
+  return {
+    id: u.id.toString(),
+    displayName: u.displayName,
+    role: u.role,
+    primaryEmail: u.primaryEmail,
+    createdAt: u.createdAt.toISOString(),
+  };
+}
+export async function promoteToAdminAction(params: { userId: string }) {
+  const id = BigInt(params.userId);
+
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) throw new Error("User not found");
+  if (user.role === UserRole.ADMIN) throw new Error("Already ADMIN");
+
+  await prisma.user.update({
+    where: { id },
+    data: { role: UserRole.ADMIN },
+  });
+
+  // ✅ 이 페이지 다시 렌더링하라고 서버에 지시
+  revalidatePath("/admin/user");
+}
+
+export async function demoteAdminToUserAction(params: { userId: string }) {
+  const id = BigInt(params.userId);
+
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) throw new Error("User not found");
+  if (user.role !== UserRole.ADMIN) throw new Error("Not ADMIN");
+
+  await prisma.user.update({
+    where: { id },
+    data: { role: UserRole.USER },
+  });
+
+  // ✅ 동일
+  revalidatePath("/admin/user");
+}

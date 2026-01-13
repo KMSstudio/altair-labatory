@@ -3,7 +3,7 @@
 import { UserRole } from "@labatory/db";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-
+import { promoteToAdminAction,demoteAdminToUserAction } from "./actions";
 type UserDTO = {
   id: string;
   displayName: string;
@@ -89,7 +89,7 @@ export function UserSearchListSection({
       controller.abort();
       clearTimeout(timer);
     };
-  }, [trimmed, initialUsers]);
+  }, [trimmed, initialUsers,field]);
 
   return (
     <section>
@@ -141,3 +141,86 @@ export function UserListByRoleSection({
   );
 }
 
+export function PromoteToAdminSection() {
+  const [userId, setUserId] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit() {
+    const trimmedId = userId.trim();
+    if (!trimmedId || loading) return;
+
+    setLoading(true);
+    try {
+      await promoteToAdminAction({ userId: trimmedId });
+      setUserId("");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section>
+      <h2>관리자 권한 부여</h2>
+
+      <label>
+        User ID{" "}
+        <input
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="예) 123"
+          disabled={loading}
+        />
+      </label>
+
+      <button type="button" onClick={onSubmit} disabled={loading || !userId.trim()}>
+        {loading ? "처리 중..." : "ADMIN으로 승격"}
+      </button>
+    </section>
+  );
+}
+
+export function DemoteAdminSection() {
+  const [userId, setUserId] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit() {
+    const trimmedId = userId.trim();
+    if (!trimmedId || loading) return;
+
+    setLoading(true);
+    try {
+      // ✅ Server Action 실행
+      await demoteAdminToUserAction({ userId: trimmedId });
+
+      // 성공 시 입력값만 초기화
+      setUserId("");
+      // 화면 갱신은 Server Action 내부 revalidatePath("/admin/user")가 담당
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section>
+      <h2>관리자 권한 제거</h2>
+
+      <label>
+        User ID{" "}
+        <input
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="예) 123"
+          disabled={loading}
+        />
+      </label>
+
+      <button
+        type="button"
+        onClick={onSubmit}
+        disabled={loading || !userId.trim()}
+      >
+        {loading ? "처리 중..." : "USER로 강등"}
+      </button>
+    </section>
+  );
+}

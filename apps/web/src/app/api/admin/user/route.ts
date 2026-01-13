@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@labatory/db";
+import { UserRole } from "@labatory/db";
 
 type SearchField = "name" | "email" | "all";
 

@@ -83,16 +83,6 @@ export default async function EditUserPage({ params }: EditPageProps) {
         </div>
       </form>
 
-      {/* ===== Delete form ===== */}
-      <form action={deleteUser}>
-        <input type="hidden" name="id" value={user.id.toString()} />
-
-        <div>
-          <button type="submit">
-            Delete user
-          </button>
-        </div>
-      </form>
     </main>
   );
 }

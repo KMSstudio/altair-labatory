@@ -1,9 +1,18 @@
 import Link from "next/link";
 import { prisma, UserRole } from "@labatory/db";
-import { UserListByRoleSection,UserSearchListSection } from "./client";
+import { UserListByRoleSection,UserSearchListSection,PromoteToAdminSection, DemoteAdminSection } from "./client";
 /** =========================
  *  User query section
  *  ========================= */
+
+type UserDTO = {
+  id: string;
+  displayName: string;
+  role: string;
+  primaryEmail: string | null;
+  createdAt: string;
+};
+
 async function getUsers() {
   const users= await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
@@ -25,9 +34,28 @@ async function getUsers() {
   }));
 }
 
+async function updateUserRole({
+  userId,
+  nextRole,
+}: {
+  userId: string;
+  nextRole: UserRole;
+}) {
+  const res = await fetch("/api/admin/user/role", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, nextRole }),
+  });
+
+  if (!res.ok) {
+    throw new Error("권한 변경 실패");
+  }
+
+  return (await res.json()) as UserDTO; // 변경된 유저
+}
+
 export default async function AdminUserPage() {
   const users = await getUsers();
-
   return (
     <main>
       <header>
@@ -38,6 +66,8 @@ export default async function AdminUserPage() {
 
       {/* User query section */}
       <UserSearchListSection initialUsers={users} />
+      <PromoteToAdminSection/>
+      <DemoteAdminSection/>
       <UserListByRoleSection initialUsers={users} Role="ADMIN" />
       <UserListByRoleSection initialUsers={users} Role="PI" />
       {/* 이후 확장용 섹션들 */}

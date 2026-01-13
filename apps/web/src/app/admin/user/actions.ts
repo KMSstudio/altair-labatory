@@ -83,8 +83,8 @@ export async function updateUser(formData: FormData) {
     data,
   });
 
-  const target = `/admin/users/`;
-  revalidatePath("/admin/users");
+  const target = `/admin/user/`;
+  revalidatePath("/admin/user");
   redirect(target);
 }
 
@@ -101,6 +101,6 @@ export async function deleteUser(formData: FormData) {
 
   await prisma.user.delete({ where: { id } });
 
-  revalidatePath("/admin/users");
-  redirect("/admin/users");
+  revalidatePath("/admin/user");
+  redirect("/admin/user");
 }

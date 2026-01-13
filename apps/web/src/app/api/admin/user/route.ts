@@ -12,7 +12,7 @@ const fieldRaw = (searchParams.get("field") ?? "name").trim();
 
   const where =
     q.length === 0
-      ? undefined // q가 비면 전체 유저
+      ? undefined // select all if q is empty
       : field === "name"
         ? { displayName: { contains: q, mode: "insensitive" as const } }
         : field === "email"
@@ -24,10 +24,8 @@ const fieldRaw = (searchParams.get("field") ?? "name").trim();
               ],
             };
   const users = await prisma.user.findMany({
-    where: where,// q가 없으면 전체
+    where: where,
     orderBy: { createdAt: "desc" },
-    // 전체가 너무 많아질 수 있으니 운영에서는 페이지네이션/limit 권장
-    // 요구사항대로 "모두"면 take 제거하거나 충분히 큰 값 사용
     select: {
       id: true,
       displayName: true,

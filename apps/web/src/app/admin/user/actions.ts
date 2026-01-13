@@ -138,7 +138,7 @@ export async function promoteToAdminAction(params: { userId: string }) {
     data: { role: UserRole.ADMIN },
   });
 
-  // ✅ 이 페이지 다시 렌더링하라고 서버에 지시
+  // make page render again
   revalidatePath("/admin/user");
 }
 
@@ -154,6 +154,5 @@ export async function demoteAdminToUserAction(params: { userId: string }) {
     data: { role: UserRole.USER },
   });
 
-  // ✅ 동일
   revalidatePath("/admin/user");
 }

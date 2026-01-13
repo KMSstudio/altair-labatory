@@ -48,10 +48,10 @@ async function updateUserRole({
   });
 
   if (!res.ok) {
-    throw new Error("권한 변경 실패");
+    throw new Error("failed role change");
   }
 
-  return (await res.json()) as UserDTO; // 변경된 유저
+  return (await res.json()) as UserDTO; 
 }
 
 export default async function AdminUserPage() {
@@ -70,10 +70,6 @@ export default async function AdminUserPage() {
       <DemoteAdminSection/>
       <UserListByRoleSection initialUsers={users} Role="ADMIN" />
       <UserListByRoleSection initialUsers={users} Role="PI" />
-      {/* 이후 확장용 섹션들 */}
-      {/* <UserFiltersSection /> */}
-      {/* <UserStatsSection /> */}
-      {/* <BulkActionsSection /> */}
     </main>
   );
 }

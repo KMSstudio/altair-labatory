@@ -189,12 +189,9 @@ export function DemoteAdminSection() {
 
     setLoading(true);
     try {
-      // ✅ Server Action 실행
+      // Server Action
       await demoteAdminToUserAction({ userId: trimmedId });
-
-      // 성공 시 입력값만 초기화
       setUserId("");
-      // 화면 갱신은 Server Action 내부 revalidatePath("/admin/user")가 담당
     } finally {
       setLoading(false);
     }

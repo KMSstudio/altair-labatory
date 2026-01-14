@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 type UserInput = {
   displayName: string;
   primaryEmail: string | null;
-  role: UserRole;
+  role: UserRole|undefined;
 };
 
 /**
@@ -60,10 +60,14 @@ const requireUserRole = (value: FormDataEntryValue | null): UserRole => {
  * @param formData - Submitted form data.
  * @returns Parsed user input.
  */
-const parseUserInput = (formData: FormData): UserInput => ({
+const parseUserInput = (formData: FormData): UserInput => (formData.get("role")?{
   displayName: requireText(formData.get("displayName"), "Display name"),
   primaryEmail: normalizeText(formData.get("primaryEmail")),
   role: requireUserRole(formData.get("role")),
+}:{
+  displayName: requireText(formData.get("displayName"), "Display name"),
+  primaryEmail: normalizeText(formData.get("primaryEmail")),
+  role:undefined,
 });
 
 /**

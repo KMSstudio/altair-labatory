@@ -4,15 +4,8 @@ import { UserRole } from "@labatory/db";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { promoteToAdminAction,demoteAdminToUserAction } from "./actions";
-type UserDTO = {
-  id: string;
-  displayName: string;
-  role: string;
-  primaryEmail: string | null;
-  createdAt: string;
-};
-
-type SearchField = "name" | "email" | "all";
+import type {UserDTO} from "./page.tsx";
+import type { SearchField } from "@/app/api/admin/user/route";
 
 function UserListItem({ user }: { user: UserDTO }) {
   return (

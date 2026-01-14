@@ -3,7 +3,7 @@
 import { prisma, UserRole } from "@labatory/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
+import type {UserDTO} from "./page";
 type UserInput = {
   displayName: string;
   primaryEmail: string | null;
@@ -107,28 +107,6 @@ export async function deleteUser(formData: FormData) {
 
   revalidatePath("/admin/user");
   redirect("/admin/user");
-}
-type UserDTO = {
-  id: string;
-  displayName: string;
-  role: UserRole;
-  primaryEmail: string | null;
-  createdAt: string;
-};
-function toDTO(u: {
-  id: bigint;
-  displayName: string;
-  role: UserRole;
-  primaryEmail: string | null;
-  createdAt: Date;
-}): UserDTO {
-  return {
-    id: u.id.toString(),
-    displayName: u.displayName,
-    role: u.role,
-    primaryEmail: u.primaryEmail,
-    createdAt: u.createdAt.toISOString(),
-  };
 }
 export async function promoteToAdminAction(params: { userId: string }) {
   const id = BigInt(params.userId);

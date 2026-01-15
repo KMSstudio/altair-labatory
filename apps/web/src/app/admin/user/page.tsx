@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { prisma, UserRole } from "@labatory/db";
 import { UserListByRoleSection,UserSearchListSection,PromoteToAdminSection, DemoteAdminSection } from "./client";
-/** =========================
- *  User query section
- *  ========================= */
 
-type UserDTO = {
+export type UserDTO = {
   id: string;
   displayName: string;
   role: string;
@@ -32,26 +29,6 @@ async function getUsers() {
     primaryEmail: u.primaryEmail,
     createdAt: u.createdAt.toISOString(),
   }));
-}
-
-async function updateUserRole({
-  userId,
-  nextRole,
-}: {
-  userId: string;
-  nextRole: UserRole;
-}) {
-  const res = await fetch("/api/admin/user/role", {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, nextRole }),
-  });
-
-  if (!res.ok) {
-    throw new Error("failed role change");
-  }
-
-  return (await res.json()) as UserDTO; 
 }
 
 export default async function AdminUserPage() {

@@ -182,7 +182,6 @@ export function DemoteAdminSection() {
 
     setLoading(true);
     try {
-      // Server Action
       await demoteAdminToUserAction({ userId: trimmedId });
       setUserId("");
     } finally {

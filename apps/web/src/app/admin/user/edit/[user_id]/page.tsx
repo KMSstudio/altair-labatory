@@ -45,7 +45,6 @@ export default async function EditUserPage({ params }: EditPageProps) {
         </div>
       </header>
 
-      {/* ===== Update form ===== */}
       <form action={updateUser}>
         <input type="hidden" name="id" value={user.id.toString()} />
 

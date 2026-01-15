@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@labatory/db";
 import { UserRole } from "@labatory/db";
 
-type SearchField = "name" | "email" | "all";
+export type SearchField = "name" | "email" | "all";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -13,7 +13,7 @@ const fieldRaw = (searchParams.get("field") ?? "name").trim();
 
   const where =
     q.length === 0
-      ? undefined // select all if q is empty
+      ? undefined
       : field === "name"
         ? { displayName: { contains: q, mode: "insensitive" as const } }
         : field === "email"
@@ -39,11 +39,11 @@ const fieldRaw = (searchParams.get("field") ?? "name").trim();
   return NextResponse.json({
     users: users.map((u) => ({
       where:where,
-      id: u.id.toString(),               // BigInt -> string
+      id: u.id.toString(),               
       displayName: u.displayName,
       role: u.role,
       primaryEmail: u.primaryEmail,
-      createdAt: u.createdAt.toISOString(), // Date -> string
+      createdAt: u.createdAt.toISOString(),
     })),
   });
 }

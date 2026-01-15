@@ -7,7 +7,7 @@ export function PIManageConsole (){
     return (
     <section>
       <h2>PI 관리</h2>
-        <UserListByRole Role={UserRole.PI}/>
+        <UserListByRole userRole={UserRole.PI}/>
         <PromoteTo promoteRole={UserRole.PI}/>
         <DemoteFrom demoteRole={UserRole.PI}/>
     </section>

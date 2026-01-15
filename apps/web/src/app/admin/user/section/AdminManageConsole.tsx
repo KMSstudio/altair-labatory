@@ -7,7 +7,7 @@ export function AdminManageConsole (){
     return (
     <section>
       <h2>ADMIN 관리</h2>
-        <UserListByRole Role={UserRole.ADMIN}/>
+        <UserListByRole userRole={UserRole.ADMIN}/>
         <PromoteTo promoteRole={UserRole.ADMIN}/>
         <DemoteFrom demoteRole={UserRole.ADMIN}/>
     </section>

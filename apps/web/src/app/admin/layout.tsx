@@ -1,3 +1,5 @@
+// @/app/admin/layout.tsx
+
 import { ReactNode } from "react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";

@@ -1,29 +1,16 @@
-"use server";
-
-import { type UserRole, prisma } from "@labatory/db";
+import { type UserRole } from "@labatory/db";
+import { getUserByRole } from "../actions";
 import { UserListSection } from "./UserListSection";
 
 export async function UserListByRole({
-     Role
-}: {Role:UserRole;
-}) {
-    const users=await prisma.user.findMany({
-        where:{role:Role},
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          displayName: true,
-          role: true,
-          primaryEmail: true,
-          createdAt: true,
-          updatedAt:true,
-        },
-      });
+  userRole
+}: { userRole: UserRole; }) {
+  const users = await getUserByRole({ userRole, })
 
   return (
     <section>
       <header>
-        <h2>{Role} List</h2>
+        <h2>{userRole} List</h2>
       </header>
       <UserListSection users={users} />
     </section>

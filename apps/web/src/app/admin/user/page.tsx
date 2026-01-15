@@ -4,7 +4,6 @@ import { AdminManageConsole } from "./section/AdminManageConsole";
 import { PIManageConsole } from "./section/PIManageConsole";
 import Layout from "../layout";
 
-
 export default async function AdminUserPage() {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },

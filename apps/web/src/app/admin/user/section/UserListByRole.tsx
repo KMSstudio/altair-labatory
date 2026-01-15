@@ -1,6 +1,6 @@
 "use server";
 
-import {type User, type UserRole, prisma } from "@labatory/db";
+import { type UserRole, prisma } from "@labatory/db";
 import { UserListSection } from "./UserListSection";
 
 export async function UserListByRole({

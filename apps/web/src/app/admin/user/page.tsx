@@ -27,7 +27,6 @@ export default async function AdminUserPage() {
           <p>Prisma 기반 User 테이블 조회 (Admin 전용)</p>
         </header>
 
-        {/* User query section */}
         <UserSearchList initialUsers={users} />
         <AdminManageConsole/>
         <PIManageConsole/>

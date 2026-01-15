@@ -1,6 +1,6 @@
 "use server";
 
-import { type UserRole,type User } from "@labatory/db";
+import { type User } from "@labatory/db";
 import Link from "next/link";
 
 function UserListItem({ user }: { user: User }) {

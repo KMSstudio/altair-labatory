@@ -3,10 +3,6 @@ import { notFound } from "next/navigation";
 import { prisma } from "@labatory/db";
 import Layout from "../../layout";
 
-type UserPageProps = {
-  params: { user_id: string };
-};
-
 async function getUser(userId: bigint) {
   return prisma.user.findUnique({
     where: { id: userId },
@@ -29,7 +25,9 @@ async function getUser(userId: bigint) {
   });
 }
 
-export default async function UserDetailPage({ params }: UserPageProps) {
+export default async function UserDetailPage({ params }: {
+  params: { user_id: string };
+}) {
   params = await params;
 
   let id: bigint;

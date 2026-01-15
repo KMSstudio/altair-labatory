@@ -61,32 +61,26 @@ export default async function UserDetailPage({ params }: UserPageProps) {
         <div>
           <strong>Role:</strong> {user.role}
         </div>
-
         <div>
           <strong>Primary Email:</strong>{" "}
           {user.primaryEmail ?? "No email"}
         </div>
-
         <div>
           <strong>ID:</strong> {user.id.toString()}
         </div>
-
         <div>
           <strong>Created:</strong>{" "}
           {user.createdAt.toISOString()}
         </div>
-
         <div>
           <strong>Updated:</strong>{" "}
           {user.updatedAt.toISOString()}
         </div>
-
         <div>
           <strong>PI:</strong>{" "}
           {user.pi ? "Linked" : "Not linked"}
         </div>
       </section>
-
       <section>
         <header>
           <h3>Credentials linked ({user.credentials.length})</h3>
@@ -101,32 +95,26 @@ export default async function UserDetailPage({ params }: UserPageProps) {
                 <p>
                   <strong>ID:</strong> {cred.id.toString()}
                 </p>
-
                 <p>
                   <strong>Provider:</strong>{" "}
                   {cred.provider}
                   {cred.isPrimary ? " (Primary)" : ""}
                 </p>
-
                 <p>
                   <strong>Email:</strong> {cred.email}
                 </p>
-
                 <p>
                   <strong>Email verified:</strong>{" "}
                   {cred.emailVerified ? "Yes" : "No"}
                 </p>
-
                 <p>
                   <strong>Provider user ID:</strong>{" "}
                   {cred.providerUserId}
                 </p>
-
                 <p>
                   <strong>Created:</strong>{" "}
                   {cred.createdAt.toISOString()}
                 </p>
-
                 <p>
                   <strong>Updated:</strong>{" "}
                   {cred.updatedAt.toISOString()}

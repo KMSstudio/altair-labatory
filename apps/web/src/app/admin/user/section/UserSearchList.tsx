@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { type User } from "@labatory/db";
 import { useEffect, useMemo, useState } from "react";

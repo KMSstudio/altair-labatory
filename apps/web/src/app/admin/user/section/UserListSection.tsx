@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { type UserRole,type User } from "@labatory/db";
 import Link from "next/link";

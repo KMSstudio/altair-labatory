@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import {type User, type UserRole, prisma } from "@labatory/db";
 import { UserListSection } from "./UserListSection";

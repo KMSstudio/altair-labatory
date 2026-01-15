@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { type UserRole } from "@labatory/db";
 import { useState } from "react";

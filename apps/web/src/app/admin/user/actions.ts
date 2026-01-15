@@ -3,6 +3,7 @@
 import { prisma, UserRole } from "@labatory/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
 type UserInput = {
   displayName: string;
   primaryEmail: string | null;
@@ -27,6 +28,10 @@ const parseUserInput = (formData: FormData): UserInput => ({
   primaryEmail: normalizeText(formData.get("primaryEmail")),
 });
 
+/**
+ * Update a user, revalidate related pages, then redirect to the detail page.
+ * @param formData - Submitted form data. Need to contain "id", "displayName" field. Can contain "primaryEmail" field
+ */
 export async function updateUser(formData: FormData) {
   const idValue = formData.get("id");
   if (typeof idValue !== "string") {

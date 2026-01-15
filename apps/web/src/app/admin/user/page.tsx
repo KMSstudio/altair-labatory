@@ -2,7 +2,7 @@ import { prisma } from "@labatory/db";
 import { UserSearchList } from "./section/UserSearchList";
 import { AdminManageConsole } from "./section/AdminManageConsole";
 import { PIManageConsole } from "./section/PIManageConsole";
-
+import Layout from "../layout";
 
 
 export default async function AdminUserPage() {
@@ -19,17 +19,19 @@ export default async function AdminUserPage() {
   });
 
   return (
-    <main>
-      <header>
-        <p>Admin</p>
-        <h1>Users</h1>
-        <p>Prisma 기반 User 테이블 조회 (Admin 전용)</p>
-      </header>
+    <Layout>
+      <main>
+        <header>
+          <p>Admin</p>
+          <h1>Users</h1>
+          <p>Prisma 기반 User 테이블 조회 (Admin 전용)</p>
+        </header>
 
-      {/* User query section */}
-      <UserSearchList initialUsers={users} />
-      <AdminManageConsole/>
-      <PIManageConsole/>
-    </main>
+        {/* User query section */}
+        <UserSearchList initialUsers={users} />
+        <AdminManageConsole/>
+        <PIManageConsole/>
+      </main>
+    </Layout>
   );
 }

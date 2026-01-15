@@ -5,7 +5,7 @@ import { DemoteFrom } from "./DemoteFrom";
 export function AdminManageConsole (){
     return (
     <section>
-      <h2>ADMIV 관리</h2>
+      <h2>ADMIN 관리</h2>
         <UserListByRole Role="ADMIN"/>
         <PromoteTo promoteRole="ADMIN"/>
         <DemoteFrom demoteRole="ADMIN"/>

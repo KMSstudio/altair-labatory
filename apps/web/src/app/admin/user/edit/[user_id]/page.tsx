@@ -1,20 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { type UserRole,prisma } from "@labatory/db";
-import { updateUser,deleteUser } from "../../actions";
-type EditPageProps = {
-  params: { user_id: string };
-};
-
+import { prisma } from "@labatory/db";
+import { updateUser } from "../../actions";
 async function getUser(userId: bigint) {
   return prisma.user.findUnique({
     where: { id: userId },
   });
 }
 
-export default async function EditUserPage({ params }: EditPageProps) {
-  params = await params;
-
+export default async function EditUserPage({ params }: {params:{user_id:string}}) {
   let id: bigint;
   try {
     id = BigInt(params.user_id);
@@ -66,14 +60,6 @@ export default async function EditUserPage({ params }: EditPageProps) {
           />
         </label>
 
-        {user.role!=="ADMIN" && (
-          <label>
-          Role
-          <select name="role" defaultValue={user.role}>
-            <option value="USER">USER</option>
-            <option value="PI">PI</option>
-          </select>
-        </label>)}
 
         <div>
           <button type="submit">

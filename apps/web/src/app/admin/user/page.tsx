@@ -2,8 +2,9 @@ import { prisma } from "@labatory/db";
 import { UserListByRoleSection,UserSearchListSection,PromoteToAdminSection, DemoteAdminSection } from "./client";
 
 
-async function getUsers() {
-  return prisma.user.findMany({
+
+export default async function AdminUserPage() {
+  const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -14,10 +15,7 @@ async function getUsers() {
       updatedAt:true,
     },
   });
-}
 
-export default async function AdminUserPage() {
-  const users = await getUsers();
   return (
     <main>
       <header>

@@ -23,23 +23,7 @@ const requireText = (value: FormDataEntryValue | null, field: string): string =>
   return normalized;
 };
 
-const requireUserRole = (value: FormDataEntryValue | null): UserRole => {
-  if (typeof value !== "string") {
-    throw new Error("Role is required");
-  }
-  const trimmed = value.trim();
-  const roles = Object.values(UserRole) as string[];
-  if (!roles.includes(trimmed)) {
-    throw new Error(`Invalid role: ${trimmed}`);
-  }
-  return trimmed as UserRole;
-};
-
-const parseUserInput = (formData: FormData): UserInput => (formData.get("role")?{
-  displayName: requireText(formData.get("displayName"), "Display name"),
-  primaryEmail: normalizeText(formData.get("primaryEmail")),
-  role: requireUserRole(formData.get("role")),
-}:{
+const parseUserInput = (formData: FormData): UserInput => ({
   displayName: requireText(formData.get("displayName"), "Display name"),
   primaryEmail: normalizeText(formData.get("primaryEmail")),
   role:undefined,
@@ -58,23 +42,10 @@ export async function updateUser(formData: FormData) {
     data,
   });
 
-  const target = `/admin/user/`;
-  revalidatePath("/admin/user");
-  redirect(target);
-}
-
-export async function deleteUser(formData: FormData) {
-  const idValue = formData.get("id");
-  if (typeof idValue !== "string") {
-    throw new Error("Missing user id");
-  }
-  const id = BigInt(idValue);
-
-  await prisma.user.delete({ where: { id } });
-
   revalidatePath("/admin/user");
   redirect("/admin/user");
 }
+
 export async function promoteToAdminAction(params: { userId: string }) {
   const id = BigInt(params.userId);
 

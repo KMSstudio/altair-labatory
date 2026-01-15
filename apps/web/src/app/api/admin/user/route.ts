@@ -1,44 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@labatory/db";
-import { type UserRole } from "@labatory/db";
+import { prisma,Prisma } from "@labatory/db"
 
-export type SearchField = "name" | "email" | "all";
+const normalizeField = (raw: string): string=> (raw === "email" || raw === "all" ? raw : "name");
+const containsInsensitive = (q: string) => ({ contains: q, mode: "insensitive" as const });
+const buildWhere = (q: string, f: string): Prisma.UserWhereInput | undefined => {
+  const field = normalizeField(f);
+  if (!q) return undefined;
+  if (field === "name") return { displayName: containsInsensitive(q) };
+  if (field === "email") return { primaryEmail: containsInsensitive(q) };
+  return { OR: [{ displayName: containsInsensitive(q) }, { primaryEmail: containsInsensitive(q) }] };
+};
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const q = (searchParams.get("search") ?? "").trim();
-const fieldRaw = (searchParams.get("field") ?? "name").trim();
-  const field: SearchField =
-    fieldRaw === "email" || fieldRaw === "all" ? (fieldRaw as SearchField) : "name";
 
-  const where =
-    q.length === 0
-      ? undefined
-      : field === "name"
-        ? { displayName: { contains: q, mode: "insensitive" as const } }
-        : field === "email"
-          ? { primaryEmail: { contains: q, mode: "insensitive" as const } }
-          : {
-              OR: [
-                { displayName: { contains: q, mode: "insensitive" as const } },
-                { primaryEmail: { contains: q, mode: "insensitive" as const } },
-              ],
-            };
+  const q = (searchParams.get("search") ?? "").trim();
+  const field = (searchParams.get("field") ?? "name").trim();
+
   const users = await prisma.user.findMany({
-    where: where,
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      displayName: true,
-      role: true,
-      primaryEmail: true,
-      createdAt: true,
-    },
+    where: buildWhere(q, field),
+    orderBy: { createdAt: "desc" }
   });
 
   return NextResponse.json({
     users: users.map((u) => ({
-      where:where,
       id: u.id.toString(),               
       displayName: u.displayName,
       role: u.role,

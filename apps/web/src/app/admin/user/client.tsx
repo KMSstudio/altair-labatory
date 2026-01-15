@@ -4,7 +4,6 @@ import { type UserRole,type User } from "@labatory/db";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { promoteToAdminAction,demoteAdminToUserAction } from "./actions";
-import type { SearchField } from "@/app/api/admin/user/route";
 
 function UserListItem({ user }: { user: User }) {
   return (
@@ -51,7 +50,7 @@ export function UserSearchListSection({
 }) {
   const [q, setQ] = useState("");
   const [users, setUsers] = useState<User[]>(initialUsers);
-  const [field, setField] = useState<SearchField>("name");
+  const [field, setField] = useState<string>("name");
   const [loading, setLoading] = useState(false);
 
   const trimmed = useMemo(() => q.trim(), [q]);
@@ -101,7 +100,7 @@ export function UserSearchListSection({
         </label>{" "}
         <label>
           Field{" "}
-          <select value={field} onChange={(e) => setField(e.target.value as SearchField)}>
+          <select value={field} onChange={(e) => setField(e.target.value as string)}>
             <option value="name">Display name</option>
             <option value="email">Primary email</option>
             <option value="all">Name + Email</option>

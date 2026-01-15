@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 type UserInput = {
   displayName: string;
   primaryEmail: string | null;
-  role: UserRole|undefined;
 };
 
 const normalizeText = (value: FormDataEntryValue | null): string | null => {
@@ -26,7 +25,6 @@ const requireText = (value: FormDataEntryValue | null, field: string): string =>
 const parseUserInput = (formData: FormData): UserInput => ({
   displayName: requireText(formData.get("displayName"), "Display name"),
   primaryEmail: normalizeText(formData.get("primaryEmail")),
-  role:undefined,
 });
 
 export async function updateUser(formData: FormData) {
@@ -46,27 +44,25 @@ export async function updateUser(formData: FormData) {
   redirect("/admin/user");
 }
 
-export async function promoteToAdminAction(params: { userId: string }) {
+export async function promoteToAction(params: { userId: string,userRole: UserRole }) {
   const id = BigInt(params.userId);
 
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new Error("User not found");
-  if (user.role === UserRole.ADMIN) throw new Error("Already ADMIN");
 
   await prisma.user.update({
     where: { id },
-    data: { role: UserRole.ADMIN },
+    data: { role: params.userRole },
   });
 
   revalidatePath("/admin/user");
 }
 
-export async function demoteAdminToUserAction(params: { userId: string }) {
+export async function demoteToUserAction(params: { userId: string }) {
   const id = BigInt(params.userId);
 
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new Error("User not found");
-  if (user.role !== UserRole.ADMIN) throw new Error("Not ADMIN");
 
   await prisma.user.update({
     where: { id },

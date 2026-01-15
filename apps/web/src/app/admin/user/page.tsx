@@ -1,5 +1,7 @@
 import { prisma } from "@labatory/db";
-import { UserListByRoleSection,UserSearchListSection,PromoteToAdminSection, DemoteAdminSection } from "./client";
+import { UserSearchList } from "./section/UserSearchList";
+import { AdminManageConsole } from "./section/AdminManageConsole";
+import { PIManageConsole } from "./section/PIManageConsole";
 
 
 
@@ -25,11 +27,9 @@ export default async function AdminUserPage() {
       </header>
 
       {/* User query section */}
-      <UserSearchListSection initialUsers={users} />
-      <PromoteToAdminSection/>
-      <DemoteAdminSection/>
-      <UserListByRoleSection initialUsers={users} Role="ADMIN" />
-      <UserListByRoleSection initialUsers={users} Role="PI" />
+      <UserSearchList initialUsers={users} />
+      <AdminManageConsole/>
+      <PIManageConsole/>
     </main>
   );
 }

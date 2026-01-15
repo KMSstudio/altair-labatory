@@ -10,7 +10,11 @@ async function getUser(userId: bigint) {
   });
 }
 
-export default async function EditUserPage({ params }: {params:{user_id:string}}) {
+export default async function EditUserPage({ params }: {
+  params:{ user_id : string }
+}) {
+  params = await params;
+
   let id: bigint;
   try {
     id = BigInt(params.user_id);

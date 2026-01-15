@@ -1,6 +1,6 @@
 "use client";
 
-import { UserRole } from "@labatory/db";
+import { type UserRole } from "@labatory/db";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { promoteToAdminAction,demoteAdminToUserAction } from "./actions";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { prisma, UserRole } from "@labatory/db";
+import { prisma, type UserRole } from "@labatory/db";
 import { UserListByRoleSection,UserSearchListSection,PromoteToAdminSection, DemoteAdminSection } from "./client";
 
 export type UserDTO = {

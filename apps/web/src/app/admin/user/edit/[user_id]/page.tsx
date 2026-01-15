@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { UserRole,prisma } from "@labatory/db";
+import { type UserRole,prisma } from "@labatory/db";
 import { updateUser,deleteUser } from "../../actions";
 type EditPageProps = {
   params: { user_id: string };

@@ -3,7 +3,6 @@
 import { prisma, UserRole } from "@labatory/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type {UserDTO} from "./page";
 type UserInput = {
   displayName: string;
   primaryEmail: string | null;

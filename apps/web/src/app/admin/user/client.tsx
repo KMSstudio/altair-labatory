@@ -1,13 +1,12 @@
 "use client";
 
-import { type UserRole } from "@labatory/db";
+import { type UserRole,type User } from "@labatory/db";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { promoteToAdminAction,demoteAdminToUserAction } from "./actions";
-import type {UserDTO} from "./page.tsx";
 import type { SearchField } from "@/app/api/admin/user/route";
 
-function UserListItem({ user }: { user: UserDTO }) {
+function UserListItem({ user }: { user: User }) {
   return (
     <li>
       <div>
@@ -29,7 +28,7 @@ function UserListItem({ user }: { user: UserDTO }) {
   );
 }
 
-export function UserListSection({ users }: { users: UserDTO[] }) {
+export function UserListSection({ users }: { users: User[] }) {
   return (
     <section>
       {users.length === 0 ? (
@@ -48,10 +47,10 @@ export function UserListSection({ users }: { users: UserDTO[] }) {
 export function UserSearchListSection({
   initialUsers,
 }: {
-  initialUsers: UserDTO[];
+  initialUsers: User[];
 }) {
   const [q, setQ] = useState("");
-  const [users, setUsers] = useState<UserDTO[]>(initialUsers);
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [field, setField] = useState<SearchField>("name");
   const [loading, setLoading] = useState(false);
 
@@ -71,7 +70,7 @@ export function UserSearchListSection({
           `/api/admin/user?search=${encodeURIComponent(trimmed)}&field=${encodeURIComponent(field)}`,
           { signal: controller.signal }
         );
-        const data = (await res.json()) as { users: UserDTO[] };
+        const data = (await res.json()) as { users: User[] };
         setUsers(data.users);
       } finally {
         setLoading(false);
@@ -121,9 +120,9 @@ export function UserSearchListSection({
 export function UserListByRoleSection({
   initialUsers,Role
 }: {
-  initialUsers: UserDTO[],Role:UserRole;
+  initialUsers: User[],Role:UserRole;
 }) {
-  const [users, setUsers] = useState<UserDTO[]>(initialUsers.filter((u)=>u.role===Role.toString()));
+  const [users, setUsers] = useState<User[]>(initialUsers.filter((u)=>u.role===Role.toString()));
   return (
     <section>
       <header>

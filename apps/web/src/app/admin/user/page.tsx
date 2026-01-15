@@ -1,17 +1,9 @@
-import Link from "next/link";
-import { prisma, type UserRole } from "@labatory/db";
+import { prisma } from "@labatory/db";
 import { UserListByRoleSection,UserSearchListSection,PromoteToAdminSection, DemoteAdminSection } from "./client";
 
-export type UserDTO = {
-  id: string;
-  displayName: string;
-  role: string;
-  primaryEmail: string | null;
-  createdAt: string;
-};
 
 async function getUsers() {
-  const users= await prisma.user.findMany({
+  return prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -19,16 +11,9 @@ async function getUsers() {
       role: true,
       primaryEmail: true,
       createdAt: true,
+      updatedAt:true,
     },
   });
-
-  return users.map((u)=>({
-    id: u.id.toString(),
-    displayName: u.displayName,
-    role: u.role,
-    primaryEmail: u.primaryEmail,
-    createdAt: u.createdAt.toISOString(),
-  }));
 }
 
 export default async function AdminUserPage() {

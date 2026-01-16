@@ -38,18 +38,18 @@ export async function submitPIApplicationAction(params: {
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
-    //throw Error("Unauthorized");
+    throw Error("Unauthorized");
   }
 
   const sessionUserId = BigInt("123");
   const sessionSchoolEmail = "1";
 
   if (!sessionUserId) {
-    //throw Error("Invalid session userId");
+    throw Error("Invalid session userId");
   }
 
   if (!sessionSchoolEmail) {
-    //throw Error("Invalid session schoolEmail");
+    throw Error("Invalid session schoolEmail");
   }
 
   const requestedName = params.requestedName.trim();
@@ -57,34 +57,37 @@ export async function submitPIApplicationAction(params: {
   const note = params.note ? String(params.note).trim() : null;
 
   if (!requestedName || !scholarUrl) {
-    //throw Error("requestedName and scholarUrl are required");
+    throw Error("requestedName and scholarUrl are required");
   }
 
   if (!isValidUrl(scholarUrl)) {
-    //throw Error("scholarUrl is invalid");
+    throw Error("scholarUrl is invalid");
   }
 
   //hard-coded labId
   let labId: bigint | null = null; // let labId: bigint|null = params.labId;
 
   try {
-    
+    const existingPending = await prisma.pIApplication.findFirst({
+      where: { userId: sessionUserId, status: "PENDING" },
+      select: { id: true },
+    });
 
-    const chec = await prisma.pIApplication.create({
-    data: {
-      userId: sessionUserId,
-      requestedName: "Minseo Kim",
-      labId: BigInt("1"),
-      schoolEmail: "minseo.kim@school.test",
-      ScholarUrl: "https://scholar.google.com/citations?user=minseo",
-      note: "Looking to register the lab for recruitment.",
-      decidedBy: BigInt("1"),
-      decidedAt: new Date(),
-    },
-  });
-    console.log("Seed completed", {chec:chec.id,
+    if (existingPending) {
+        throw Error("A pending PI application already exists.");
+    }
 
-  });
+    prisma.pIApplication.create({
+        data: {
+        userId: sessionUserId,
+        requestedName: requestedName,
+        labId: labId,
+        schoolEmail: sessionSchoolEmail,
+        ScholarUrl: scholarUrl,
+        note: note,
+        },
+    });
+
     revalidatePath("/");
   } catch {
     throw Error("Internal server error");

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@labatory/db";
 import Layout from "../../layout";
+import styles from "../../admin.module.css";
 
 async function getUser(userId: bigint) {
   return prisma.user.findUnique({
@@ -42,56 +43,59 @@ export default async function UserDetailPage({ params }: {
 
   return (
     <Layout>
-      <main>
-        <header>
+      <main className={styles.adminShell}>
+        <header className={styles.adminHeader}>
           <div>
-            <p>/admin/users/{params.user_id}</p>
+            <p className={styles.eyebrow}>/admin/users/{params.user_id}</p>
             <h1>{user.displayName}</h1>
-            {user.primaryEmail && <p>{user.primaryEmail}</p>}
+            {user.primaryEmail && <p className={styles.muted}>{user.primaryEmail}</p>}
           </div>
 
-          <div>
-            <Link href="/admin/user">← Back to list</Link>
-            {" "}|{" "}
-            <Link href={`/admin/user/edit/${params.user_id}`}>Edit</Link>
+          <div className={`${styles.actions} ${styles.actionsEnd}`}>
+            <Link className={styles.ghost} href="/admin/user">
+              ← Back to list
+            </Link>
+            <Link className={styles.ghost} href={`/admin/user/edit/${params.user_id}`}>
+              Edit
+            </Link>
           </div>
         </header>
 
-        <section>
-          <div>
-            <strong>Role:</strong> {user.role}
+        <section className={`${styles.panel} ${styles.infoGrid}`}>
+          <div className={styles.infoRow}>
+            <strong>Role:</strong> <span className={styles.value}>{user.role}</span>
           </div>
-          <div>
+          <div className={styles.infoRow}>
             <strong>Primary Email:</strong>{" "}
-            {user.primaryEmail ?? "No email"}
+            <span className={styles.value}>{user.primaryEmail ?? "No email"}</span>
           </div>
-          <div>
-            <strong>ID:</strong> {user.id.toString()}
+          <div className={styles.infoRow}>
+            <strong>ID:</strong> <span className={styles.value}>{user.id.toString()}</span>
           </div>
-          <div>
+          <div className={styles.infoRow}>
             <strong>Created:</strong>{" "}
-            {user.createdAt.toISOString()}
+            <span className={styles.value}>{user.createdAt.toISOString()}</span>
           </div>
-          <div>
+          <div className={styles.infoRow}>
             <strong>Updated:</strong>{" "}
-            {user.updatedAt.toISOString()}
+            <span className={styles.value}>{user.updatedAt.toISOString()}</span>
           </div>
-          <div>
+          <div className={styles.infoRow}>
             <strong>PI:</strong>{" "}
-            {user.pi ? "Linked" : "Not linked"}
+            <span className={styles.value}>{user.pi ? "Linked" : "Not linked"}</span>
           </div>
         </section>
-        <section>
-          <header>
+        <section className={styles.panel}>
+          <header className={styles.panelHead}>
             <h3>Credentials linked ({user.credentials.length})</h3>
           </header>
 
           {user.credentials.length === 0 ? (
-            <p>No credentials linked to this user.</p>
+            <p className={styles.muted}>No credentials linked to this user.</p>
           ) : (
-            <ul>
+            <ul className={styles.list}>
               {user.credentials.map((cred) => (
-                <li key={cred.id.toString()}>
+                <li className={styles.card} key={cred.id.toString()}>
                   <p>
                     <strong>ID:</strong> {cred.id.toString()}
                   </p>

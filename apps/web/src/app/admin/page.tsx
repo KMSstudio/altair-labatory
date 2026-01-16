@@ -11,6 +11,11 @@ export default function AdminPage() {
           Go to User Management
         </button>
       </Link>
+      <Link href="/admin/pi">
+        <button type="button">
+          Go to PI Application Management
+        </button>
+      </Link>
     </main>
   );
 }

@@ -15,11 +15,6 @@ const isValidUrl = (v: unknown): v is string => {
   }
 };
 
-const toBigIntFromString = (v: String): bigint | null => {
-  if (typeof v === "string" && /^[0-9]+$/.test(v)) return BigInt(v);
-  return null;
-};
-
 /**
  * Submit PI Application.
  *
@@ -41,8 +36,8 @@ export async function submitPIApplicationAction(params: {
     throw Error("Unauthorized");
   }
 
-  const sessionUserId = BigInt("123");
-  const sessionSchoolEmail = "1";
+  const sessionUserId = BigInt(session.user.id);
+  const sessionSchoolEmail = session.user.email;
 
   if (!sessionUserId) {
     throw Error("Invalid session userId");

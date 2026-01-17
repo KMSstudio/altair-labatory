@@ -29,15 +29,15 @@ jobs:
         working-directory: .
       - name: Build db
         run: npm run build -w @labatory/db
+    
+      - name: DB up
+        run: npm run db:up
 
       - name: Prisma generate
         run: npm run prisma:generate 
 
       - name: Prisma migrate
         run: npm run prisma:migrate:dev
-    
-      - name: DB up
-        run: npm run db:up
 
       - name: Build
         run: npm run web:build

@@ -35,6 +35,12 @@ jobs:
           node -v
           npm -v
           npm ls --workspaces --depth=0
+          
+      - name: Debug @labatory/db resolution
+        run: |
+          ls -la packages/db
+          cat packages/db/package.json
+          node -p "require.resolve('@labatory/db')"
 
       - name: Build
         run: npm run web:build

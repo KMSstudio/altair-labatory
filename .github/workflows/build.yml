@@ -28,11 +28,9 @@ jobs:
         working-directory: .
 
       - name: DB up
-        run: npm run db:up
+        run: docker compose up -d db
 
       - name: Prisma generate
-        env:
-          DATABASE_URL: "postgresql://user:password@localhost:3000/dummy"
         run: npm run prisma:generate 
 
       - name: run web:dev

@@ -26,11 +26,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: .
-        
+
       - name: DB up
         run: npm run db:up
 
       - name: Prisma generate
+        env:
+          DATABASE_URL: "postgresql://user:password@localhost:5432/dummy"
         run: npm run prisma:generate 
 
       - name: Prisma migrate

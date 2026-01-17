@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { submitPIApplicationAction } from "./actions";
+import { redirect } from "next/navigation";
 
 export default function PIApplicationApplyPage() {
   const [submitting, setSubmitting] = useState(false);
@@ -21,7 +22,10 @@ export default function PIApplicationApplyPage() {
         setSubmitting(false);
     } catch (e: any){
         setError(e.error);
-        alert(error);
+        //alert(error);
+      redirect("/");
+    }finally{
+      redirect("/");
     }
   }
 

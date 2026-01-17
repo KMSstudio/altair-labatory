@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@labatory/db";
 import { updateUser } from "../../actions";
 import Layout from "../../../layout";
+import styles from "../../../admin.module.css";
 
 async function getUser(userId: bigint) {
   return prisma.user.findUnique({
@@ -27,26 +28,27 @@ export default async function EditUserPage({ params }: {
 
   return (
     <Layout>
-      <main>
-        <header>
+      <main className={styles.adminShell}>
+        <header className={styles.adminHeader}>
           <div>
-            <p>/admin/users/edit/{params.user_id}</p>
+            <p className={styles.eyebrow}>/admin/users/edit/{params.user_id}</p>
             <h1>Edit user</h1>
-            <p>Server action demo for updating and deleting a user through Prisma.</p>
+            <p className={styles.lede}>
+              Server action demo for updating and deleting a user through Prisma.
+            </p>
           </div>
 
-          <div>
-            <Link href={`/admin/user/${params.user_id}`}>
+          <div className={`${styles.actions} ${styles.actionsEnd}`}>
+            <Link className={styles.ghost} href={`/admin/user/${params.user_id}`}>
               ← Back to detail
-            </Link>{" "}
-            |{" "}
-            <Link href="/admin/user">
+            </Link>
+            <Link className={styles.ghost} href="/admin/user">
               List
             </Link>
           </div>
         </header>
 
-        <form action={updateUser}>
+        <form className={styles.form} action={updateUser}>
           <input type="hidden" name="id" value={user.id.toString()} />
 
           <label>
@@ -68,8 +70,8 @@ export default async function EditUserPage({ params }: {
           </label>
 
 
-          <div>
-            <button type="submit">
+          <div className={`${styles.actions} ${styles.actionsEnd}`}>
+            <button className={styles.primary} type="submit">
               Save changes
             </button>
           </div>

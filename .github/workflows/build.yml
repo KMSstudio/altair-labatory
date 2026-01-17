@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+      - run: docker version
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -31,3 +34,4 @@ jobs:
 
       - name: DB down
         run: npm run db:down
+  

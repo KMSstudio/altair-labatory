@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_DB: labatory
+      POSTGRES_USER: labatory
+      POSTGRES_PASSWORD: labatory_pw
+      DATABASE_URL: postgresql://labatory:labatory_pw@localhost:4821/labatory?schema=public
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker version
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: .
+
+      - name: DB up
+        run: npm run db:up
+
+      - name: Wait for DB
+        shell: bash
+        run: |
+          for i in {1..60}; do
+            if docker compose exec -T db pg_isready >/dev/null 2>&1; then
+              echo "DB is ready"; exit 0
+            fi
+            echo "Waiting for DB... ($i/60)"
+            sleep 1
+          done
+          echo "DB not ready in time"
+          docker compose logs db || true
+          exit 1
+
+      - name: Prisma generate
+        run: npm run prisma:generate 
+
+      - name: Prisma migrate
+        run : npm run prisma:migrate:deploy
+
+      - name: Prisma build
+        run: npm run prisma:build
+    
+      - name: Build
+        run: npm run web:build
+
+      - name: DB down
+        if: always()
+        run: npm run db:down

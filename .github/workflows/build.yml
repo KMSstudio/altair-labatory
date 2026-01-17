@@ -35,11 +35,6 @@ jobs:
           DATABASE_URL: "postgresql://user:password@localhost:3000/dummy"
         run: npm run prisma:generate 
 
-      - name: Prisma migrate
-        env:
-          DATABASE_URL: "postgresql://user:password@localhost:3000/dummy"
-        run: npm run prisma:migrate:dev
-
       - name: Build db
         run: npm run build -w @labatory/db
     

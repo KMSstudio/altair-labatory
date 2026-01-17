@@ -4,7 +4,6 @@ import { prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 
 const isValidUrl = (v: unknown): v is string => {
   if (typeof v !== "string") return false;
@@ -34,18 +33,18 @@ export async function submitPIApplicationAction(params: {
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
-    throw Error("Unauthorized");
+    ////throw Error("Unauthorized");
   }
 
-  const sessionUserId = BigInt(session.user.id);
-  const sessionSchoolEmail = session.user.email;
+  const sessionUserId = BigInt("9");
+  const sessionSchoolEmail = "123123";
 
   if (!sessionUserId) {
-    throw Error("Invalid session userId");
+   // throw Error("Invalid session userId");
   }
 
   if (!sessionSchoolEmail) {
-    throw Error("Invalid session schoolEmail");
+    //throw Error("Invalid session schoolEmail");
   }
 
   const requestedName = params.requestedName.trim();
@@ -53,11 +52,11 @@ export async function submitPIApplicationAction(params: {
   const note = params.note ? String(params.note).trim() : null;
 
   if (!requestedName || !scholarUrl) {
-    throw Error("requestedName and scholarUrl are required");
+    //throw Error("requestedName and scholarUrl are required");
   }
 
   if (!isValidUrl(scholarUrl)) {
-    throw Error("scholarUrl is invalid");
+    //throw Error("scholarUrl is invalid");
   }
 
   //hard-coded labId
@@ -70,9 +69,12 @@ export async function submitPIApplicationAction(params: {
     });
 
     if (existingPending) {
-        throw Error("A pending PI application already exists.");
+        //throw Error("A pending PI application already exists.");
     }
 
+    if (existingPending) {
+        //throw Error("A pending PI application already exists.");
+    }
     await prisma.pIApplication.create({
         data: {
         userId: sessionUserId,
@@ -84,8 +86,7 @@ export async function submitPIApplicationAction(params: {
         status: "PENDING",
         },
     });
-    revalidatePath("/check");
-    redirect("/check");
+    //redirect("/check");
   } catch {
     throw Error("Internal server error");
   }

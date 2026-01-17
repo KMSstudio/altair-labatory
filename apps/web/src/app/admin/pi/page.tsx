@@ -5,14 +5,6 @@ import { PIApplicationListSection } from "./section/PIApplicationListSection";
 
 export default async function PIApplicationPage() {
   const applications = await prisma.pIApplication.findMany({
-    where: {
-      status: {
-        in: [
-          PIApplicationStatus.PENDING,
-          PIApplicationStatus.APPROVED,
-        ],
-      },
-    },
     include: {
       user: true,
     },

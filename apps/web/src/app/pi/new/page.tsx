@@ -18,11 +18,10 @@ export default function PIApplicationApplyPage() {
 
     try {
         await submitPIApplicationAction({ requestedName: requestedName, labId: labId, scholarUrl: scholarUrl, note: note});
+        setSubmitting(false);
     } catch (e: any){
         setError(e.error);
-        alert(e.message);
-    } finally{
-        setSubmitting(false);
+        alert(error);
     }
   }
 

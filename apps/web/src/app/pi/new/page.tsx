@@ -12,23 +12,18 @@ export default function PIApplicationApplyPage() {
   const [scholarUrl,SetScholarUrl]=useState("");
   const [note, SetNote] = useState("");
 
-  function onChange(e) {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  }
-
-  async function onSubmit(e) {
-    e.preventDefault();
+  async function onSubmit() {
     setSubmitting(true);
     setError("");
 
     try {
         await submitPIApplicationAction({ requestedName: requestedName, labId: labId, scholarUrl: scholarUrl, note: note});
-    } catch (e){
+    } catch (e: any){
         setError(e.error);
         alert(e.message);
+    } finally{
         setSubmitting(false);
-    } 
+    }
   }
 
   return (

@@ -3,6 +3,7 @@
 import { prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 const isValidUrl = (v: unknown): v is string => {
@@ -72,7 +73,7 @@ export async function submitPIApplicationAction(params: {
         throw Error("A pending PI application already exists.");
     }
 
-    prisma.pIApplication.create({
+    await prisma.pIApplication.create({
         data: {
         userId: sessionUserId,
         requestedName: requestedName,
@@ -80,10 +81,11 @@ export async function submitPIApplicationAction(params: {
         schoolEmail: sessionSchoolEmail,
         ScholarUrl: scholarUrl,
         note: note,
+        status: "PENDING",
         },
     });
-
-    revalidatePath("/");
+    revalidatePath("/check");
+    redirect("/check");
   } catch {
     throw Error("Internal server error");
   }

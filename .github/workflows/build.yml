@@ -35,6 +35,9 @@ jobs:
           DATABASE_URL: "postgresql://user:password@localhost:3000/dummy"
         run: npm run prisma:generate 
 
+      - name: run web:dev
+        run: npm -w @labatory/web run dev
+
       - name: Build db
         run: npm run build -w @labatory/db
     

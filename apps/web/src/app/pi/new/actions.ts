@@ -32,12 +32,10 @@ export async function submitPIApplicationAction(params: {
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
-    ////throw Error("Unauthorized");
+    throw Error("Unauthorized");
   }
-  const user = await prisma.user.findFirst();
-  if(!user) throw Error("user table does not exist");
-  const sessionUserId = user.id;
-  const sessionSchoolEmail = user.primaryEmail ?? ".com";
+  const sessionUserId = BigInt(session.user.id);
+  const sessionSchoolEmail = session.user.primaryEmail;
 
   if (!sessionUserId) {
    throw Error("Invalid session userId");
@@ -62,16 +60,16 @@ export async function submitPIApplicationAction(params: {
   //hard-coded labId
   let labId: bigint | null = null; // let labId: bigint|null = params.labId;
 
+  const existingPending = await prisma.pIApplication.findFirst({
+    where: { userId: sessionUserId, status: "PENDING" },
+    select: { id: true },
+  });
+
+  if (existingPending) {
+      throw Error("A pending PI application already exists.");
+  }
+
   try {
-    const existingPending = await prisma.pIApplication.findFirst({
-      where: { userId: sessionUserId, status: "PENDING" },
-      select: { id: true },
-    });
-
-    if (existingPending) {
-        //throw Error("A pending PI application already exists.");
-    }
-
     await prisma.pIApplication.create({
         data: {
         userId: sessionUserId,

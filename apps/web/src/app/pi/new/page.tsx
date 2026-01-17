@@ -1,82 +1,18 @@
-"use client";
-
-import { useState } from "react";
-import { submitPIApplicationAction } from "./actions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { PIApplicationForm } from "./PIApplicationForm";
 
-export default function PIApplicationApplyPage() {
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+export default async function PIApplicationApplyPage() {
+  const session = await getServerSession(authOptions);
 
-  const [requestedName, SetRequestedName] = useState("");
-  const [labId, SetLabId] = useState("");
-  const [scholarUrl,SetScholarUrl]=useState("");
-  const [note, SetNote] = useState("");
-
-  async function onSubmit() {
-    setSubmitting(true);
-    setError("");
-
-    try {
-        await submitPIApplicationAction({ requestedName: requestedName, labId: labId, scholarUrl: scholarUrl, note: note});
-        setSubmitting(false);
-    } catch (e: any){
-        setError(e.error);
-        //alert(error);
-      redirect("/");
-    }finally{
-      redirect("/");
-    }
+  if(!session?.user || session.user.role!=="USER"){
+    redirect("/");
   }
 
   return (
     <main>
       <h1>Apply as PI</h1>
-
-      <form onSubmit={onSubmit}>
-        <div>
-          <label>Requested Name</label>
-          <input
-            name="requestedName"
-            value={requestedName}
-            onChange={(e)=>SetRequestedName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Lab ID (optional)</label>
-          <input
-            name="labId"
-            value={labId}
-            onChange={(e)=>SetLabId(e.target.value)}
-            placeholder="e.g. 10"
-          />
-        </div>
-        <div>
-          <label>Scholar URL</label>
-          <input
-            name="scholarUrl"
-            value={scholarUrl}
-            onChange={(e)=>SetScholarUrl(e.target.value)}
-            placeholder="https://scholar.google.com/..."
-            required
-          />
-        </div>
-        <div>
-          <label>Note (optional)</label>
-          <textarea
-            name="note"
-            value={note}
-            onChange={(e)=>SetNote(e.target.value)}
-          />
-        </div>
-        <button type="submit" disabled={submitting}>
-          {submitting ? "Submitting..." : "Submit"}
-        </button>
-      </form>
-
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
-
+      <PIApplicationForm />
     </main>
-  );
-}
+  );}

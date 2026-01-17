@@ -30,17 +30,8 @@ jobs:
       - name: DB up
         run: npm run db:up
 
-      - name: Debug workspaces
-        run: |
-          node -v
-          npm -v
-          npm ls --workspaces --depth=0
-          
-      - name: Debug @labatory/db resolution
-        run: |
-          ls -la packages/db
-          cat packages/db/package.json
-          node -p "require.resolve('@labatory/db')"
+      - name: Build db
+        run: npm run build -w @labatory/db
 
       - name: Build
         run: npm run web:build

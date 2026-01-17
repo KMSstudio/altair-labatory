@@ -25,16 +25,16 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
         working-directory: .
+      - name: Build db
+        run: npm run build -w @labatory/db
 
       - name: Prisma generate
         run: npm run prisma:generate 
 
       - name: Prisma migrate
         run: npm run prisma:migrate:dev
-
-      - name: Build db
-        run: npm run build -w @labatory/db
     
       - name: DB up
         run: npm run db:up

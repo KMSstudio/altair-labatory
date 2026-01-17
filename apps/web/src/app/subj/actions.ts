@@ -27,7 +27,6 @@ const requireText = (value: FormDataEntryValue | null, field: string): string =>
 
 const parseSubjectInput = (formData: FormData): SubjectInput => {
   const isActiveRaw = formData.get("isActive");
-  // checkbox는 체크 시 "on"인 경우가 많음
   const isActive = isActiveRaw === null ? true : isActiveRaw === "on" || isActiveRaw === "true";
 
   return {
@@ -89,7 +88,6 @@ export async function mergeSubjects(formData: FormData) {
       throw new Error("Subject not found");
     }
 
-    // LabSubject 링크를 from -> to 로 이동
     const links = await tx.labSubject.findMany({
       where: { subjectId: fromId },
       select: { labId: true },
@@ -104,7 +102,6 @@ export async function mergeSubjects(formData: FormData) {
       await tx.labSubject.deleteMany({ where: { subjectId: fromId } });
     }
 
-    // 병합 소스는 soft-delete(비활성화)
     await tx.subject.update({ where: { id: fromId }, data: { isActive: false } });
   });
 
@@ -112,4 +109,54 @@ export async function mergeSubjects(formData: FormData) {
   revalidatePath(`/subj/${fromValue}`);
   revalidatePath(`/subj/${toValue}`);
   redirect(`/subj/${toValue}`);
+}
+
+export async function updateSubjectLabLinks(formData: FormData) {
+  const subjectValue = formData.get("subjectId");
+  if (typeof subjectValue !== "string") {
+    throw new Error("Missing subjectId");
+  }
+  const subjectId = BigInt(subjectValue);
+
+  const selectedLabIds = formData
+    .getAll("labIds")
+    .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+    .map((v) => BigInt(v));
+
+  await prisma.$transaction(async (tx) => {
+    const current = await tx.labSubject.findMany({
+      where: { subjectId },
+      select: { labId: true },
+    });
+
+    const currentSet = new Set(current.map((x) => x.labId.toString()));
+    const nextSet = new Set(selectedLabIds.map((x) => x.toString()));
+
+    const toAdd = selectedLabIds.filter((id) => !currentSet.has(id.toString()));
+
+    const toRemove = current
+      .map((x) => x.labId)
+      .filter((id) => !nextSet.has(id.toString()));
+
+    if (toRemove.length) {
+      await tx.labSubject.deleteMany({
+        where: {
+          subjectId,
+          labId: { in: toRemove },
+        },
+      });
+    }
+
+    if (toAdd.length) {
+      await tx.labSubject.createMany({
+        data: toAdd.map((labId) => ({ labId, subjectId })),
+        skipDuplicates: true,
+      });
+    }
+  });
+
+  const target = `/subj/${subjectValue}`;
+  revalidatePath("/subj/list");
+  revalidatePath(target);
+  redirect(target);
 }

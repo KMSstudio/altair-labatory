@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@labatory/db";
-import { updateSubject } from "../actions";
+import { updateSubject, updateSubjectLabLinks } from "../actions";
 import styles from "../subj.module.css";
 
 type SubjectPageProps = {
@@ -29,6 +29,18 @@ async function getSubject(subjId: bigint) {
   });
 }
 
+async function getAllLabs() {
+  return prisma.lab.findMany({
+    select: {
+      id: true,
+      nameKo: true,
+      nameEn: true,
+      websiteUrl: true,
+    },
+    orderBy: { nameKo: "asc" },
+  });
+}
+
 export default async function SubjectDetailPage({ params }: SubjectPageProps) {
   params = await params;
   let id: bigint;
@@ -38,8 +50,10 @@ export default async function SubjectDetailPage({ params }: SubjectPageProps) {
     notFound();
   }
 
-  const subject = await getSubject(id);
+  const [subject, allLabs] = await Promise.all([getSubject(id), getAllLabs()]);
   if (!subject) notFound();
+
+  const linkedSet = new Set(subject.labs.map((x) => x.labId.toString()));
 
   return (
     <main className={styles.subjShell}>
@@ -49,11 +63,14 @@ export default async function SubjectDetailPage({ params }: SubjectPageProps) {
           <h1>{subject.nameKo}</h1>
           <p className={styles.muted}>{subject.nameEn}</p>
         </div>
+
         <div className={styles.actions}>
           <div className={styles.statusTag}>{subject.isActive ? "Active" : "Inactive"}</div>
+
           <Link className={styles.ghost} href="/subj/list">
             ← Back to list
           </Link>
+
           <Link className={styles.ghost} href="/subj/merge">
             Merge
           </Link>
@@ -89,18 +106,22 @@ export default async function SubjectDetailPage({ params }: SubjectPageProps) {
 
         <form action={updateSubject} className={styles.form}>
           <input type="hidden" name="id" value={subject.id.toString()} />
+
           <label>
             Korean name *
             <input name="nameKo" defaultValue={subject.nameKo} required />
           </label>
+
           <label>
             English name *
             <input name="nameEn" defaultValue={subject.nameEn} required />
           </label>
+
           <label>
             Description
             <input name="description" defaultValue={subject.description ?? ""} />
           </label>
+
           <label>
             Active
             <input name="isActive" type="checkbox" defaultChecked={subject.isActive} />
@@ -118,23 +139,55 @@ export default async function SubjectDetailPage({ params }: SubjectPageProps) {
         <header className={styles.panelHead}>
           <div>
             <p className={styles.eyebrow}>Labs linked</p>
-            <h3>{subject.labs.length} lab(s)</h3>
+            <h3>{subject.labs.length} linked</h3>
+            <p className={styles.muted}>
+              Check labs to link to this subject, then click “Save lab links”.
+            </p>
           </div>
         </header>
 
-        {subject.labs.length === 0 ? (
-          <p className={styles.muted}>No labs have been associated with this subject yet.</p>
+        {allLabs.length === 0 ? (
+          <p className={styles.muted}>
+            No labs exist in the database yet. Create labs first, then link them here.
+          </p>
         ) : (
-          <ul className={styles.labGrid}>
-            {subject.labs.map((ls) => (
-              <li key={`${ls.labId.toString()}-${ls.subjectId.toString()}`} className={styles.card}>
-                <p className={styles.eyebrow}>Lab ID {ls.lab.id.toString()}</p>
-                <h4>{ls.lab.nameKo}</h4>
-                {ls.lab.nameEn && <p className={styles.muted}>{ls.lab.nameEn}</p>}
-                <p className={styles.muted}>{ls.lab.websiteUrl ?? "No website"}</p>
-              </li>
-            ))}
-          </ul>
+          <form action={updateSubjectLabLinks} className={styles.linkForm}>
+            <input type="hidden" name="subjectId" value={subject.id.toString()} />
+
+            <ul className={styles.labGrid}>
+              {allLabs.map((lab) => {
+                const labIdStr = lab.id.toString();
+                const checked = linkedSet.has(labIdStr);
+
+                return (
+                  <li key={labIdStr} className={styles.card}>
+                    <div className={styles.cardHead}>
+                      <div>
+                        <p className={styles.eyebrow}>Lab ID {labIdStr}</p>
+                        <h4>{lab.nameKo}</h4>
+                        {lab.nameEn && <p className={styles.muted}>{lab.nameEn}</p>}
+                        <p className={styles.muted}>{lab.websiteUrl ?? "No website"}</p>
+                      </div>
+
+                      <input
+                        type="checkbox"
+                        name="labIds"
+                        value={labIdStr}
+                        defaultChecked={checked}
+                        aria-label={`Link ${lab.nameKo}`}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
+              <button type="submit" className={styles.primary}>
+                Save lab links
+              </button>
+            </div>
+          </form>
         )}
       </section>
     </main>

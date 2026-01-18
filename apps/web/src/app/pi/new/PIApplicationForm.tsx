@@ -19,11 +19,10 @@ export function PIApplicationForm() {
     e.preventDefault();
 
     try {
-        await submitPIApplicationAction({ requestedName, labId, scholarUrl, note });
-        router.push("/check");
+      await submitPIApplicationAction({ requestedName, labId, scholarUrl, note });
+      router.push("/check");
     } catch (error: any){
-        alert(error.message);
-    } finally {
+      alert(error.message);
       setSubmitting(false);
     }
   }
@@ -70,6 +69,5 @@ export function PIApplicationForm() {
           {submitting ? "Submitting..." : "Submit"}
         </button>
       </form>
-
   );
 }

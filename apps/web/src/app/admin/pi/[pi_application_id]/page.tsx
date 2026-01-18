@@ -1,7 +1,7 @@
-//@app/admin/pi/[pi_application_id]/page.tsx
+// @app/admin/pi/[pi_application_id]/page.tsx
 
 import Link from "next/link";
-import { notFound,redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { prisma } from "@labatory/db";
 
 async function getPIApplication(id: bigint) {

@@ -40,7 +40,6 @@ export async function submitPIApplicationAction(params: {
   if (!sessionUserId) {
    throw Error("Invalid session userId");
   }
-
   if (!sessionSchoolEmail) {
     throw Error("Invalid session schoolEmail");
   }
@@ -57,14 +56,12 @@ export async function submitPIApplicationAction(params: {
     throw Error("scholarUrl is invalid");
   }
 
-  //hard-coded labId
-  let labId: bigint | null = null; // let labId: bigint|null = params.labId;
+  let labId: bigint | null = null;
 
   const existingPending = await prisma.pIApplication.findFirst({
     where: { userId: sessionUserId, status: "PENDING" },
     select: { id: true },
   });
-
   if (existingPending) {
       throw Error("A pending PI application already exists.");
   }

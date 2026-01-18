@@ -6,7 +6,7 @@ import { PIApplicationForm } from "./PIApplicationForm";
 export default async function PIApplicationApplyPage() {
   const session = await getServerSession(authOptions);
 
-  if(!session?.user || session.user.role!=="USER"){
+  if(!session?.user || session.user.role!=="USER") {
     redirect("/");
   }
 

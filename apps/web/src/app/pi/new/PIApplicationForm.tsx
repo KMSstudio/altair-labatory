@@ -28,46 +28,46 @@ export function PIApplicationForm() {
   }
 
   return (
-      <form onSubmit={onSubmit}>
-        <div>
-          <label>Requested Name</label>
-          <input
-            name="requestedName"
-            value={requestedName}
-            onChange={(e)=>SetRequestedName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Lab ID (optional)</label>
-          <input
-            name="labId"
-            value={labId}
-            onChange={(e)=>SetLabId(e.target.value)}
-            placeholder="e.g. 10"
-          />
-        </div>
-        <div>
-          <label>Scholar URL</label>
-          <input
-            name="scholarUrl"
-            value={scholarUrl}
-            onChange={(e)=>SetScholarUrl(e.target.value)}
-            placeholder="https://scholar.google.com/..."
-            required
-          />
-        </div>
-        <div>
-          <label>Note (optional)</label>
-          <textarea
-            name="note"
-            value={note}
-            onChange={(e)=>SetNote(e.target.value)}
-          />
-        </div>
-        <button type="submit" disabled={submitting}>
-          {submitting ? "Submitting..." : "Submit"}
-        </button>
-      </form>
+    <form onSubmit={onSubmit}>
+      <div>
+        <label>Requested Name</label>
+        <input
+          name="requestedName"
+          value={requestedName}
+          onChange={(e)=>SetRequestedName(e.target.value)}
+          required
+        />
+      </div>
+      <div>
+        <label>Lab ID (optional)</label>
+        <input
+          name="labId"
+          value={labId}
+          onChange={(e)=>SetLabId(e.target.value)}
+          placeholder="e.g. 10"
+        />
+      </div>
+      <div>
+        <label>Scholar URL</label>
+        <input
+          name="scholarUrl"
+          value={scholarUrl}
+          onChange={(e)=>SetScholarUrl(e.target.value)}
+          placeholder="https://scholar.google.com/..."
+          required
+        />
+      </div>
+      <div>
+        <label>Note (optional)</label>
+        <textarea
+          name="note"
+          value={note}
+          onChange={(e)=>SetNote(e.target.value)}
+        />
+      </div>
+      <button type="submit" disabled={submitting}>
+        {submitting ? "Submitting..." : "Submit"}
+      </button>
+    </form>
   );
 }

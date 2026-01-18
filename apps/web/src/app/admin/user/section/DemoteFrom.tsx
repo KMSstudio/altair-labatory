@@ -3,8 +3,9 @@
 import { type UserRole } from "@labatory/db";
 import { useState } from "react";
 import { demoteToUserAction } from "../actions";
+import styles from "../../admin.module.css";
 
-export function DemoteFrom({demoteRole}:{demoteRole : UserRole}) {
+export function DemoteFrom({ demoteRole }: { demoteRole: UserRole }) {
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,22 +23,29 @@ export function DemoteFrom({demoteRole}:{demoteRole : UserRole}) {
   }
 
   return (
-    <section>
-      <h2>{demoteRole} 권한 강등</h2>
+    <section className={styles.card}>
+      <h3>Demote from {demoteRole}</h3>
 
-      <label>
-        User ID{" "}
-        <input
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="예) 123"
-          disabled={loading}
-        />
-      </label>
+      <div className={styles.formInline}>
+        <label>
+          User ID{" "}
+          <input
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            placeholder="?? 123"
+            disabled={loading}
+          />
+        </label>
 
-      <button type="button" onClick={onSubmit} disabled={loading || !userId.trim()}>
-        {loading ? "처리 중..." : "강등"}
-      </button>
+        <button
+          className={styles.danger}
+          type="button"
+          onClick={onSubmit}
+          disabled={loading || !userId.trim()}
+        >
+          {loading ? "Processing.." : "Demote"}
+        </button>
+      </div>
     </section>
   );
 }

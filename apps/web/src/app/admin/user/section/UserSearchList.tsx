@@ -5,6 +5,7 @@
 import { type User } from "@labatory/db";
 import { useMemo, useState } from "react";
 import { UserListSection } from "./UserListSection";
+import styles from "../../admin.module.css";
 
 const normalizeField = (raw: string): string =>
   raw === "email" || raw === "all" ? raw : "name";
@@ -29,13 +30,17 @@ export function UserSearchList({ initialUsers }: { initialUsers: User[] }) {
   }, [initialUsers, search, field]);
 
   return (
-    <section>
-      <header>
-        <h2>User search</h2>
-        <p>{search !== "" ? `Searching "${search}"` : "Showing all users"}</p>
+    <section className={styles.panel}>
+      <header className={styles.panelHead}>
+        <div>
+          <h2>User search</h2>
+          <p className={styles.muted}>
+            {search !== "" ? `Searching "${search}"` : "Showing all users"}
+          </p>
+        </div>
       </header>
 
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form className={styles.formInline} onSubmit={(e) => e.preventDefault()}>
         <label>
           Name contains{" "}
           <input
@@ -52,7 +57,7 @@ export function UserSearchList({ initialUsers }: { initialUsers: User[] }) {
             <option value="all">Name + Email</option>
           </select>
         </label>{" "}
-        <button type="button" onClick={() => setSearch("")}>
+        <button className={styles.ghost} type="button" onClick={() => setSearch("")}>
           Clear
         </button>
       </form>

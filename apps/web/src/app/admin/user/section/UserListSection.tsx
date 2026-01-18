@@ -2,24 +2,28 @@
 
 import { type User } from "@labatory/db";
 import Link from "next/link";
+import styles from "../../admin.module.css";
 
 function UserListItem({ user }: { user: User }) {
   return (
-    <li>
+    <li className={styles.card}>
       <div>
-        <p>ID {user.id}</p>
+        <p className={styles.eyebrow}>ID {user.id}</p>
         <h3>{user.displayName}</h3>
-        {user.primaryEmail && <p>{user.primaryEmail}</p>}
-        <p>Role: {user.role}</p>
-        <p>
+        {user.primaryEmail && <p className={styles.muted}>{user.primaryEmail}</p>}
+        <p>Role: <span className={styles.value}>{user.role}</span></p>
+        <p className={styles.muted}>
           Created at: {new Date(user.createdAt).toLocaleDateString()}
         </p>
       </div>
 
-      <div>
-        <Link href={`/admin/user/edit/${user.id}`}>Edit</Link>
-        {" | "}
-        <Link href={`/admin/user/${user.id}`}>View</Link>
+      <div className={styles.actions}>
+        <Link className={styles.ghost} href={`/admin/user/edit/${user.id}`}>
+          Edit
+        </Link>
+        <Link className={styles.ghost} href={`/admin/user/${user.id}`}>
+          View
+        </Link>
       </div>
     </li>
   );
@@ -27,11 +31,11 @@ function UserListItem({ user }: { user: User }) {
 
 export function UserListSection({ users }: { users: User[] }) {
   return (
-    <section>
+    <section className={styles.listSection}>
       {users.length === 0 ? (
-        <p>No users found.</p>
+        <p className={styles.muted}>No users found.</p>
       ) : (
-        <ul>
+        <ul className={styles.list}>
           {users.map((user) => (
             <UserListItem key={user.id} user={user} />
           ))}

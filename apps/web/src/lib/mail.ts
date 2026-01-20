@@ -15,18 +15,18 @@ const transporter = nodemailer.createTransport({
 
 const ExpireDuration = 5;
 
-export async function SendVerificationEmail({ userId, userEmail }:{ userId:string, userEmail:string }) {
+export async function SendVerificationEmail({ credentialId, userEmail }:{ credentialId:string, userEmail:string }) {
 
     const tokenHash = crypto.randomBytes(32).toString("hex");
     const expireAt = new Date(Date.now() + 1000 * 60 * ExpireDuration);
 
     try{
-        const id = BigInt(userId);
+        const id = BigInt(credentialId);
         await prisma.userVerificationToken.create({
             data:{
-                userId:id,
-                tokenHash:tokenHash,
-                expireAt:expireAt
+                credentialId: id,
+                tokenHash: tokenHash,
+                expireAt: expireAt
             }
         });
     } catch{
@@ -55,17 +55,17 @@ export async function SendVerificationEmail({ userId, userEmail }:{ userId:strin
   return true;
 }
 
-export async function SendPasswordChangeEmail({userId, userEmail}:{ userId:string, userEmail:string }){
+export async function SendPasswordChangeEmail({credentialId, userEmail}:{ credentialId:string, userEmail:string }){
      const tokenHash = crypto.randomBytes(32).toString("hex");
     const expireAt = new Date(Date.now() + 1000 * 60 * ExpireDuration);
 
     try{
-        const id = BigInt(userId);
+        const id = BigInt(credentialId);
         await prisma.userPasswordChangeToken.create({
             data:{
-                userId:id,
-                tokenHash:tokenHash,
-                expireAt:expireAt
+                credentialId: id,
+                tokenHash: tokenHash,
+                expireAt: expireAt
             }
         });
     } catch{

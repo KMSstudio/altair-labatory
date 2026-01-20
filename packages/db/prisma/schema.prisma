@@ -268,3 +268,24 @@ model LabReviewReport {
   @@index([reporterId, createdAt],  map: "idx_review_reports_reporter_created")
   @@map("lab_review_reports")
 }
+
+// =========================
+// USER VERIFICATION TOKEN / USER PASSWORD CHANGE TOKEN
+// =========================
+
+model UserVerificationToken {
+  tokenHash String @unique @map("token_hash")
+
+  userId BigInt @map("user_id")
+
+  expireAt DateTime @default(now()) @map("Expired_at")
+}
+
+
+model UserPasswordChangeToken {
+  tokenHash String @unique @map("token_hash")
+
+  userId BigInt @map("user_id")
+
+  expireAt DateTime @default(now()) @map("Expired_at")
+}

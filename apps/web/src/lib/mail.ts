@@ -5,28 +5,28 @@ import crypto from "crypto";
 import { prisma } from "@labatory/db";
 
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    host: 'smtp.ethereal.email',
     port: 587,
+    secure:false,
     auth: {
-        user: process.env.EMAIL_ID,
-        pass: process.env.EMAIL_PASSWORD
+        user: "aryanna11@ethereal.email",
+        pass: "mZwm66mn9X2AUu57y9"
     }
 });
 
-const ExpireDuration = 5;
+const ExpireDuration = 50;
 
-export async function SendVerificationEmail({ credentialId, userEmail }:{ credentialId:string, userEmail:string }) {
-
+export async function SendVerificationEmail({ credentialId, userEmail }:{ credentialId: bigint, userEmail: string }) {
+ 
     const tokenHash = crypto.randomBytes(32).toString("hex");
     const expireAt = new Date(Date.now() + 1000 * 60 * ExpireDuration);
 
     try{
-        const id = BigInt(credentialId);
         await prisma.userVerificationToken.create({
             data:{
-                credentialId: id,
-                tokenHash: tokenHash,
-                expireAt: expireAt
+                credentialId,
+                tokenHash,
+                expireAt
             }
         });
     } catch{
@@ -36,7 +36,6 @@ export async function SendVerificationEmail({ credentialId, userEmail }:{ creden
     const verifyUrl=new URL("/auth/verify",process.env.NEXTAUTH_URL);
     verifyUrl.searchParams.set("token",tokenHash);
 
-    try{
         await transporter.sendMail({
             from: `"Your Service" <no-reply@your-service.com>`,
             to: userEmail,
@@ -48,24 +47,21 @@ export async function SendVerificationEmail({ credentialId, userEmail }:{ creden
             <p>이 링크는 ${ExpireDuration}분 후 만료됩니다.</p>
             `,
         });
-    } catch{
-        throw Error("Fail to send verification email");
-    }
+   
 
   return true;
 }
 
-export async function SendPasswordChangeEmail({credentialId, userEmail}:{ credentialId:string, userEmail:string }){
+export async function SendPasswordChangeEmail({credentialId, userEmail}:{ credentialId:bigint, userEmail:string }){
      const tokenHash = crypto.randomBytes(32).toString("hex");
     const expireAt = new Date(Date.now() + 1000 * 60 * ExpireDuration);
 
     try{
-        const id = BigInt(credentialId);
         await prisma.userPasswordChangeToken.create({
             data:{
-                credentialId: id,
-                tokenHash: tokenHash,
-                expireAt: expireAt
+                credentialId,
+                tokenHash,
+                expireAt
             }
         });
     } catch{
@@ -75,7 +71,6 @@ export async function SendPasswordChangeEmail({credentialId, userEmail}:{ creden
     const verifyUrl=new URL("/auth/reset-password",process.env.NEXTAUTH_URL);
     verifyUrl.searchParams.set("token",tokenHash);
 
-    try{
         await transporter.sendMail({
             from: `"Your Service" <no-reply@your-service.com>`,
             to: userEmail,
@@ -87,9 +82,6 @@ export async function SendPasswordChangeEmail({credentialId, userEmail}:{ creden
             <p>이 링크는 ${ExpireDuration}분 후 만료됩니다.</p>
             `,
         });
-    } catch{
-        throw Error("Fail to send password reset email");
-    }
-
+    
   return true;
 }

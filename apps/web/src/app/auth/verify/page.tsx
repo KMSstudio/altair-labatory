@@ -1,15 +1,14 @@
 // @/app/verify/page.tsx
 
 import { prisma } from "@labatory/db";
-
-export default async function Page({ params } : { params: { token?: string }}) {
-
-    if(!params.token){
+export default async function Page({ searchParams } : { searchParams: { token?: string }}) {
+    const tokenParams = await searchParams;
+    if(!tokenParams.token){
         return <div>잘못된 접근입니다.</div>
     }
 
     const token = await prisma.userVerificationToken.findUnique({
-        where:{ tokenHash: params.token }
+        where:{ tokenHash: tokenParams.token }
     })
     if(!token){
         return <div>메일이 만료되었거나 링크가 잘못 보내어졌습니다.</div>
@@ -28,7 +27,7 @@ export default async function Page({ params } : { params: { token?: string }}) {
         })
 
         await tx.userVerificationToken.delete({
-            where: { tokenHash: params.token }
+            where: { tokenHash: tokenParams.token }
         })
     });
    

@@ -3,14 +3,14 @@
 import { prisma } from "@labatory/db";
 import { ResetPassword } from "./ResetPassword";
 
-export default async function Page({ params } : { params: { token?: string }}) {
-
-    if(!params.token){
+export default async function Page({ searchParams } : { searchParams: { token?: string }}) {
+    const tokenparams = await searchParams;
+    if(!tokenparams.token){
         return <div>잘못된 접근입니다.</div>
     }
 
     const token = await prisma.userPasswordChangeToken.findUnique({
-        where:{ tokenHash: params.token }
+        where:{ tokenHash: tokenparams.token }
     })
     if(!token){
         return <div>메일이 만료되었거나 링크가 잘못 보내어졌습니다.</div>
@@ -24,6 +24,6 @@ export default async function Page({ params } : { params: { token?: string }}) {
 
     return (<main>
         <h1>비밀번호 변경</h1>
-        <ResetPassword token={params.token} />
+        <ResetPassword token={tokenparams.token} />
     </main>);
 }

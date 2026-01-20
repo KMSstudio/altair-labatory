@@ -16,9 +16,9 @@ export function ResetPassword({ token }: { token: string }) {
 
   async function onSubmit(formData: FormData) {
     const res = await fetch("/api/auth/reset-password", {
-      method: "POST",
+      method: "PATCH",
       body: JSON.stringify({
-        token,
+        tokenHash: token,
         password: formData.get("password"),
       }),
     });

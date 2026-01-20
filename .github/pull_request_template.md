@@ -13,11 +13,20 @@ Common gitmoji examples for quick copy-paste:
 ### What feature does this PR add?
 
 <!-- Describe the feature or enhancement you implemented -->
+- 
+
+---
 
 ### What Issue does this PR fix?
 
 <!-- MUST write in `fixed #number` form so that GitHub can detect the issue automatically -->
+- 
+
+---
 
 ### Is there any consideration on your implementation?
 
 <!-- If there is some alternatives or considerations on your implementation, please let me know -->
+- 
+
+---

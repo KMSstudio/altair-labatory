@@ -5,12 +5,12 @@ import crypto from "crypto";
 import { prisma } from "@labatory/db";
 
 const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
+    host: 'smtp.gmail.com',
     port: 587,
     secure:false,
     auth: {
-        user: "aryanna11@ethereal.email",
-        pass: "mZwm66mn9X2AUu57y9"
+        user: process.env.EMAIL_ID ?? "",
+        pass: process.env.EMAIL_PASSWORD ?? ""
     }
 });
 

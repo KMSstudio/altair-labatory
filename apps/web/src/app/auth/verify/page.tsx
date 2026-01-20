@@ -1,6 +1,7 @@
 // @/app/verify/page.tsx
 
 import { prisma } from "@labatory/db";
+
 export default async function Page({ searchParams } : { searchParams: { token?: string }}) {
     const tokenParams = await searchParams;
     if(!tokenParams.token){

@@ -21,9 +21,8 @@ export function PIApplicationForm() {
     try {
       await submitPIApplicationAction({ requestedName, labId, scholarUrl, note });
       router.push("/check");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      if (error instanceof Error) alert(error.message);
       setSubmitting(false);
     }
   }

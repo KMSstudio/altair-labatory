@@ -5,7 +5,7 @@ import { hash } from "bcryptjs";
 import { prisma } from "@labatory/db";
 import { Prisma } from "@prisma/client";
 
-export async function PATCH(request: Request) {
+export async function POST(request: Request) {
   let body: { password?: string; tokenHash?: string };
   try { body = await request.json(); }
   catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }

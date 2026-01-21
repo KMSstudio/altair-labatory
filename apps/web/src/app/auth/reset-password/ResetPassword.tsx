@@ -1,14 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-
 export function ResetPassword({ token }: { token: string }) {
-  const [done, setDone] = useState(false);
-
-  if (done) {
-    window.location.href = "/auth/login";
-  }
 
   async function onSubmit(formData: FormData) {
     const password = formData.get("password");
@@ -27,7 +19,9 @@ export function ResetPassword({ token }: { token: string }) {
       }),
     });
 
-    if (res.ok) setDone(true);
+    if (res.ok) {
+      window.location.href = "/auth/login";
+    }
     else {
       const payload = (await res.json().catch(() => null)) as { error?: string } | null;
       alert(payload?.error ?? "Password reset failed.");

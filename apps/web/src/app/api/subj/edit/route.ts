@@ -6,6 +6,12 @@ import {
   updateSubject,
 } from "@/app/subj/subject.service";
 
+/**
+ * Serializes a Subject record for JSON responses.
+ *
+ * @param s - Subject record from Prisma.
+ * @returns Plain JSON-serializable object.
+ */
 const serializeSubject = (s: {
   id: bigint;
   nameKo: string;
@@ -24,6 +30,18 @@ const serializeSubject = (s: {
   updatedAt: s.updatedAt.toISOString(),
 });
 
+/**
+ * POST /api/subj/edit
+ *
+ * Updates an existing subject via JSON request body (partial update).
+ *
+ * Expected JSON:
+ * - id: string (required; integer string)
+ * - nameKo/nameEn/description/isActive: optional fields to update
+ *
+ * @param request - Next.js Request object.
+ * @returns JSON response with updated subject or error.
+ */
 export async function POST(request: Request) {
   let body: any;
   try {

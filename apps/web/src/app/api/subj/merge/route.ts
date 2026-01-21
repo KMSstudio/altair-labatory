@@ -5,6 +5,20 @@ import {
   parseMergeInputFromJson,
 } from "@/app/subj/subject.service";
 
+/**
+ * POST /api/subj/merge
+ *
+ * Merges two subjects via JSON request body.
+ * This endpoint moves LabSubject edges from `fromId` to `toId`.
+ *
+ * Expected JSON:
+ * - fromId: string (required; integer string)
+ * - toId: string (required; integer string)
+ * - deactivateFrom: boolean (optional; defaults to true)
+ *
+ * @param request - Next.js Request object.
+ * @returns JSON response with merge result summary or error.
+ */
 export async function POST(request: Request) {
   let body: any;
   try {

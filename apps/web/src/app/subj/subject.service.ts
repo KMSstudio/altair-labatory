@@ -16,18 +16,40 @@ export type SubjectMergeInput = {
   deactivateFrom: boolean;
 };
 
+/**
+ * Normalizes an arbitrary input into a trimmed string.
+ *
+ * @param value - Unknown input.
+ * @returns Trimmed string if non-empty; otherwise `null`.
+ */
 const normalizeText = (value: unknown): string | null => {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
   return trimmed.length ? trimmed : null;
 };
 
+/**
+ * Reads a required text field.
+ *
+ * @param value - Unknown input.
+ * @param field - Field name (used in error messages).
+ * @throws {Error} If missing or empty.
+ * @returns Non-empty trimmed string.
+ */
 const requireText = (value: unknown, field: string): string => {
   const normalized = normalizeText(value);
   if (!normalized) throw new Error(`${field} is required`);
   return normalized;
 };
 
+/**
+ * Parses an integer id represented as a string into `bigint`.
+ *
+ * @param raw - Raw input (expected string).
+ * @param field - Field name (used in error messages).
+ * @throws {Error} If not a string, empty, or not a valid integer string.
+ * @returns Parsed bigint.
+ */
 const parseId = (raw: unknown, field: string): bigint => {
   if (typeof raw !== "string") throw new Error(`${field} must be a string`);
   const trimmed = raw.trim();
@@ -39,20 +61,48 @@ const parseId = (raw: unknown, field: string): bigint => {
   }
 };
 
+/**
+ * Parses checkbox-like inputs.
+ *
+ * For FormData, checkboxes are typically submitted as "on" when checked,
+ * and omitted (null/undefined) when unchecked.
+ *
+ * @param raw - Raw input.
+ * @param defaultValue - Value returned when input is not a string.
+ * @returns Boolean interpretation of the input.
+ */
 const parseCheckbox = (raw: unknown, defaultValue: boolean): boolean => {
   if (typeof raw !== "string") return defaultValue;
   return raw === "on" || raw === "true" || raw === "1";
 };
 
+/**
+ * Parses a create payload from FormData.
+ *
+ * @param formData - FormData submitted from the browser.
+ * @throws {Error} On missing required fields.
+ * @returns SubjectCreateInput.
+ */
 export const parseCreateInputFromFormData = (formData: FormData): SubjectCreateInput => {
   return {
     nameKo: requireText(formData.get("nameKo"), "nameKo"),
     nameEn: requireText(formData.get("nameEn"), "nameEn"),
     description: normalizeText(formData.get("description")),
-    isActive: parseCheckbox(formData.get("isActive"), true),
+    // NOTE: unchecked checkbox => key omitted => should be false
+    isActive: parseCheckbox(formData.get("isActive"), false),
   };
 };
 
+/**
+ * Parses an update payload from FormData.
+ *
+ * This expects a full subject payload (same fields as create) plus an `id`.
+ * If you want partial updates, use {@link parseUpdateInputFromJson}.
+ *
+ * @param formData - FormData submitted from the browser.
+ * @throws {Error} If the id is invalid or required fields are missing.
+ * @returns Object containing `{ id, data }`.
+ */
 export const parseUpdateInputFromFormData = (
   formData: FormData,
 ): { id: bigint; data: SubjectCreateInput } => {
@@ -62,6 +112,13 @@ export const parseUpdateInputFromFormData = (
   return { id, data };
 };
 
+/**
+ * Parses a merge payload from FormData.
+ *
+ * @param formData - FormData submitted from the browser.
+ * @throws {Error} If ids are missing/invalid or equal.
+ * @returns SubjectMergeInput.
+ */
 export const parseMergeInputFromFormData = (formData: FormData): SubjectMergeInput => {
   const fromId = parseId(formData.get("fromId"), "fromId");
   const toId = parseId(formData.get("toId"), "toId");
@@ -74,6 +131,13 @@ export const parseMergeInputFromFormData = (formData: FormData): SubjectMergeInp
   };
 };
 
+/**
+ * Parses a create payload from JSON.
+ *
+ * @param body - Parsed JSON request body.
+ * @throws {Error} On missing required fields.
+ * @returns SubjectCreateInput.
+ */
 export const parseCreateInputFromJson = (body: any): SubjectCreateInput => {
   return {
     nameKo: requireText(body?.nameKo, "nameKo"),
@@ -83,6 +147,13 @@ export const parseCreateInputFromJson = (body: any): SubjectCreateInput => {
   };
 };
 
+/**
+ * Parses an update payload from JSON.
+ *
+ * @param body - Parsed JSON request body.
+ * @throws {Error} If id is invalid, field types are invalid, or no fields are provided.
+ * @returns Object containing `{ id, data }`.
+ */
 export const parseUpdateInputFromJson = (
   body: any,
 ): { id: bigint; data: Partial<SubjectCreateInput> } => {
@@ -102,6 +173,13 @@ export const parseUpdateInputFromJson = (
   return { id, data };
 };
 
+/**
+ * Parses a merge payload from JSON.
+ *
+ * @param body - Parsed JSON request body.
+ * @throws {Error} If ids are invalid or equal.
+ * @returns SubjectMergeInput.
+ */
 export const parseMergeInputFromJson = (body: any): SubjectMergeInput => {
   const fromId = parseId(body?.fromId, "fromId");
   const toId = parseId(body?.toId, "toId");
@@ -114,14 +192,39 @@ export const parseMergeInputFromJson = (body: any): SubjectMergeInput => {
   };
 };
 
+/**
+ * Creates a Subject row.
+ *
+ * @param data - SubjectCreateInput.
+ * @returns The created Subject record.
+ */
 export async function createSubject(data: SubjectCreateInput) {
   return prisma.subject.create({ data });
 }
 
+/**
+ * Updates a Subject row.
+ *
+ * @param id - Subject id.
+ * @param data - Partial update data.
+ * @returns The updated Subject record.
+ */
 export async function updateSubject(id: bigint, data: Partial<SubjectCreateInput>) {
   return prisma.subject.update({ where: { id }, data });
 }
 
+/**
+ * Merges two subjects.
+ *
+ * Behavior:
+ * - Moves all LabSubject edges from `fromId` to `toId`.
+ * - Deletes edges pointing to `fromId`.
+ * - Optionally deactivates the `fromId` subject (soft delete).
+ * - If destination has no description and source has one, copies it.
+ *
+ * @param input - Merge parameters.
+ * @returns Transaction result summary.
+ */
 export async function mergeSubjects(input: SubjectMergeInput) {
   const { fromId, toId, deactivateFrom } = input;
 
@@ -159,5 +262,11 @@ export async function mergeSubjects(input: SubjectMergeInput) {
   });
 }
 
+/**
+ * Checks whether an error is a Prisma unique constraint violation (P2002).
+ *
+ * @param e - Unknown caught value.
+ * @returns True when the error is P2002.
+ */
 export const isUniqueViolation = (e: unknown) =>
   e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";

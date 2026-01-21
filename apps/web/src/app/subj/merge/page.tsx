@@ -3,6 +3,13 @@ import { prisma } from "@labatory/db";
 import { mergeSubjects } from "../actions";
 import styles from "../subj.module.css";
 
+/**
+ * Loads subjects for the merge UI.
+ *
+ * We order by active status first so active subjects appear at the top.
+ *
+ * @returns Subjects list with minimal fields for selection.
+ */
 async function getSubjectsForMerge() {
   return prisma.subject.findMany({
     orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
@@ -15,6 +22,14 @@ async function getSubjectsForMerge() {
   });
 }
 
+/**
+ * /subj/merge
+ *
+ * Server Component page to merge two Subject rows.
+ * The merge server action moves LabSubject edges and deactivates the source.
+ *
+ * @returns JSX for the merge page.
+ */
 export default async function MergeSubjectPage() {
   const subjects = await getSubjectsForMerge();
 

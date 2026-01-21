@@ -15,7 +15,7 @@ type SubjectInput = {
 type SubjectDraft = {
   nameKo?: string;
   nameEn?: string;
-  description?: string;
+  description?: string | null;
   isActive?: boolean;
 };
 

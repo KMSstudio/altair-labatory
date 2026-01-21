@@ -270,22 +270,18 @@ model LabReviewReport {
 }
 
 // =========================
-// USER VERIFICATION TOKEN / USER PASSWORD CHANGE TOKEN
+// VERIFICATION TOKEN
 // =========================
 
-model UserVerificationToken {
+model VerificationToken {
   tokenHash String @unique @map("token_hash")
 
-  credentialId BigInt @map("credential_id")
+  credentialId BigInt? @map("credential_id")
+  sendEmail String @map("send_email")
 
-  expireAt DateTime @default(now()) @map("Expired_at")
-}
+  createdAt DateTime @default(now()) @map("created_at")
+  expireAt DateTime @default(now()) @map("expire_at")
+  usedAt DateTime? @map("used_at")
 
-
-model UserPasswordChangeToken {
-  tokenHash String @unique @map("token_hash")
-
-  credentialId BigInt @map("credential_id")
-
-  expireAt DateTime @default(now()) @map("Expired_at")
+  @@map("verification_token")
 }

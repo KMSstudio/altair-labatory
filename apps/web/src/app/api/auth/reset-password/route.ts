@@ -15,13 +15,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "token is required." }, { status: 400 });
 
 
-  const token = await prisma.userPasswordChangeToken.findUnique({
+  const token = await prisma.verificationToken.findUnique({
     where:{ tokenHash: body.tokenHash },
   })
-  if(!token){
+  if( !token ){
     return NextResponse.json({ error: "token not found." }, { status: 404 });
   }
-  
+
   const id = token.credentialId;
   if( !id )
     return NextResponse.json({ error: "invalid credential id." }, { status: 400 });
@@ -43,11 +43,12 @@ export async function POST(request: Request) {
         },
       });
 
-      await tx.userPasswordChangeToken.delete(
-        {
-            where: { tokenHash },
+      await tx.verificationToken.update({
+        where: { tokenHash },
+        data:{
+          usedAt: new Date(Date.now())
         }
-      );
+      });
     });
 
     return NextResponse.json({ ok: true });

@@ -26,9 +26,7 @@ async function getUser(userId: bigint) {
   });
 }
 
-export default async function UserDetailPage({ params }: {
-  params: { user_id: string };
-}) {
+export default async function UserDetailPage({ params }: { params: { user_id: string } }) {
   params = await params;
 
   let id: bigint;
@@ -100,28 +98,23 @@ export default async function UserDetailPage({ params }: {
                     <strong>ID:</strong> {cred.id.toString()}
                   </p>
                   <p>
-                    <strong>Provider:</strong>{" "}
-                    {cred.provider}
+                    <strong>Provider:</strong> {cred.provider}
                     {cred.isPrimary ? " (Primary)" : ""}
                   </p>
                   <p>
                     <strong>Email:</strong> {cred.email}
                   </p>
                   <p>
-                    <strong>Email verified:</strong>{" "}
-                    {cred.emailVerified ? "Yes" : "No"}
+                    <strong>Email verified:</strong> {cred.emailVerified ? "Yes" : "No"}
                   </p>
                   <p>
-                    <strong>Provider user ID:</strong>{" "}
-                    {cred.providerUserId}
+                    <strong>Provider user ID:</strong> {cred.providerUserId}
                   </p>
                   <p>
-                    <strong>Created:</strong>{" "}
-                    {cred.createdAt.toISOString()}
+                    <strong>Created:</strong> {cred.createdAt.toISOString()}
                   </p>
                   <p>
-                    <strong>Updated:</strong>{" "}
-                    {cred.updatedAt.toISOString()}
+                    <strong>Updated:</strong> {cred.updatedAt.toISOString()}
                   </p>
                 </li>
               ))}

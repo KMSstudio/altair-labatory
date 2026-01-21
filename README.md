@@ -62,6 +62,23 @@ npm run web:dev
 - `packages/db` — Prisma schema, migrations, seed
 - `packages/auth` — Auth utilities (depends on db)
 
+## Linting (Prettier + ESLint)
+
+This repository uses **Prettier** for formatting and **ESLint** for code-quality rules.
+Run linting **before opening a PR**. CI may fail if lint checks do not pass.
+
+### Fix formatting and lint issues (auto-fix)
+
+```bash
+npm run web:lint
+```
+
+### Check only (no modifications)
+
+```bash
+npm run web:lint:check
+```
+
 ## Common issues
 - **DB not ready**: wait for the health check (Compose retries), or rerun `npm run db:up`.
 - **Prisma errors**: confirm `DATABASE_URL` matches `.env` and the container port `4821`.

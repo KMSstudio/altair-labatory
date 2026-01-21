@@ -73,8 +73,7 @@ export const authOptions: NextAuthOptions = {
       if (!account) return false;
       if (account.provider !== "google") return true;
 
-      const providerUserId =
-        account.providerAccountId || (profile as { sub?: string } | null)?.sub;
+      const providerUserId = account.providerAccountId || (profile as { sub?: string } | null)?.sub;
       if (!providerUserId) return false;
 
       // schema: UserCredential.email is required (String)

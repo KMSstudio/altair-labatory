@@ -17,9 +17,7 @@ export default function AdminPage() {
         <div className={styles.panelHead}>
           <div>
             <h2>Admin sections</h2>
-            <p className={styles.muted}>
-              Each button opens a dedicated admin area.
-            </p>
+            <p className={styles.muted}>Each button opens a dedicated admin area.</p>
           </div>
         </div>
         <div className={styles.actions}>

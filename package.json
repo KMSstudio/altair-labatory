@@ -23,7 +23,8 @@
     "web:dev": "npm -w @labatory/web run dev",
     "web:build": "npm -w @labatory/web run build",
     "web:start": "npm -w @labatory/web run start",
-    "web:lint": "npm -w @labatory/web run lint",
+    "web:lint": "npm -w @labatory/web run format && npm -w @labatory/web run lint:fix",
+    "web:lint:check": "npm -w @labatory/web run format:check && npm -w @labatory/web run lint",
 
     "dev": "npm run db:up && npm run web:dev"
   }

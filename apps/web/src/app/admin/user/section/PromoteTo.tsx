@@ -46,6 +46,6 @@ export function PromoteTo({ promoteRole }: { promoteRole: UserRole }) {
           {loading ? "Processing.." : "Promote"}
         </button>
       </div>
-    </section> 
+    </section>
   );
 }

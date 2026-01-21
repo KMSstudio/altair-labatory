@@ -9,11 +9,11 @@ export function PIApplicationForm() {
 
   const [requestedName, SetRequestedName] = useState("");
   const [labId, SetLabId] = useState("");
-  const [scholarUrl,SetScholarUrl]=useState("");
+  const [scholarUrl, SetScholarUrl] = useState("");
   const [note, SetNote] = useState("");
 
   const router = useRouter();
-  
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     setSubmitting(true);
     e.preventDefault();
@@ -21,8 +21,8 @@ export function PIApplicationForm() {
     try {
       await submitPIApplicationAction({ requestedName, labId, scholarUrl, note });
       router.push("/check");
-    } catch (error: any){
-      alert(error.message);
+    } catch (error) {
+      if (error instanceof Error) alert(error.message);
       setSubmitting(false);
     }
   }
@@ -34,7 +34,7 @@ export function PIApplicationForm() {
         <input
           name="requestedName"
           value={requestedName}
-          onChange={(e)=>SetRequestedName(e.target.value)}
+          onChange={(e) => SetRequestedName(e.target.value)}
           required
         />
       </div>
@@ -43,7 +43,7 @@ export function PIApplicationForm() {
         <input
           name="labId"
           value={labId}
-          onChange={(e)=>SetLabId(e.target.value)}
+          onChange={(e) => SetLabId(e.target.value)}
           placeholder="e.g. 10"
         />
       </div>
@@ -52,18 +52,14 @@ export function PIApplicationForm() {
         <input
           name="scholarUrl"
           value={scholarUrl}
-          onChange={(e)=>SetScholarUrl(e.target.value)}
+          onChange={(e) => SetScholarUrl(e.target.value)}
           placeholder="https://scholar.google.com/..."
           required
         />
       </div>
       <div>
         <label>Note (optional)</label>
-        <textarea
-          name="note"
-          value={note}
-          onChange={(e)=>SetNote(e.target.value)}
-        />
+        <textarea name="note" value={note} onChange={(e) => SetNote(e.target.value)} />
       </div>
       <button type="submit" disabled={submitting}>
         {submitting ? "Submitting..." : "Submit"}

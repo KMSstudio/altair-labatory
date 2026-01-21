@@ -11,9 +11,7 @@ async function getUser(userId: bigint) {
   });
 }
 
-export default async function EditUserPage({ params }: {
-  params:{ user_id : string }
-}) {
+export default async function EditUserPage({ params }: { params: { user_id: string } }) {
   params = await params;
 
   let id: bigint;
@@ -53,22 +51,13 @@ export default async function EditUserPage({ params }: {
 
           <label>
             Display name *
-            <input
-              name="displayName"
-              defaultValue={user.displayName}
-              required
-            />
+            <input name="displayName" defaultValue={user.displayName} required />
           </label>
 
           <label>
             Primary email
-            <input
-              name="primaryEmail"
-              type="email"
-              defaultValue={user.primaryEmail ?? ""}
-            />
+            <input name="primaryEmail" type="email" defaultValue={user.primaryEmail ?? ""} />
           </label>
-
 
           <div className={`${styles.actions} ${styles.actionsEnd}`}>
             <button className={styles.primary} type="submit">
@@ -76,7 +65,6 @@ export default async function EditUserPage({ params }: {
             </button>
           </div>
         </form>
-
       </main>
     </Layout>
   );

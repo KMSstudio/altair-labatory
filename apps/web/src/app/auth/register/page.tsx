@@ -23,7 +23,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ displayName, email, password })
+      body: JSON.stringify({ displayName, email, password }),
     });
 
     if (!res.ok) {
@@ -36,7 +36,7 @@ export default function RegisterPage() {
     const result = await signIn("credentials", {
       email,
       password,
-      redirect: false
+      redirect: false,
     });
 
     setLoading(false);

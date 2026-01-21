@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 
 const ExpireDuration = Number(process.env.EXPIRE_DURATION) ?? 50;
 
-export async function SendVerification({ credentialId, userEmail }:{ credentialId: bigint | null, userEmail: string }) {
+export async function SendVerification({ credentialId, userEmail }:{ credentialId: bigint, userEmail: string }) {
  
     const rawToken = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");

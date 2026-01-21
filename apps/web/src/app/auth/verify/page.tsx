@@ -20,14 +20,16 @@ export default async function Page({ searchParams } : { searchParams: { token?: 
     if(token.usedAt !== null) {
         return <div>이미 이메일을 인증하였습니다.</div>
     }
+    if(!token.credentialId) {
+        return <div>무언가 잘못되었습니다.</div>
+    }
+
     try {  
-        const id = token.credentialId ?? undefined;
-        const email = token.sendEmail;
+        const id = token.credentialId;
         await prisma.$transaction(async (tx) => {
             await tx.userCredential.update({
                 where:{ 
                     id,
-                    email,
                  },
                 data:{ emailVerified: true }
             })

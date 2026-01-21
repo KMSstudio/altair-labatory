@@ -14,13 +14,13 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const ExpireDuration = Number(process.env.EXPIRE_DURATION) ?? 50;
+const EXPIRE_DURATION = Number(process.env.EXPIRE_DURATION) ?? 50;
 
 export async function SendVerification({ credentialId, userEmail }:{ credentialId: bigint, userEmail: string }) {
  
     const rawToken = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
-    const expireAt = new Date(Date.now() + 1000 * 60 * ExpireDuration);
+    const expireAt = new Date(Date.now() + 1000 * 60 * EXPIRE_DURATION);
 
     try {
         await prisma.verificationToken.create({
@@ -45,11 +45,11 @@ export async function SendVerification({ credentialId, userEmail }:{ credentialI
             from: `"Your Service" <${process.env.EMAIL_NAME}@${process.env.EMAIL_DOMAIN_NAME}>`,
             to: userEmail,
             subject: "이메일 인증을 완료해 주세요",
-            text: `아래 링크를 눌러 이메일 인증을 완료해 주세요:\n${verifyUrl.toString()}\n\n이 링크는 ${ExpireDuration}분 후 만료됩니다.`,
+            text: `아래 링크를 눌러 이메일 인증을 완료해 주세요:\n${verifyUrl.toString()}\n\n이 링크는 ${EXPIRE_DURATION}분 후 만료됩니다.`,
             html: `
             <p>아래 버튼을 눌러 이메일 인증을 완료해 주세요.</p>
             <p><a href="${verifyUrl.toString()}">이메일 인증하기</a></p>
-            <p>이 링크는 ${ExpireDuration}분 후 만료됩니다.</p>
+            <p>이 링크는 ${EXPIRE_DURATION}분 후 만료됩니다.</p>
             `,
         });
     } catch {
@@ -62,7 +62,7 @@ export async function SendPasswordReset({credentialId, userEmail}:{ credentialId
 
     const rawToken = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
-    const expireAt = new Date(Date.now() + 1000 * 60 * ExpireDuration);
+    const expireAt = new Date(Date.now() + 1000 * 60 * EXPIRE_DURATION);
 
     try{
         await prisma.verificationToken.create({
@@ -87,11 +87,11 @@ export async function SendPasswordReset({credentialId, userEmail}:{ credentialId
             from: `"Your Service" <${process.env.EMAIL_NAME}@${process.env.EMAIL_DOMAIN_NAME}>`,
             to: userEmail,
             subject: "비밀번호를 변경해 주세요",
-            text: `아래 링크를 눌러 비밀번호를 변경해 주세요:\n${verifyUrl.toString()}\n\n이 링크는 ${ExpireDuration}분 후 만료됩니다.`,
+            text: `아래 링크를 눌러 비밀번호를 변경해 주세요:\n${verifyUrl.toString()}\n\n이 링크는 ${EXPIRE_DURATION}분 후 만료됩니다.`,
             html: `
             <p>아래 버튼을 눌러 비밀번호를 변경해 주세요.</p>
             <p><a href="${verifyUrl.toString()}">비밀번호 변경하기</a></p>
-            <p>이 링크는 ${ExpireDuration}분 후 만료됩니다.</p>
+            <p>이 링크는 ${EXPIRE_DURATION}분 후 만료됩니다.</p>
             `,
         });
     } catch {

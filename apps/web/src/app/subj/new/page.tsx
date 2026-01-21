@@ -75,21 +75,37 @@ export default async function NewSubjectPage({ searchParams }: NewSubjectPagePro
         </section>
       )}
 
+      {errorText && (
+        <section className={`${styles.panel} ${styles.dangerZone}`}>
+          <p className={styles.eyebrow}>Error</p>
+          <p className={styles.value}>{errorText}</p>
+          {error === "unique" && (
+            <p className={styles.muted}>
+              Duplicate Korean/English name is not allowed (DB unique constraint).
+            </p>
+          )}
+        </section>
+      )}
+
       <form action={createSubject} className={styles.form}>
         <label>
           Korean name *
+          <input name="nameKo" placeholder="컴퓨터 비전" defaultValue={nameKo} required />
           <input name="nameKo" placeholder="컴퓨터 비전" defaultValue={nameKo} required />
         </label>
         <label>
           English name *
           <input name="nameEn" placeholder="Computer Vision" defaultValue={nameEn} required />
+          <input name="nameEn" placeholder="Computer Vision" defaultValue={nameEn} required />
         </label>
         <label>
           Description
           <input name="description" placeholder="Short summary" defaultValue={description} />
+          <input name="description" placeholder="Short summary" defaultValue={description} />
         </label>
         <label>
           Active
+          <input name="isActive" type="checkbox" defaultChecked={isActive} />
           <input name="isActive" type="checkbox" defaultChecked={isActive} />
         </label>
 

@@ -6,6 +6,14 @@ import {
   parseCreateInputFromJson,
 } from "@/app/subj/subject.service";
 
+/**
+ * Serializes a Subject record for JSON responses.
+ *
+ * Prisma returns `bigint` for ids; JSON does not support bigint, so we convert.
+ *
+ * @param s - Subject record from Prisma.
+ * @returns Plain JSON-serializable object.
+ */
 const serializeSubject = (s: {
   id: bigint;
   nameKo: string;
@@ -24,6 +32,20 @@ const serializeSubject = (s: {
   updatedAt: s.updatedAt.toISOString(),
 });
 
+/**
+ * POST /api/subj/new
+ *
+ * Creates a new subject via JSON request body.
+ *
+ * Expected JSON:
+ * - nameKo: string (required)
+ * - nameEn: string (required)
+ * - description: string | null (optional)
+ * - isActive: boolean (optional; defaults to true)
+ *
+ * @param request - Next.js Request object.
+ * @returns JSON response with created subject or error.
+ */
 export async function POST(request: Request) {
   let body: any;
   try {

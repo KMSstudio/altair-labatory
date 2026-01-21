@@ -8,16 +8,34 @@ type ListPageProps = {
     | Promise<Record<string, string | string[] | undefined>>;
 };
 
+/**
+ * Normalizes a query parameter that may come as a string or string[].
+ *
+ * @param value - Raw query param value.
+ * @returns Single string (empty string when missing).
+ */
 const normalizeQuery = (value: string | string[] | undefined): string => {
   if (!value) return "";
   return Array.isArray(value) ? value[0] ?? "" : value;
 };
 
+/**
+ * Restricts status filter to a safe union type.
+ *
+ * @param value - Normalized string.
+ * @returns "all" | "active" | "inactive".
+ */
 const normalizeFilter = (value: string): "all" | "active" | "inactive" => {
   if (value === "active" || value === "inactive") return value;
   return "all";
 };
 
+/**
+ * Loads subjects from the database with basic search and status filtering.
+ *
+ * @param params - Search query and status filter.
+ * @returns List of subjects (selected fields).
+ */
 async function getSubjects(params: { q: string; status: "all" | "active" | "inactive" }) {
   const where: any = {};
   const q = params.q.trim();
@@ -46,6 +64,14 @@ async function getSubjects(params: { q: string; status: "all" | "active" | "inac
   });
 }
 
+/**
+ * /subj/list
+ *
+ * Server Component page that lists subjects and provides GET-based filters.
+ *
+ * @param props - Next.js page props.
+ * @returns JSX for the list page.
+ */
 export default async function SubjectListPage({ searchParams }: ListPageProps) {
   const sp = (await searchParams) ?? {};
   const q = normalizeQuery(sp.q);

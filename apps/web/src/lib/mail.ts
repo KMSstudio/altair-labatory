@@ -18,8 +18,8 @@ const EXPIRE_DURATION = Number(process.env.EXPIRE_DURATION) ?? 50;
 
 export async function SendVerification({ credentialId, userEmail }:{ credentialId: bigint, userEmail: string }) {
  
-    const rawToken = crypto.randomBytes(32).toString("hex");
-    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const rawToken = crypto.randomBytes(3).toString("hex");
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex").slice(0, 5);
     const expireAt = new Date(Date.now() + 1000 * 60 * EXPIRE_DURATION);
 
     try {
@@ -39,6 +39,7 @@ export async function SendVerification({ credentialId, userEmail }:{ credentialI
 
     const verifyUrl=new URL("/auth/verify", process.env.NEXTAUTH_URL);
     verifyUrl.searchParams.set("token", tokenHash);
+    verifyUrl.searchParams.set("email", userEmail);
 
     try {
         await transporter.sendMail({
@@ -60,8 +61,8 @@ export async function SendVerification({ credentialId, userEmail }:{ credentialI
 
 export async function SendPasswordReset({credentialId, userEmail}:{ credentialId: bigint, userEmail: string }){
 
-    const rawToken = crypto.randomBytes(32).toString("hex");
-    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const rawToken = crypto.randomBytes(3).toString("hex");
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex").slice(0, 5);
     const expireAt = new Date(Date.now() + 1000 * 60 * EXPIRE_DURATION);
 
     try{
@@ -81,6 +82,7 @@ export async function SendPasswordReset({credentialId, userEmail}:{ credentialId
 
     const verifyUrl = new URL("/auth/reset-password", process.env.NEXTAUTH_URL);
     verifyUrl.searchParams.set("token", tokenHash);
+    verifyUrl.searchParams.set("email", userEmail);
 
     try{
         await transporter.sendMail({

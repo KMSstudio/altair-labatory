@@ -286,4 +286,5 @@ model VerificationToken {
   usedAt DateTime? @map("used_at")
 
   @@map("verification_token")
+  @@index(tokenHash)
 }

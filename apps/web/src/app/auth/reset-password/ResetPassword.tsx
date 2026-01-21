@@ -1,6 +1,6 @@
 "use client";
 
-export function ResetPassword({ token }: { token: string }) {
+export function ResetPassword({ token, email }: { token: string , email: string  }) {
 
   async function onSubmit(formData: FormData) {
     const password = formData.get("password");
@@ -15,6 +15,7 @@ export function ResetPassword({ token }: { token: string }) {
       method: "POST",
       body: JSON.stringify({
         tokenHash: token,
+        email: email,
         password: password,
       }),
     });

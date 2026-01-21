@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "token is required." }, { status: 400 });
 
 
-  const token = await prisma.verificationToken.findUnique({
+  const token = await prisma.verificationToken.findFirst({
     where:{ tokenHash: body.tokenHash },
   })
   if( !token ){

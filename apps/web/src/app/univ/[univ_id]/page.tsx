@@ -25,11 +25,17 @@ async function getUniversity(univId: bigint) {
 }
 
 export default async function UniversityDetailPage({ params }: UnivPageProps) {
-  params = await params
+  params = await params;
   let id: bigint;
-  try { id = BigInt(params.univ_id); } catch { notFound(); }
+  try {
+    id = BigInt(params.univ_id);
+  } catch {
+    notFound();
+  }
   const university = await getUniversity(id);
-  if (!university) { notFound(); }
+  if (!university) {
+    notFound();
+  }
 
   return (
     <main className={styles.univShell}>
@@ -57,7 +63,12 @@ export default async function UniversityDetailPage({ params }: UnivPageProps) {
         <div>
           <p className={styles.eyebrow}>Website</p>
           {university.websiteUrl ? (
-            <a className={styles.value} href={university.websiteUrl} target="_blank" rel="noreferrer">
+            <a
+              className={styles.value}
+              href={university.websiteUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
               {university.websiteUrl}
             </a>
           ) : (

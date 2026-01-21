@@ -9,15 +9,21 @@ const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 export async function POST(request: Request) {
   let body: { email?: string; password?: string; displayName?: string };
-  try { body = await request.json(); }
-  catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
 
   const email = body.email ? normalizeEmail(body.email) : "";
   const password = body.password ?? "";
   const displayName = body.displayName ? body.displayName.trim() : "";
 
   if (!email || !password || !displayName)
-    return NextResponse.json({ error: "Email, password, and display name are required." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Email, password, and display name are required." },
+      { status: 400 },
+    );
 
   if (password.length < 8)
     return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });

@@ -15,11 +15,17 @@ async function getUniversity(univId: bigint) {
 }
 
 export default async function EditUniversityPage({ params }: EditPageProps) {
-  params = await params
+  params = await params;
   let id: bigint;
-  try { id = BigInt(params.univ_id); } catch { notFound(); }
+  try {
+    id = BigInt(params.univ_id);
+  } catch {
+    notFound();
+  }
   const university = await getUniversity(id);
-  if (!university) { notFound(); }
+  if (!university) {
+    notFound();
+  }
 
   return (
     <main className={styles.univFormShell}>
@@ -40,7 +46,6 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
           </Link>
         </div>
       </header>
-
       <form action={updateUniversity} className={styles.form}>
         <input type="hidden" name="id" value={university.id.toString()} />
         <label>
@@ -66,7 +71,6 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
           </button>
         </div>
       </form>
-
       <form action={deleteUniversity} className={`${styles.form} ${styles.dangerZone}`}>
         <input type="hidden" name="id" value={university.id.toString()} />
         <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
@@ -74,7 +78,8 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
             Delete university
           </button>
         </div>
-      </form>=
+      </form>
+      =
     </main>
   );
 }

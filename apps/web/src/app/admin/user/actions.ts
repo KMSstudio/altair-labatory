@@ -80,7 +80,10 @@ export async function updateUser(formData: FormData): Promise<never> {
  * @param params.userRole - Role to set for the user.
  * @throws If user does not exist.
  */
-export async function promoteToAction(params: { userId: string; userRole: UserRole }): Promise<void> {
+export async function promoteToAction(params: {
+  userId: string;
+  userRole: UserRole;
+}): Promise<void> {
   const id = BigInt(params.userId);
 
   const user = await prisma.user.findUnique({ where: { id } });

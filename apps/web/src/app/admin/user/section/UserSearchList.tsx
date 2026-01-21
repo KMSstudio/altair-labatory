@@ -7,8 +7,7 @@ import { useMemo, useState } from "react";
 import { UserListSection } from "./UserListSection";
 import styles from "../../admin.module.css";
 
-const normalizeField = (raw: string): string =>
-  raw === "email" || raw === "all" ? raw : "name";
+const normalizeField = (raw: string): string => (raw === "email" || raw === "all" ? raw : "name");
 const norm = (v: string) => v.trim().toLowerCase();
 
 export function UserSearchList({ initialUsers }: { initialUsers: User[] }) {

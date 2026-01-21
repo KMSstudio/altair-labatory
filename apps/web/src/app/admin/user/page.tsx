@@ -25,9 +25,7 @@ export default async function AdminUserPage() {
           <div>
             <p className={styles.eyebrow}>Admin</p>
             <h1>Users</h1>
-            <p className={styles.lede}>
-              Prisma Based User Table Request (Administrator only)
-            </p>
+            <p className={styles.lede}>Prisma Based User Table Request (Administrator only)</p>
           </div>
         </header>
 

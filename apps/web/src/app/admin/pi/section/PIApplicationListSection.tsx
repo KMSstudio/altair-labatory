@@ -17,15 +17,10 @@ export function PIApplicationListItem({
         <p>School Email: {application.schoolEmail}</p>
         <p>Lab Id: {application.labId}</p>
         <p>Status: {application.status}</p>
-        <p>
-          Created at:{" "}
-          {new Date(application.createdAt).toLocaleDateString()}
-        </p>
+        <p>Created at: {new Date(application.createdAt).toLocaleDateString()}</p>
       </div>
       <div>
-        <Link href={`/admin/pi/${application.id}`}>
-            View
-        </Link>
+        <Link href={`/admin/pi/${application.id}`}>View</Link>
       </div>
     </li>
   );
@@ -49,7 +44,7 @@ export function PIApplicationListSection({
       ) : (
         <ul>
           {applications.map((application) => (
-            <PIApplicationListItem key={application.id} application={application}/>
+            <PIApplicationListItem key={application.id} application={application} />
           ))}
         </ul>
       )}

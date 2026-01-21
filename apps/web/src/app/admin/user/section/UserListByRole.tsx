@@ -3,10 +3,8 @@ import { getUserByRole } from "../actions";
 import { UserListSection } from "./UserListSection";
 import styles from "../../admin.module.css";
 
-export async function UserListByRole({
-  userRole
-}: { userRole: UserRole; }) {
-  const users = await getUserByRole({ userRole, })
+export async function UserListByRole({ userRole }: { userRole: UserRole }) {
+  const users = await getUserByRole({ userRole });
 
   return (
     <section className={styles.card}>

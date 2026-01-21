@@ -25,15 +25,9 @@ export default async function PIApplicationPage() {
     <main>
       <h1>PI Applications</h1>
 
-      <PIApplicationListSection
-        title="Pending Applications"
-        applications={pendingApplications}
-      />
+      <PIApplicationListSection title="Pending Applications" applications={pendingApplications} />
 
-      <PIApplicationListSection
-        title="Decided Applications"
-        applications={decidedApplications}
-      />
+      <PIApplicationListSection title="Decided Applications" applications={decidedApplications} />
     </main>
   );
 }

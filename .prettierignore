@@ -1,0 +1,13 @@
+**/node_modules/**
+**/.next/**
+**/out/**
+**/build/**
+**/dist/**
+**/.turbo/**
+**/.cache/**
+**/coverage/**
+**/.DS_Store
+**/*.log
+
+# Prisma migrations (generated files)
+**/prisma/migrations/**

@@ -38,7 +38,7 @@ export async function submitPIApplicationAction(params: {
   const sessionSchoolEmail = session.user.primaryEmail;
 
   if (!sessionUserId) {
-   throw Error("Invalid session userId");
+    throw Error("Invalid session userId");
   }
   if (!sessionSchoolEmail) {
     throw Error("Invalid session schoolEmail");
@@ -56,26 +56,26 @@ export async function submitPIApplicationAction(params: {
     throw Error("scholarUrl is invalid");
   }
 
-  let labId: bigint | null = null;
+  const labId: bigint | null = null;
 
   const existingPending = await prisma.pIApplication.findFirst({
     where: { userId: sessionUserId, status: "PENDING" },
     select: { id: true },
   });
   if (existingPending) {
-      throw Error("A pending PI application already exists.");
+    throw Error("A pending PI application already exists.");
   }
 
   try {
     await prisma.pIApplication.create({
-        data: {
+      data: {
         userId: sessionUserId,
         requestedName: requestedName,
         labId: labId,
         schoolEmail: sessionSchoolEmail,
-        ScholarUrl:scholarUrl,
+        ScholarUrl: scholarUrl,
         note: note,
-        },
+      },
     });
   } catch {
     throw Error("Internal server error");

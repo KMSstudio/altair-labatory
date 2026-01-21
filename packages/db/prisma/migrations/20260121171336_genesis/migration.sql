@@ -230,6 +230,9 @@ CREATE INDEX "idx_review_reports_reporter_created" ON "lab_review_reports"("repo
 -- CreateIndex
 CREATE UNIQUE INDEX "lab_review_reports_review_id_reporter_id_key" ON "lab_review_reports"("review_id", "reporter_id");
 
+-- CreateIndex
+CREATE INDEX "verification_token_token_hash_idx" ON "verification_token"("token_hash");
+
 -- AddForeignKey
 ALTER TABLE "user_credentials" ADD CONSTRAINT "user_credentials_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

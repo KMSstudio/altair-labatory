@@ -32,7 +32,7 @@ export function ResetPassword({ token, email }: { token: string , email: string 
   return (
     <form action={onSubmit}>
       <input type="password" name="password" placeholder="new password" />
-      <input type="passwordCheck" name="passwordCheck" placeholder="new password check" />
+      <input type="password" name="passwordCheck" placeholder="new password check" />
       <button>변경</button>
     </form>
   );

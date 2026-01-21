@@ -25,7 +25,7 @@ export default async function Page({ searchParams } : { searchParams: { token?: 
             return <div>메일이 만료되었습니다.</div>
         }
         if(token.usedAt !== null) {
-            return <div>이미 이메일을 인증하였습니다.</div>
+            return <div>이미 비밀번호를 변경하였습니다.</div>
         }
         if(!token.credentialId) {
             return <div>무언가 잘못되었습니다.</div>

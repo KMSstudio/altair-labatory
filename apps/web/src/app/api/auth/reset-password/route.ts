@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       sendEmail: email
     },
   })
-    for (const token of tokens){
+  for (const token of tokens){
       if(token.sendEmail !== email) continue;
     if( !token ){
       return NextResponse.json({ error: "token not found." }, { status: 404 });

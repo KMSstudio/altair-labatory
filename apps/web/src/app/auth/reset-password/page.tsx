@@ -1,6 +1,6 @@
 // @/app/reset-password/page.tsx
 
-import { prisma, VerificationToken } from "@labatory/db";
+import { prisma } from "@labatory/db";
 import { ResetPassword } from "./ResetPassword";
 
 export default async function Page({ searchParams } : { searchParams: { token?: string, email?: string }}) {

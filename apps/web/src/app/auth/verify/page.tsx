@@ -14,6 +14,7 @@ export default async function Page({ searchParams } : { searchParams: { token?: 
 
     for (const token of tokens){
         if(token.sendEmail !== tokenParams.email) continue;
+        
         if(!token) {
             return <div>유효하지 않은 접근입니다.</div>
         }

@@ -15,7 +15,7 @@ export type {
   LabSubject,
   LabReview,
   LabReviewReport,
-  verificationToken,
+  VerificationToken,
 } from "@prisma/client";
 
 // enum

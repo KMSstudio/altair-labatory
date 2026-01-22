@@ -147,6 +147,20 @@ CREATE TABLE "lab_review_reports" (
     CONSTRAINT "lab_review_reports_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "verification_token" (
+    "id" BIGSERIAL NOT NULL,
+    "token_hash" TEXT NOT NULL,
+    "credential_id" BIGINT,
+    "send_email" TEXT NOT NULL,
+    "string_val" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expire_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "used_at" TIMESTAMP(3),
+
+    CONSTRAINT "verification_token_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE INDEX "idx_user_credentials_user_id" ON "user_credentials"("user_id");
 
@@ -215,6 +229,9 @@ CREATE INDEX "idx_review_reports_reporter_created" ON "lab_review_reports"("repo
 
 -- CreateIndex
 CREATE UNIQUE INDEX "lab_review_reports_review_id_reporter_id_key" ON "lab_review_reports"("review_id", "reporter_id");
+
+-- CreateIndex
+CREATE INDEX "verification_token_token_hash_idx" ON "verification_token"("token_hash");
 
 -- AddForeignKey
 ALTER TABLE "user_credentials" ADD CONSTRAINT "user_credentials_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -268,3 +268,23 @@ model LabReviewReport {
   @@index([reporterId, createdAt],  map: "idx_review_reports_reporter_created")
   @@map("lab_review_reports")
 }
+
+// =========================
+// VERIFICATION TOKEN
+// =========================
+
+model VerificationToken {
+  id BigInt @id @default(autoincrement())
+  tokenHash String @map("token_hash")
+
+  credentialId BigInt? @map("credential_id")
+  sendEmail String @map("send_email")
+  stringVal String? @map("string_val")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  expireAt DateTime @default(now()) @map("expire_at")
+  usedAt DateTime? @map("used_at")
+
+  @@map("verification_token")
+  @@index(tokenHash)
+}

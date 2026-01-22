@@ -1,7 +1,7 @@
 // @/app/api/auth/register/route.ts
 
 import { NextResponse } from "next/server";
-import { hash } from "bcryptjs";
+import { passwordHashing } from "@/lib/auth";
 import { prisma } from "@labatory/db";
 import { Prisma } from "@prisma/client";
 
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
 
   try {
-    const passwordHash = hash(password, 10);
+    const passwordHash = await passwordHashing(password);
 
     // $transaction: wraps the DB operations below into a single transaction (all-or-nothing). Used for observe ACID.
     await prisma.$transaction(async (tx) => {

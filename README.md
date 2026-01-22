@@ -2,8 +2,8 @@
 # Labatory Monorepo
 
 > Last Revised: 01.12.2026  
-> Date Created: 01.12.2026  
-> Latest Reviser: Jiho Tyu  
+> Date Created: 01.22.2026  
+> Latest Reviser: MyeongSeok Kang  
 > Revisers: KMSStudio, Jihoon Kim, Jiho Ryu
 
 Monorepo for the Altair Labatory project.

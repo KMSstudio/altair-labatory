@@ -153,7 +153,7 @@ CREATE TABLE "verification_token" (
     "token_hash" TEXT NOT NULL,
     "credential_id" BIGINT,
     "send_email" TEXT NOT NULL,
-    "string_bio" TEXT,
+    "string_val" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "expire_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "used_at" TIMESTAMP(3),

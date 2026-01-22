@@ -279,7 +279,7 @@ model VerificationToken {
 
   credentialId BigInt? @map("credential_id")
   sendEmail String @map("send_email")
-  stringBio String? @map("string_bio")
+  stringVal String? @map("string_val")
 
   createdAt DateTime @default(now()) @map("created_at")
   expireAt DateTime @default(now()) @map("expire_at")

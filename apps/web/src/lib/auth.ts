@@ -3,7 +3,7 @@
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcryptjs";
+import { hash, compare } from "bcryptjs";
 import { prisma } from "@labatory/db";
 import { Prisma } from "@prisma/client";
 
@@ -30,6 +30,8 @@ async function loadUserTokenData(userId: bigint) {
     piId: user.pi?.id ? user.pi.id.toString() : null,
   };
 }
+
+export const passwordHashing = (str: string): Promise<string> => hash(str, 10);
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },

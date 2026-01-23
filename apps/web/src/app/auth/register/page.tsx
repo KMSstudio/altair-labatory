@@ -3,7 +3,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { SendVerification } from "@/lib/mail";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +21,20 @@ export default function RegisterPage() {
     const displayName = String(formData.get("displayName") || "").trim();
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
+
+    try {
+      if (!SendVerification({ stringVal: JSON.stringify({ displayName, email, password }), userEmail: email })) {
+        setError("Fail to send Email. please try again.");
+        return;
+      }
+    } catch {
+      setError("Internal serer error");
+      return;
+    }
+
+    const IGNORE_EMAIL_VERIFY = process.env.IGNORE_EMAIL_VERIFY ?? "";
+    if (!(IGNORE_EMAIL_VERIFY === "1" || IGNORE_EMAIL_VERIFY.toUpperCase() === "TRUE"))
+      window.location.href = `/auth/verify-email?email=${email}`;
 
     const res = await fetch("/api/auth/register", {
       method: "POST",

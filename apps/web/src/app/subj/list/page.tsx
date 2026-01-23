@@ -3,9 +3,7 @@ import { prisma } from "@labatory/db";
 import styles from "../subj.module.css";
 
 type ListPageProps = {
-  searchParams?:
-    | Record<string, string | string[] | undefined>
-    | Promise<Record<string, string | string[] | undefined>>;
+  searchParams?: Record<string, string | string[] | undefined>;
 };
 
 /**
@@ -136,21 +134,18 @@ export default async function SubjectListPage({ searchParams }: ListPageProps) {
         ) : (
           <ul className={styles.subjGrid}>
             {subjects.map((s) => (
-              <li key={s.id.toString()} className={styles.card}>
-                <div className={styles.cardHead}>
-                  <div>
-                    <p className={styles.eyebrow}>ID {s.id.toString()}</p>
-                    <h3>{s.nameKo}</h3>
-                    <p className={styles.muted}>{s.nameEn}</p>
+              <li key={s.id.toString()}>
+                <Link href={`/subj/${s.id.toString()}`} className={`${styles.card} ${styles.cardLink}`}>
+                  <div className={styles.cardHead}>
+                    <div>
+                      <h3>{s.nameKo}</h3>
+                      <p className={styles.muted}>{s.nameEn}</p>
+                    </div>
+                    <div className={styles.statusTag}>{s.isActive ? "Active" : "Inactive"}</div>
                   </div>
-                  <div className={styles.statusTag}>{s.isActive ? "Active" : "Inactive"}</div>
-                </div>
 
-                <p className={styles.muted}>{s.description ?? "No description"}</p>
-
-                <div className={styles.actions}>
-                  <Link href={`/subj/${s.id.toString()}`}>View</Link>
-                </div>
+                  <p className={styles.muted}>{s.description ?? "No description"}</p>
+                </Link>
               </li>
             ))}
           </ul>

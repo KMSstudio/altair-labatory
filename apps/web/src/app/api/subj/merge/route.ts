@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import {
   mergeSubjects,
   parseMergeInputFromJson,
-} from "@/app/subj/subject.service";
+} from "@/util/subj.action";
 
 /**
  * POST /api/subj/merge

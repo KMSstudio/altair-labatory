@@ -1,23 +1,19 @@
 "use server";
 
-import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-type SubjectInput = {
-  nameKo: string;
-  nameEn: string;
-  description: string | null;
-  isActive: boolean;
-};
-
-type SubjectDraft = {
-  nameKo?: string;
-  nameEn?: string;
-  description?: string | null;
-  isActive?: boolean;
-};
+import {
+  SubjectCreateInput,
+  isKnownRequestError,
+  getUniqueTargets,
+  with_transaction,
+  create_subject,
+  update_subject,
+  find_subject_unique,
+  find_lab_subject_links_by_subject,
+  find_subject_first_by_name
+} from "@/util/subj.action";
 
 /**
  * Normalizes a text field from FormData.
@@ -58,11 +54,10 @@ const requireText = (value: FormDataEntryValue | null, field: string): string =>
  *
  * @param formData - FormData from the browser.
  * @throws {Error} When required fields are missing.
- * @returns Parsed SubjectInput.
+ * @returns Parsed SubjectCreateInput.
  */
-const parseSubjectInput = (formData: FormData): SubjectInput => {
+const parseSubjectInput = (formData: FormData): SubjectCreateInput => {
   const isActiveRaw = formData.get("isActive");
-  // checkbox는 체크 시 "on"인 경우가 많고, unchecked면 아예 key가 안 들어옴
   const isActive = isActiveRaw === "on" || isActiveRaw === "true";
 
   return {
@@ -82,7 +77,7 @@ const parseSubjectInput = (formData: FormData): SubjectInput => {
  * @param formData - Raw FormData from the browser.
  * @returns Draft values (strings default to empty string).
  */
-const extractSubjectDraft = (formData: FormData): SubjectDraft => {
+const extractSubjectDraft = (formData: FormData): SubjectCreateInput => {
   const isActiveRaw = formData.get("isActive");
   return {
     nameKo: normalizeText(formData.get("nameKo")) ?? "",
@@ -90,28 +85,6 @@ const extractSubjectDraft = (formData: FormData): SubjectDraft => {
     description: normalizeText(formData.get("description")) ?? "",
     isActive: isActiveRaw === "on" || isActiveRaw === "true",
   };
-};
-
-/**
- * Type guard for Prisma "known" request errors.
- *
- * @param e - Unknown caught value.
- * @returns True when `e` is a PrismaClientKnownRequestError.
- */
-const isKnownRequestError = (e: unknown): e is Prisma.PrismaClientKnownRequestError =>
-  e instanceof Prisma.PrismaClientKnownRequestError;
-
-/**
- * Extracts the Prisma unique-constraint targets from an error meta payload.
- *
- * @param e - Prisma known request error (P2002).
- * @returns List of DB column names reported as the unique target(s).
- */
-const getUniqueTargets = (e: Prisma.PrismaClientKnownRequestError): string[] => {
-  const target = (e.meta as { target?: unknown } | undefined)?.target;
-  if (Array.isArray(target)) return target.map(String);
-  if (typeof target === "string") return [target];
-  return [];
 };
 
 /**
@@ -139,7 +112,7 @@ const dbFieldToFormField = (dbField: string): string => {
  * @param message - Optional human-readable message.
  * @returns URL-encoded query string.
  */
-const buildQuery = (draft: SubjectDraft, error: string, fields?: string[], message?: string): string => {
+const buildQuery = (draft: SubjectCreateInput, error: string, fields?: string[], message?: string): string => {
   const qs = new URLSearchParams();
   qs.set("error", error);
   if (fields?.length) qs.set("fields", fields.join(","));
@@ -151,35 +124,6 @@ const buildQuery = (draft: SubjectDraft, error: string, fields?: string[], messa
   return qs.toString();
 };
 
-/**
- * Best-effort duplicate pre-check to provide a fail-safe UX.
- *
- * This avoids a hard 500 on unique constraint errors by proactively detecting
- * duplicates and redirecting with an error payload. Note that this does NOT
- * replace the P2002 catch (race conditions can still occur).
- *
- * @param input - Subject input.
- * @param excludeId - Optional subject id to exclude (useful for updates).
- * @returns Field list that duplicates an existing row, or null.
- */
-const findDuplicateFields = async (
-  input: SubjectInput,
-  excludeId?: bigint,
-): Promise<{ fields: Array<"nameKo" | "nameEn"> } | null> => {
-  const existing = await prisma.subject.findFirst({
-    where: {
-      ...(excludeId !== undefined ? { id: { not: excludeId } } : {}),
-      OR: [{ nameKo: input.nameKo }, { nameEn: input.nameEn }],
-    },
-    select: { nameKo: true, nameEn: true },
-  });
-
-  if (!existing) return null;
-  const fields: Array<"nameKo" | "nameEn"> = [];
-  if (existing.nameKo === input.nameKo) fields.push("nameKo");
-  if (existing.nameEn === input.nameEn) fields.push("nameEn");
-  return fields.length ? { fields } : null;
-};
 
 /**
  * Server Action: Create a new Subject.
@@ -194,7 +138,7 @@ const findDuplicateFields = async (
  */
 export async function createSubject(formData: FormData) {
   const draft = extractSubjectDraft(formData);
-  let data: SubjectInput;
+  let data: SubjectCreateInput;
   try {
     data = parseSubjectInput(formData);
   } catch (e) {
@@ -202,14 +146,13 @@ export async function createSubject(formData: FormData) {
     redirect(`/subj/new?${buildQuery(draft, "validation", undefined, message)}`);
   }
 
-  // 사용자 경험을 위해 사전 중복 체크(레이스 컨디션은 아래 P2002 catch로 최종 방어)
   const dup = await findDuplicateFields(data);
   if (dup) {
     redirect(`/subj/new?${buildQuery({ ...draft, ...data }, "unique", dup.fields)}`);
   }
 
   try {
-    const created = await prisma.subject.create({ data });
+    const created = await create_subject({...data, isActive:true});
     revalidatePath("/subj/list");
     redirect(`/subj/${created.id.toString()}`);
   } catch (e) {
@@ -247,7 +190,7 @@ export async function updateSubject(formData: FormData) {
   }
 
   const draft = extractSubjectDraft(formData);
-  let data: SubjectInput;
+  let data: SubjectCreateInput;
   try {
     data = parseSubjectInput(formData);
   } catch (e) {
@@ -261,10 +204,7 @@ export async function updateSubject(formData: FormData) {
   }
 
   try {
-    await prisma.subject.update({
-      where: { id },
-      data,
-    });
+    await update_subject(id, data);
 
     revalidatePath("/subj/list");
     revalidatePath(target);
@@ -307,11 +247,9 @@ export async function mergeSubjects(formData: FormData) {
     throw new Error("fromId and toId cannot be the same");
   }
 
-  await prisma.$transaction(async (tx) => {
-    const [from, to] = await Promise.all([
-      tx.subject.findUnique({ where: { id: fromId } }),
-      tx.subject.findUnique({ where: { id: toId } }),
-    ]);
+  await with_transaction(async (tx) => {
+    const [from, to] = await Promise.all([find_subject_unique(fromId, tx), find_subject_unique(toId, tx)]);
+ 
 
     if (!from || !to) {
       throw new Error("Subject not found");
@@ -363,11 +301,8 @@ export async function updateSubjectLabLinks(formData: FormData) {
     .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
     .map((v) => BigInt(v));
 
-  await prisma.$transaction(async (tx) => {
-    const current = await tx.labSubject.findMany({
-      where: { subjectId },
-      select: { labId: true },
-    });
+  await with_transaction(async (tx) => {
+    const current = await find_lab_subject_links_by_subject(subjectId, tx);
 
     const currentSet = new Set(current.map((x) => x.labId.toString()));
     const nextSet = new Set(selectedLabIds.map((x) => x.toString()));
@@ -397,3 +332,27 @@ export async function updateSubjectLabLinks(formData: FormData) {
   revalidatePath(target);
   redirect(target);
 }
+
+/**
+ * Best-effort duplicate pre-check to provide a fail-safe UX.
+ *
+ * This avoids a hard 500 on unique constraint errors by proactively detecting
+ * duplicates and redirecting with an error payload. Note that this does NOT
+ * replace the P2002 catch (race conditions can still occur).
+ *
+ * @param input - Subject input.
+ * @param excludeId - Optional subject id to exclude (useful for updates).
+ * @returns Field list that duplicates an existing row, or null.
+ */
+const findDuplicateFields = async (
+  input: SubjectCreateInput,
+  excludeId?: bigint,
+): Promise<{ fields: Array<"nameKo" | "nameEn"> } | null> => {
+  const existing = await find_subject_first_by_name(input, excludeId);
+
+  if (!existing) return null;
+  const fields: Array<"nameKo" | "nameEn"> = [];
+  if (existing.nameKo === input.nameKo) fields.push("nameKo");
+  if (existing.nameEn === input.nameEn) fields.push("nameEn");
+  return fields.length ? { fields } : null;
+};

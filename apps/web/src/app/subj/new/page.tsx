@@ -39,7 +39,6 @@ export default async function NewSubjectPage({ searchParams }: NewSubjectPagePro
   const nameKo = asString(searchParams?.nameKo) ?? "";
   const nameEn = asString(searchParams?.nameEn) ?? "";
   const description = asString(searchParams?.description) ?? "";
-  const isActive = (asString(searchParams?.isActive) ?? "true") === "true";
 
   const errorText =
     error === "unique"
@@ -56,7 +55,7 @@ export default async function NewSubjectPage({ searchParams }: NewSubjectPagePro
         <div>
           <p className={styles.eyebrow}>/subj/new</p>
           <h1>Create subject</h1>
-          <p className={styles.lede}>Minimal form for inserting a new subject row via Prisma.</p>
+          <p className={styles.lede}>Creates a new subject. New subjects are created as active by default.</p>
         </div>
         <Link href="/subj/list" className={styles.ghost}>
           ← Back to list
@@ -91,22 +90,14 @@ export default async function NewSubjectPage({ searchParams }: NewSubjectPagePro
         <label>
           Korean name *
           <input name="nameKo" placeholder="컴퓨터 비전" defaultValue={nameKo} required />
-          <input name="nameKo" placeholder="컴퓨터 비전" defaultValue={nameKo} required />
         </label>
         <label>
           English name *
-          <input name="nameEn" placeholder="Computer Vision" defaultValue={nameEn} required />
           <input name="nameEn" placeholder="Computer Vision" defaultValue={nameEn} required />
         </label>
         <label>
           Description
           <input name="description" placeholder="Short summary" defaultValue={description} />
-          <input name="description" placeholder="Short summary" defaultValue={description} />
-        </label>
-        <label>
-          Active
-          <input name="isActive" type="checkbox" defaultChecked={isActive} />
-          <input name="isActive" type="checkbox" defaultChecked={isActive} />
         </label>
 
         <div className={`${styles.actions} ${styles.actionsEnd}`}>

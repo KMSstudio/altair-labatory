@@ -4,7 +4,7 @@ import {
   createSubject,
   isUniqueViolation,
   parseCreateInputFromJson,
-} from "@/app/subj/subject.service";
+} from "@/util/subj.action";
 
 /**
  * Serializes a Subject record for JSON responses.
@@ -54,9 +54,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
+  if (body && typeof body === "object" && "isActive" in body) {
+    return NextResponse.json(
+      { error: "`isActive` is managed by the system and must not be provided." },
+      { status: 400 },
+    );
+  }
+
   try {
     const data = parseCreateInputFromJson(body);
-    const created = await createSubject(data);
+    const created = await createSubject({ ...data, isActive: true });
     return NextResponse.json({ ok: true, subject: serializeSubject(created) }, { status: 201 });
   } catch (e: unknown) {
     if (isUniqueViolation(e)) {

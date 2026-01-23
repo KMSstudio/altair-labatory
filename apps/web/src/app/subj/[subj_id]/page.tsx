@@ -61,7 +61,9 @@ async function getSubject(subjId: bigint) {
  * @param props - Next.js page props.
  * @returns JSX for the subject detail page.
  */
-export default async function SubjectDetailPage({ params, searchParams }: SubjectPageProps) {
+export default async function SubjectDetailPage(param: Promise<SubjectPageProps>) {
+  const _param = await param;
+  var {params ,searchParams} = _param;
   params = await params;
   searchParams = await searchParams;
   let id: bigint;

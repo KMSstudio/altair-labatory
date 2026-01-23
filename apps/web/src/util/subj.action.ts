@@ -1,5 +1,3 @@
-import "server-only";
-
 import { prisma } from "@labatory/db";
 import { Prisma } from "@prisma/client";
 
@@ -270,3 +268,64 @@ export async function mergeSubjects(input: SubjectMergeInput) {
  */
 export const isUniqueViolation = (e: unknown) =>
   e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
+
+/**
+ * Type guard for Prisma "known" request errors.
+ *
+ * @param e - Unknown caught value.
+ * @returns True when `e` is a PrismaClientKnownRequestError.
+ */
+export const isKnownRequestError = (e: unknown): e is Prisma.PrismaClientKnownRequestError =>
+  e instanceof Prisma.PrismaClientKnownRequestError;
+
+/**
+ * Extracts the Prisma unique-constraint targets from an error meta payload.
+ *
+ * @param e - Prisma known request error (P2002).
+ * @returns List of DB column names reported as the unique target(s).
+ */
+export const getUniqueTargets = (e: Prisma.PrismaClientKnownRequestError): string[] => {
+  const target = (e.meta as { target?: unknown } | undefined)?.target;
+  if (Array.isArray(target)) return target.map(String);
+  if (typeof target === "string") return [target];
+  return [];
+};
+
+type DbClient = Prisma.TransactionClient | typeof prisma;
+
+export const with_transaction = async <T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> => {
+  return prisma.$transaction(fn);
+};
+
+export const create_subject = async (data: SubjectCreateInput, db: DbClient = prisma) => {
+  return db.subject.create({ data });
+};
+
+export const update_subject = async (id: bigint, data: SubjectCreateInput, db: DbClient = prisma) => {
+  return db.subject.update({ where: { id }, data });
+};
+
+export const find_subject_unique = async (id: bigint, db: DbClient = prisma) => {
+  return db.subject.findUnique({ where: { id } });
+};
+
+export const find_lab_subject_links_by_subject = async (subjectId: bigint, db: DbClient = prisma) => {
+  return db.labSubject.findMany({
+    where: { subjectId },
+    select: { labId: true },
+  });
+};
+
+export const find_subject_first_by_name = async (
+  input: Pick<SubjectCreateInput, "nameKo" | "nameEn">,
+  excludeId?: bigint,
+  db: DbClient = prisma,
+) => {
+  return db.subject.findFirst({
+    where: {
+      ...(excludeId !== undefined ? { id: { not: excludeId } } : {}),
+      OR: [{ nameKo: input.nameKo }, { nameEn: input.nameEn }],
+    },
+    select: { nameKo: true, nameEn: true },
+  });
+};

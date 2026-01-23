@@ -5,9 +5,7 @@ import styles from "../subj.module.css";
 
 /**
  * Loads subjects for the merge UI.
- *
  * We order by active status first so active subjects appear at the top.
- *
  * @returns Subjects list with minimal fields for selection.
  */
 async function getSubjectsForMerge() {
@@ -22,6 +20,12 @@ async function getSubjectsForMerge() {
   });
 }
 
+type MergePageProps = {
+  searchParams?: Record<string, string | string[] | undefined>;
+};
+
+const asString = (v: string | string[] | undefined): string | undefined => (Array.isArray(v) ? v[0] : v);
+
 /**
  * /subj/merge
  *
@@ -30,8 +34,15 @@ async function getSubjectsForMerge() {
  *
  * @returns JSX for the merge page.
  */
-export default async function MergeSubjectPage() {
+export default async function MergeSubjectPage(param: Promise<MergePageProps>) {
   const subjects = await getSubjectsForMerge();
+  const _param = await param;
+  var {searchParams} = _param;
+  searchParams = await searchParams;
+
+  const error = asString(searchParams?.error);
+  const message = asString(searchParams?.message);
+  const errorText = error ? message ?? "Request failed." : null;
 
   return (
     <main className={styles.subjFormShell}>
@@ -40,8 +51,7 @@ export default async function MergeSubjectPage() {
           <p className={styles.eyebrow}>/subj/merge</p>
           <h1>Merge subjects</h1>
           <p className={styles.lede}>
-            Moves all <code>LabSubject</code> edges from <b>from</b> → <b>to</b>, then deactivates
-            the source.
+            Moves all <code>LabSubject</code> edges from <b>from</b> → <b>to</b>, then deactivates the source.
           </p>
         </div>
         <div className={styles.actions}>
@@ -54,6 +64,13 @@ export default async function MergeSubjectPage() {
         </div>
       </header>
 
+      {errorText && (
+        <section className={`${styles.panel} ${styles.dangerZone}`}>
+          <p className={styles.eyebrow}>Error</p>
+          <p className={styles.value}>{errorText}</p>
+        </section>
+      )}
+
       <section className={styles.panel}>
         <header className={styles.panelHead}>
           <div>
@@ -63,33 +80,55 @@ export default async function MergeSubjectPage() {
         </header>
 
         <form action={mergeSubjects} className={styles.form}>
-          <label>
-            From (source) *
-            <select name="fromId" required defaultValue="">
-              <option value="" disabled>
-                Select subject…
-              </option>
-              {subjects.map((s) => (
-                <option key={`from-${s.id.toString()}`} value={s.id.toString()}>
-                  [{s.isActive ? "A" : "I"}] {s.nameKo} / {s.nameEn} (#{s.id.toString()})
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className={styles.mergeGrid}>
+            <fieldset className={styles.choiceGroup}>
+              <legend>From (source) *</legend>
+              <div className={styles.choiceList}>
+                {subjects.map((s) => (
+                  <label key={`from-${s.id.toString()}`} className={styles.choiceItem}>
+                    <input
+                      className={styles.choiceRadio}
+                      type="radio"
+                      name="fromId"
+                      value={s.id.toString()}
+                      required
+                    />
+                    <span className={styles.choiceBody}>
+                      <span className={styles.choiceText}>
+                        <span className={styles.choiceTitle}>{s.nameKo}</span>
+                        <span className={styles.choiceSub}>{s.nameEn}</span>
+                      </span>
+                      <span className={styles.statusTag}>{s.isActive ? "Active" : "Inactive"}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
 
-          <label>
-            To (destination) *
-            <select name="toId" required defaultValue="">
-              <option value="" disabled>
-                Select subject…
-              </option>
-              {subjects.map((s) => (
-                <option key={`to-${s.id.toString()}`} value={s.id.toString()}>
-                  [{s.isActive ? "A" : "I"}] {s.nameKo} / {s.nameEn} (#{s.id.toString()})
-                </option>
-              ))}
-            </select>
-          </label>
+            <fieldset className={styles.choiceGroup}>
+              <legend>To (destination) *</legend>
+              <div className={styles.choiceList}>
+                {subjects.map((s) => (
+                  <label key={`to-${s.id.toString()}`} className={styles.choiceItem}>
+                    <input
+                      className={styles.choiceRadio}
+                      type="radio"
+                      name="toId"
+                      value={s.id.toString()}
+                      required
+                    />
+                    <span className={styles.choiceBody}>
+                      <span className={styles.choiceText}>
+                        <span className={styles.choiceTitle}>{s.nameKo}</span>
+                        <span className={styles.choiceSub}>{s.nameEn}</span>
+                      </span>
+                      <span className={styles.statusTag}>{s.isActive ? "Active" : "Inactive"}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
 
           <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
             <button type="submit" className={styles.primary}>

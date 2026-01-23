@@ -4,7 +4,7 @@ import {
   isUniqueViolation,
   parseUpdateInputFromJson,
   updateSubject,
-} from "@/app/subj/subject.service";
+} from "@/util/subj.action";
 
 /**
  * Serializes a Subject record for JSON responses.

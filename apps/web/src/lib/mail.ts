@@ -7,7 +7,7 @@ import { prisma } from "@labatory/db";
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure:false,
+    secure: false,
     auth: {
         user: process.env.EMAIL_ID ?? "",
         pass: process.env.EMAIL_PASSWORD ?? ""
@@ -16,28 +16,29 @@ const transporter = nodemailer.createTransport({
 
 const EXPIRE_DURATION = Number(process.env.EXPIRE_DURATION) ?? 50;
 
-export async function SendVerification({ credentialId, userEmail }:{ credentialId: bigint, userEmail: string }) {
- 
+export async function SendVerification({ credentialId, stringVal, userEmail }: { credentialId?: bigint, stringVal?: string, userEmail: string }) {
+
     const rawToken = crypto.randomBytes(3).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex").slice(0, 5);
     const expireAt = new Date(Date.now() + 1000 * 60 * EXPIRE_DURATION);
 
     try {
         await prisma.verificationToken.create({
-            data:{
+            data: {
                 credentialId,
                 tokenHash,
+                stringVal,
                 createdAt: new Date(Date.now()),
                 expireAt,
                 usedAt: null,
-                sendEmail:userEmail,
+                sendEmail: userEmail,
             }
         });
-    } catch{
+    } catch {
         throw Error("Fail to generate token");
     }
 
-    const verifyUrl=new URL("/auth/verify", process.env.NEXTAUTH_URL);
+    const verifyUrl = new URL("/auth/verify", process.env.NEXTAUTH_URL);
     verifyUrl.searchParams.set("token", tokenHash);
     verifyUrl.searchParams.set("email", userEmail);
 
@@ -56,27 +57,27 @@ export async function SendVerification({ credentialId, userEmail }:{ credentialI
     } catch {
         return false;
     }
-  return true;
+    return true;
 }
 
-export async function SendPasswordReset({credentialId, userEmail}:{ credentialId: bigint, userEmail: string }){
+export async function SendPasswordReset({ credentialId, userEmail }: { credentialId: bigint, userEmail: string }) {
 
     const rawToken = crypto.randomBytes(3).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex").slice(0, 5);
     const expireAt = new Date(Date.now() + 1000 * 60 * EXPIRE_DURATION);
 
-    try{
+    try {
         await prisma.verificationToken.create({
-            data:{
+            data: {
                 credentialId,
                 tokenHash,
                 createdAt: new Date(Date.now()),
                 expireAt,
                 usedAt: null,
-                sendEmail:userEmail,
+                sendEmail: userEmail,
             }
         });
-    } catch{
+    } catch {
         throw Error("Fail to generate token");
     }
 
@@ -84,7 +85,7 @@ export async function SendPasswordReset({credentialId, userEmail}:{ credentialId
     verifyUrl.searchParams.set("token", tokenHash);
     verifyUrl.searchParams.set("email", userEmail);
 
-    try{
+    try {
         await transporter.sendMail({
             from: `"Your Service" <${process.env.EMAIL_NAME}@${process.env.EMAIL_DOMAIN_NAME}>`,
             to: userEmail,
@@ -99,5 +100,5 @@ export async function SendPasswordReset({credentialId, userEmail}:{ credentialId
     } catch {
         return false;
     }
-  return true;
+    return true;
 }

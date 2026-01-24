@@ -23,7 +23,7 @@ export default async function Page({
     if (!token) {
       return <div>유효하지 않은 접근입니다.</div>;
     }
-    if (token.expireAt.getTime() < now) {
+    if (token.expireAt < now) {
       return <div>메일이 만료되었습니다.</div>;
     }
     if (token.usedAt !== null) {

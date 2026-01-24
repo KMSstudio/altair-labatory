@@ -27,7 +27,7 @@ export default async function Page({
   for (const token of tokens) {
     if (token.sendEmail !== tokenparams.email) continue;
 
-    if (token.expireAt.getTime() < now) {
+    if (token.expireAt < now) {
       return <div>메일이 만료되었습니다.</div>;
     }
     if (token.usedAt !== null) {

@@ -16,11 +16,11 @@ jobs:
       DATABASE_URL: postgresql://labatory:labatory_pw@localhost:4821/labatory?schema=public
 
     steps:
-      - uses: actions/checkout@v4
-      - run: docker version
-
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Docker version
+        run: docker version
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

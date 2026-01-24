@@ -12,7 +12,7 @@ import {
   update_subject,
   find_subject_unique,
   find_lab_subject_links_by_subject,
-  find_subject_first_by_name
+  find_subject_first_by_name,
 } from "@/util/subj.action";
 
 /**
@@ -112,7 +112,12 @@ const dbFieldToFormField = (dbField: string): string => {
  * @param message - Optional human-readable message.
  * @returns URL-encoded query string.
  */
-const buildQuery = (draft: SubjectCreateInput, error: string, fields?: string[], message?: string): string => {
+const buildQuery = (
+  draft: SubjectCreateInput,
+  error: string,
+  fields?: string[],
+  message?: string,
+): string => {
   const qs = new URLSearchParams();
   qs.set("error", error);
   if (fields?.length) qs.set("fields", fields.join(","));
@@ -123,7 +128,6 @@ const buildQuery = (draft: SubjectCreateInput, error: string, fields?: string[],
   if (typeof draft.isActive === "boolean") qs.set("isActive", draft.isActive ? "true" : "false");
   return qs.toString();
 };
-
 
 /**
  * Server Action: Create a new Subject.
@@ -152,7 +156,7 @@ export async function createSubject(formData: FormData) {
   }
 
   try {
-    const created = await create_subject({...data, isActive:true});
+    const created = await create_subject({ ...data, isActive: true });
     revalidatePath("/subj/list");
     redirect(`/subj/${created.id.toString()}`);
   } catch (e) {
@@ -248,8 +252,10 @@ export async function mergeSubjects(formData: FormData) {
   }
 
   await with_transaction(async (tx) => {
-    const [from, to] = await Promise.all([find_subject_unique(fromId, tx), find_subject_unique(toId, tx)]);
- 
+    const [from, to] = await Promise.all([
+      find_subject_unique(fromId, tx),
+      find_subject_unique(toId, tx),
+    ]);
 
     if (!from || !to) {
       throw new Error("Subject not found");

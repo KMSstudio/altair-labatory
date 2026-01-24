@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@labatory/db";
+import { Prisma } from "@prisma/client";
 import styles from "../subj.module.css";
 
 type ListPageProps = {
@@ -14,7 +15,7 @@ type ListPageProps = {
  */
 const normalizeQuery = (value: string | string[] | undefined): string => {
   if (!value) return "";
-  return Array.isArray(value) ? value[0] ?? "" : value;
+  return Array.isArray(value) ? (value[0] ?? "") : value;
 };
 
 /**
@@ -35,7 +36,7 @@ const normalizeFilter = (value: string): "all" | "active" | "inactive" => {
  * @returns List of subjects (selected fields).
  */
 async function getSubjects(params: { q: string; status: "all" | "active" | "inactive" }) {
-  const where: any = {};
+  const where: Prisma.SubjectWhereInput = {};
   const q = params.q.trim();
   if (q.length) {
     where.OR = [
@@ -135,7 +136,10 @@ export default async function SubjectListPage({ searchParams }: ListPageProps) {
           <ul className={styles.subjGrid}>
             {subjects.map((s) => (
               <li key={s.id.toString()}>
-                <Link href={`/subj/${s.id.toString()}`} className={`${styles.card} ${styles.cardLink}`}>
+                <Link
+                  href={`/subj/${s.id.toString()}`}
+                  className={`${styles.card} ${styles.cardLink}`}
+                >
                   <div className={styles.cardHead}>
                     <div>
                       <h3>{s.nameKo}</h3>

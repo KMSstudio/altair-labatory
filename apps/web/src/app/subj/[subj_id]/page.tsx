@@ -18,7 +18,8 @@ type SubjectPageProps = {
  * @param v - Raw query param value.
  * @returns Single string or undefined.
  */
-const asString = (v: string | string[] | undefined): string | undefined => (Array.isArray(v) ? v[0] : v);
+const asString = (v: string | string[] | undefined): string | undefined =>
+  Array.isArray(v) ? v[0] : v;
 
 /**
  * Loads a subject including its linked labs.
@@ -63,7 +64,7 @@ async function getSubject(subjId: bigint) {
  */
 export default async function SubjectDetailPage(param: Promise<SubjectPageProps>) {
   const _param = await param;
-  var {params ,searchParams} = _param;
+  let { params, searchParams } = _param;
   params = await params;
   searchParams = await searchParams;
   let id: bigint;
@@ -92,9 +93,9 @@ export default async function SubjectDetailPage(param: Promise<SubjectPageProps>
     error === "unique"
       ? `Unique constraint failed${fields.length ? `: ${fields.join(", ")}` : ""}. Use a different name.`
       : error === "validation"
-        ? message ?? "Invalid input."
+        ? (message ?? "Invalid input.")
         : error
-          ? message ?? "Request failed."
+          ? (message ?? "Request failed.")
           : null;
 
   return (
@@ -162,7 +163,10 @@ export default async function SubjectDetailPage(param: Promise<SubjectPageProps>
           </label>
           <label>
             Description
-            <input name="description" defaultValue={descriptionDraft ?? subject.description ?? ""} />
+            <input
+              name="description"
+              defaultValue={descriptionDraft ?? subject.description ?? ""}
+            />
           </label>
           <label>
             Active

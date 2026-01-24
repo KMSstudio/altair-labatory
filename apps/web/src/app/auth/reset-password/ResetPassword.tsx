@@ -1,13 +1,12 @@
 "use client";
 
-export function ResetPassword({ token, email }: { token: string , email: string  }) {
-
+export function ResetPassword({ token, email }: { token: string; email: string }) {
   async function onSubmit(formData: FormData) {
     const password = formData.get("password");
-    const passwordCheck=formData.get("passwordCheck");
+    const passwordCheck = formData.get("passwordCheck");
 
-    if (password !== passwordCheck){
-      alert("The passwords you entered were not the same.")
+    if (password !== passwordCheck) {
+      alert("The passwords you entered were not the same.");
       return;
     }
 
@@ -22,8 +21,7 @@ export function ResetPassword({ token, email }: { token: string , email: string 
 
     if (res.ok) {
       window.location.href = "/auth/login";
-    }
-    else {
+    } else {
       const payload = (await res.json().catch(() => null)) as { error?: string } | null;
       alert(payload?.error ?? "Password reset failed.");
     }

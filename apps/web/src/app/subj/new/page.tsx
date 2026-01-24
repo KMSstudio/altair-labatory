@@ -15,7 +15,8 @@ type NewSubjectPageProps = {
  * @param v - Raw query param value.
  * @returns Single string or undefined.
  */
-const asString = (v: string | string[] | undefined): string | undefined => (Array.isArray(v) ? v[0] : v);
+const asString = (v: string | string[] | undefined): string | undefined =>
+  Array.isArray(v) ? v[0] : v;
 
 /**
  * /subj/new
@@ -44,9 +45,9 @@ export default async function NewSubjectPage({ searchParams }: NewSubjectPagePro
     error === "unique"
       ? `Unique constraint failed${fields.length ? `: ${fields.join(", ")}` : ""}. Use a different name.`
       : error === "validation"
-        ? message ?? "Invalid input."
+        ? (message ?? "Invalid input.")
         : error
-          ? message ?? "Request failed."
+          ? (message ?? "Request failed.")
           : null;
 
   return (
@@ -55,7 +56,9 @@ export default async function NewSubjectPage({ searchParams }: NewSubjectPagePro
         <div>
           <p className={styles.eyebrow}>/subj/new</p>
           <h1>Create subject</h1>
-          <p className={styles.lede}>Creates a new subject. New subjects are created as active by default.</p>
+          <p className={styles.lede}>
+            Creates a new subject. New subjects are created as active by default.
+          </p>
         </div>
         <Link href="/subj/list" className={styles.ghost}>
           ← Back to list

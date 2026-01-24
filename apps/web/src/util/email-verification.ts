@@ -3,7 +3,6 @@
 import { Prisma } from "@labatory/db";
 import { prisma } from "@labatory/db";
 import { passwordHashing } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 

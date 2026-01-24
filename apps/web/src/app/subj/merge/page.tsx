@@ -24,7 +24,8 @@ type MergePageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
 };
 
-const asString = (v: string | string[] | undefined): string | undefined => (Array.isArray(v) ? v[0] : v);
+const asString = (v: string | string[] | undefined): string | undefined =>
+  Array.isArray(v) ? v[0] : v;
 
 /**
  * /subj/merge
@@ -37,12 +38,12 @@ const asString = (v: string | string[] | undefined): string | undefined => (Arra
 export default async function MergeSubjectPage(param: Promise<MergePageProps>) {
   const subjects = await getSubjectsForMerge();
   const _param = await param;
-  var {searchParams} = _param;
+  let { searchParams } = _param;
   searchParams = await searchParams;
 
   const error = asString(searchParams?.error);
   const message = asString(searchParams?.message);
-  const errorText = error ? message ?? "Request failed." : null;
+  const errorText = error ? (message ?? "Request failed.") : null;
 
   return (
     <main className={styles.subjFormShell}>
@@ -51,7 +52,8 @@ export default async function MergeSubjectPage(param: Promise<MergePageProps>) {
           <p className={styles.eyebrow}>/subj/merge</p>
           <h1>Merge subjects</h1>
           <p className={styles.lede}>
-            Moves all <code>LabSubject</code> edges from <b>from</b> → <b>to</b>, then deactivates the source.
+            Moves all <code>LabSubject</code> edges from <b>from</b> → <b>to</b>, then deactivates
+            the source.
           </p>
         </div>
         <div className={styles.actions}>

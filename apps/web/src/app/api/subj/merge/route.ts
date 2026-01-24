@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  mergeSubjects,
-  parseMergeInputFromJson,
-} from "@/util/subj.action";
+import { mergeSubjects, parseMergeInputFromJson } from "@/util/subj.action";
 
 /**
  * POST /api/subj/merge
@@ -20,7 +17,7 @@ import {
  * @returns JSON response with merge result summary or error.
  */
 export async function POST(request: Request) {
-  let body: any;
+  let body: unknown;
   try {
     body = await request.json();
   } catch {

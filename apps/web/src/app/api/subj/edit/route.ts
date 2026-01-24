@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  isUniqueViolation,
-  parseUpdateInputFromJson,
-  updateSubject,
-} from "@/util/subj.action";
+import { isUniqueViolation, parseUpdateInputFromJson, updateSubject } from "@/util/subj.action";
 
 /**
  * Serializes a Subject record for JSON responses.
@@ -43,7 +39,7 @@ const serializeSubject = (s: {
  * @returns JSON response with updated subject or error.
  */
 export async function POST(request: Request) {
-  let body: any;
+  let body: unknown;
   try {
     body = await request.json();
   } catch {

@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  createSubject,
-  isUniqueViolation,
-  parseCreateInputFromJson,
-} from "@/util/subj.action";
+import { createSubject, isUniqueViolation, parseCreateInputFromJson } from "@/util/subj.action";
 
 /**
  * Serializes a Subject record for JSON responses.
@@ -47,14 +43,14 @@ const serializeSubject = (s: {
  * @returns JSON response with created subject or error.
  */
 export async function POST(request: Request) {
-  let body: any;
+  let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  if (body && typeof body === "object" && "isActive" in body) {
+  if (body !== null && typeof body === "object" && "isActive" in body) {
     return NextResponse.json(
       { error: "`isActive` is managed by the system and must not be provided." },
       { status: 400 },

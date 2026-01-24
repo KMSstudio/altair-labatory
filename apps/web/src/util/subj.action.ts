@@ -136,12 +136,15 @@ export const parseMergeInputFromFormData = (formData: FormData): SubjectMergeInp
  * @throws {Error} On missing required fields.
  * @returns SubjectCreateInput.
  */
-export const parseCreateInputFromJson = (body: any): SubjectCreateInput => {
+export const parseCreateInputFromJson = (body: unknown): SubjectCreateInput => {
+  if (body === null || typeof body !== "object") throw new Error("Body must be an object");
+  const b = body as Record<string, unknown>;
+
   return {
-    nameKo: requireText(body?.nameKo, "nameKo"),
-    nameEn: requireText(body?.nameEn, "nameEn"),
-    description: normalizeText(body?.description),
-    isActive: typeof body?.isActive === "boolean" ? body.isActive : true,
+    nameKo: requireText(b.nameKo, "nameKo"),
+    nameEn: requireText(b.nameEn, "nameEn"),
+    description: normalizeText(b.description),
+    isActive: typeof b.isActive === "boolean" ? b.isActive : true,
   };
 };
 
@@ -153,20 +156,20 @@ export const parseCreateInputFromJson = (body: any): SubjectCreateInput => {
  * @returns Object containing `{ id, data }`.
  */
 export const parseUpdateInputFromJson = (
-  body: any,
+  body: unknown,
 ): { id: bigint; data: Partial<SubjectCreateInput> } => {
-  const id = parseId(body?.id, "id");
-
+  if (body === null || typeof body !== "object") throw new Error("Body must be an object");
+  const b = body as Record<string, unknown>;
+  const id = parseId(b.id, "id");
   const data: Partial<SubjectCreateInput> = {};
-
-  if (body?.nameKo !== undefined) data.nameKo = requireText(body.nameKo, "nameKo");
-  if (body?.nameEn !== undefined) data.nameEn = requireText(body.nameEn, "nameEn");
-  if (body?.description !== undefined) data.description = normalizeText(body.description);
-  if (body?.isActive !== undefined) {
-    if (typeof body.isActive !== "boolean") throw new Error("isActive must be boolean");
-    data.isActive = body.isActive;
+  // Construct
+  if (b.nameKo !== undefined) data.nameKo = requireText(b.nameKo, "nameKo");
+  if (b.nameEn !== undefined) data.nameEn = requireText(b.nameEn, "nameEn");
+  if (b.description !== undefined) data.description = normalizeText(b.description);
+  if (b.isActive !== undefined) {
+    if (typeof b.isActive !== "boolean") throw new Error("isActive must be boolean");
+    data.isActive = b.isActive;
   }
-
   if (Object.keys(data).length === 0) throw new Error("No fields to update");
   return { id, data };
 };
@@ -178,15 +181,17 @@ export const parseUpdateInputFromJson = (
  * @throws {Error} If ids are invalid or equal.
  * @returns SubjectMergeInput.
  */
-export const parseMergeInputFromJson = (body: any): SubjectMergeInput => {
-  const fromId = parseId(body?.fromId, "fromId");
-  const toId = parseId(body?.toId, "toId");
-  if (fromId === toId) throw new Error("fromId and toId must be different");
+export const parseMergeInputFromJson = (body: unknown): SubjectMergeInput => {
+  if (body === null || typeof body !== "object") throw new Error("Body must be an object");
+  const b = body as Record<string, unknown>;
 
+  const fromId = parseId(b.fromId, "fromId");
+  const toId = parseId(b.toId, "toId");
+  if (fromId === toId) throw new Error("fromId and toId must be different");
   return {
     fromId,
     toId,
-    deactivateFrom: typeof body?.deactivateFrom === "boolean" ? body.deactivateFrom : true,
+    deactivateFrom: typeof b.deactivateFrom === "boolean" ? b.deactivateFrom : true,
   };
 };
 
@@ -293,7 +298,9 @@ export const getUniqueTargets = (e: Prisma.PrismaClientKnownRequestError): strin
 
 type DbClient = Prisma.TransactionClient | typeof prisma;
 
-export const with_transaction = async <T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> => {
+export const with_transaction = async <T>(
+  fn: (tx: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => {
   return prisma.$transaction(fn);
 };
 
@@ -301,7 +308,11 @@ export const create_subject = async (data: SubjectCreateInput, db: DbClient = pr
   return db.subject.create({ data });
 };
 
-export const update_subject = async (id: bigint, data: SubjectCreateInput, db: DbClient = prisma) => {
+export const update_subject = async (
+  id: bigint,
+  data: SubjectCreateInput,
+  db: DbClient = prisma,
+) => {
   return db.subject.update({ where: { id }, data });
 };
 
@@ -309,7 +320,10 @@ export const find_subject_unique = async (id: bigint, db: DbClient = prisma) => 
   return db.subject.findUnique({ where: { id } });
 };
 
-export const find_lab_subject_links_by_subject = async (subjectId: bigint, db: DbClient = prisma) => {
+export const find_lab_subject_links_by_subject = async (
+  subjectId: bigint,
+  db: DbClient = prisma,
+) => {
   return db.labSubject.findMany({
     where: { subjectId },
     select: { labId: true },

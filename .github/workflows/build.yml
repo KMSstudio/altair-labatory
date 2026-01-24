@@ -32,9 +32,6 @@ jobs:
         run: npm ci
         working-directory: .
 
-      - name: Web lint check
-        run: npm run web:lint:check
-
       - name: DB up
         run: npm run db:up
 

@@ -22,11 +22,14 @@ export default function RegisterPage() {
     const password = String(formData.get("password") || "");
 
     const IGNORE_EMAIL_VERIFY = process.env.IGNORE_EMAIL_VERIFY ?? "";
-    console.log(IGNORE_EMAIL_VERIFY)
     if (IGNORE_EMAIL_VERIFY !== "1" && IGNORE_EMAIL_VERIFY.toUpperCase() !== "TRUE") {
-
       try {
-        if (!(await SendVerification({ stringVal: JSON.stringify({ displayName, email, password }), userEmail: email }))) {
+        if (
+          !(await SendVerification({
+            stringVal: JSON.stringify({ displayName, email, password }),
+            userEmail: email,
+          }))
+        ) {
           setError("Fail to send Email. please try again.");
           return;
         }
@@ -37,8 +40,7 @@ export default function RegisterPage() {
 
       window.location.href = `/auth/verify-email?email=${encodeURIComponent(email)}`;
       return;
-    }
-    else {
+    } else {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

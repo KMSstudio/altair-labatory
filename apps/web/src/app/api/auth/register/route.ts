@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { passwordHashing } from "@/lib/auth";
 import { prisma } from "@labatory/db";
 import { Prisma } from "@prisma/client";
+import { SendVerification } from "@/lib/mail";
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
@@ -28,38 +29,57 @@ export async function POST(request: Request) {
   if (password.length < 8)
     return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
 
-  try {
-    const passwordHash = await passwordHashing(password);
+  const IGNORE_EMAIL_VERIFY = process.env.IGNORE_EMAIL_VERIFY ?? "";
 
-    // $transaction: wraps the DB operations below into a single transaction (all-or-nothing). Used for observe ACID.
-    await prisma.$transaction(async (tx) => {
-      const anyCredSameEmail = await tx.userCredential.findFirst({ where: { email } });
+  if (IGNORE_EMAIL_VERIFY === "1" || IGNORE_EMAIL_VERIFY.toUpperCase() === "TRUE") {
+    try {
+      const passwordHash = await passwordHashing(password);
 
-      let userId: bigint;
-      if (anyCredSameEmail) {
-        userId = anyCredSameEmail.userId;
-      } else {
-        const user = await tx.user.create({ data: { displayName, primaryEmail: email } });
-        userId = user.id;
-      }
+      // $transaction: wraps the DB operations below into a single transaction (all-or-nothing). Used for observe ACID.
+      await prisma.$transaction(async (tx) => {
+        const anyCredSameEmail = await tx.userCredential.findFirst({ where: { email } });
 
-      await tx.userCredential.create({
-        data: {
-          userId,
-          provider: "credentials",
-          providerUserId: email,
-          email,
-          emailVerified: false,
-          isPrimary: false,
-          passwordHash: await passwordHash,
-        },
+        let userId: bigint;
+        if (anyCredSameEmail) {
+          userId = anyCredSameEmail.userId;
+        } else {
+          const user = await tx.user.create({ data: { displayName, primaryEmail: email } });
+          userId = user.id;
+        }
+
+        await tx.userCredential.create({
+          data: {
+            userId,
+            provider: "credentials",
+            providerUserId: email,
+            email,
+            emailVerified: true,
+            isPrimary: false,
+            passwordHash: await passwordHash,
+          },
+        });
       });
-    });
 
-    return NextResponse.json({ ok: true });
-  } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002")
-      return NextResponse.json({ error: "Email already in use." }, { status: 409 });
+      return NextResponse.json({ ok: true });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002")
+        return NextResponse.json({ error: "Email already in use." }, { status: 409 });
+      return NextResponse.json({ error: "Internal server error." }, { status: 500 });
+    }
+  }
+
+  try {
+    if (
+      await SendVerification({
+        stringVal: JSON.stringify({ displayName, email, password }),
+        userEmail: email,
+      })
+    ) {
+      return NextResponse.json({ ok: true });
+    } else {
+      return NextResponse.json({ error: "Email send failed." }, { status: 502 });
+    }
+  } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }

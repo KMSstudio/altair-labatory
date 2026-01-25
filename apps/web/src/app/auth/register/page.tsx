@@ -4,7 +4,6 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { SendVerification } from "@/lib/mail";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
@@ -21,54 +20,20 @@ export default function RegisterPage() {
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
 
-    const IGNORE_EMAIL_VERIFY = process.env.IGNORE_EMAIL_VERIFY ?? "";
-    if (IGNORE_EMAIL_VERIFY !== "1" && IGNORE_EMAIL_VERIFY.toUpperCase() !== "TRUE") {
-      try {
-        if (
-          !(await SendVerification({
-            stringVal: JSON.stringify({ displayName, email, password }),
-            userEmail: email,
-          }))
-        ) {
-          setError("Fail to send Email. please try again.");
-          return;
-        }
-      } catch {
-        setError("Internal serer error");
-        return;
-      }
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ displayName, email, password }),
+    });
 
-      window.location.href = `/auth/verify-email?email=${encodeURIComponent(email)}`;
-      return;
-    } else {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ displayName, email, password }),
-      });
-
-      if (!res.ok) {
-        const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error ?? "Registration failed.");
-        setLoading(false);
-        return;
-      }
-
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
+    if (!res.ok) {
+      const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+      setError(payload?.error ?? "Registration failed.");
       setLoading(false);
-
-      if (result?.error) {
-        setError("Account created. Please log in.");
-        return;
-      }
-
-      window.location.href = "/";
+      return;
     }
+
+    window.location.href = `/auth/verify-email?email=${encodeURIComponent(email)}`;
   }
 
   return (

@@ -8,6 +8,10 @@ export default async function Page({
 }: {
   searchParams: { token_hash?: string; email?: string };
 }) {
+  const IGNORE_EMAIL_VERIFY = process.env.IGNORE_EMAIL_VERIFY ?? "";
+
+  if (IGNORE_EMAIL_VERIFY === "1" || IGNORE_EMAIL_VERIFY.toUpperCase() === "TRUE") redirect("/");
+
   let error = null;
 
   searchParams = await searchParams;

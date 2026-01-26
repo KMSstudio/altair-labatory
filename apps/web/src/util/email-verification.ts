@@ -48,9 +48,7 @@ export async function EmailVerificationAction(params: { email: string; tokenHash
         const anyCredSameEmail = await tx.userCredential.findFirst({
           where: { email },
         });
-
         let userId: bigint;
-
         if (anyCredSameEmail) {
           userId = anyCredSameEmail.userId;
         } else {

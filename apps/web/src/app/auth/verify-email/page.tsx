@@ -2,15 +2,18 @@
 
 import { EmailVerificationAction } from "@/util/email-verification";
 import { redirect } from "next/navigation";
+import { submitAction } from "./action";
+
+const IGNORE_EMAIL_VERIFY_string = process.env.IGNORE_EMAIL_VERIFY ?? "";
+const IGNORE_EMAIL_VERIFY = (IGNORE_EMAIL_VERIFY_string === "1" || IGNORE_EMAIL_VERIFY_string.toUpperCase() === "TRUE")
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: { token_hash?: string; email?: string };
 }) {
-  const IGNORE_EMAIL_VERIFY = process.env.IGNORE_EMAIL_VERIFY ?? "";
 
-  if (IGNORE_EMAIL_VERIFY === "1" || IGNORE_EMAIL_VERIFY.toUpperCase() === "TRUE") redirect("/");
+  if (IGNORE_EMAIL_VERIFY) redirect("/");
 
   let error = null;
 
@@ -21,31 +24,17 @@ export default async function Page({
   const email = decodeURIComponent(searchParams.email.trim());
 
   async function OnLoad() {
-    if (searchParams.token_hash) {
-      try {
-        const tokenHash = decodeURIComponent(searchParams.token_hash.trim());
-        await EmailVerificationAction({ email, tokenHash });
-      } catch (e: unknown) {
-        if (e instanceof Error) error = e.message ?? "Unknown error";
-        else error = "Unknown event";
-        return false;
-      }
-      return true;
+    if (!searchParams.token_hash) return false;
+    try {
+      const tokenHash = decodeURIComponent(searchParams.token_hash.trim());
+      await EmailVerificationAction({ email, tokenHash });
+    } catch (e: unknown) {
+      if (e instanceof Error) error = e.message ?? "Unknown error";
+      else error = "Unknown event";
+      return false;
     }
-    return false;
-  }
-  async function submitAction(formData: FormData) {
-    "use server";
+    return true;
 
-    const rawtokenHash = formData.get("tokenHash");
-
-    if (!rawtokenHash) return;
-
-    const tokenHash = rawtokenHash.toString();
-
-    if (tokenHash.length < 5) return;
-
-    redirect(`/auth/verify-email?email=${email}&token_hash=${tokenHash}`);
   }
 
   if (await OnLoad()) redirect("/");
@@ -54,7 +43,7 @@ export default async function Page({
     <main>
       <h1>Email verification</h1>
       {error ? <p>{error}</p> : null}
-      <form action={submitAction}>
+      <form action={submitAction.bind(null, email)}>
         <input name="tokenHash" placeholder="XXXXX" required={true} maxLength={5}></input>
         <button type="submit">Submit</button>
       </form>

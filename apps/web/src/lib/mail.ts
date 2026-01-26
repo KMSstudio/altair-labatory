@@ -1,5 +1,7 @@
 // @/lib/mail.ts
 
+"use server";
+
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { prisma } from "@labatory/db";
@@ -18,9 +20,11 @@ const EXPIRE_DURATION = Number(process.env.EXPIRE_DURATION) ?? 50;
 
 export async function SendVerification({
   credentialId,
+  stringVal,
   userEmail,
 }: {
-  credentialId: bigint;
+  credentialId?: bigint;
+  stringVal?: string;
   userEmail: string;
 }) {
   const rawToken = crypto.randomBytes(3).toString("hex");
@@ -32,6 +36,7 @@ export async function SendVerification({
       data: {
         credentialId,
         tokenHash,
+        stringVal,
         createdAt: new Date(Date.now()),
         expireAt,
         usedAt: null,
@@ -42,18 +47,20 @@ export async function SendVerification({
     throw Error("Fail to generate token");
   }
 
-  const verifyUrl = new URL("/auth/verify", process.env.NEXTAUTH_URL);
-  verifyUrl.searchParams.set("token", tokenHash);
-  verifyUrl.searchParams.set("email", userEmail);
+  const verifyUrl = new URL(
+    `/auth/verify-email?email=${encodeURIComponent(userEmail)}&token_hash=${tokenHash}`,
+    process.env.NEXTAUTH_URL,
+  );
 
   try {
     await transporter.sendMail({
       from: `"Your Service" <${process.env.EMAIL_NAME}@${process.env.EMAIL_DOMAIN_NAME}>`,
       to: userEmail,
       subject: "이메일 인증을 완료해 주세요",
-      text: `아래 링크를 눌러 이메일 인증을 완료해 주세요:\n${verifyUrl.toString()}\n\n이 링크는 ${EXPIRE_DURATION}분 후 만료됩니다.`,
+      text: `코드를 입력하거나 아래 링크를 눌러 이메일 인증을 완료해 주세요:\n${verifyUrl.toString()}\n\n이 코드는 ${EXPIRE_DURATION}분 후 만료됩니다.`,
       html: `
-            <p>아래 버튼을 눌러 이메일 인증을 완료해 주세요.</p>
+            <p>코드:${tokenHash}</p>
+            <p>혹은 아래 버튼을 눌러 이메일 인증을 완료해 주세요.</p>
             <p><a href="${verifyUrl.toString()}">이메일 인증하기</a></p>
             <p>이 링크는 ${EXPIRE_DURATION}분 후 만료됩니다.</p>
             `,
@@ -91,8 +98,8 @@ export async function SendPasswordReset({
   }
 
   const verifyUrl = new URL("/auth/reset-password", process.env.NEXTAUTH_URL);
-  verifyUrl.searchParams.set("token", tokenHash);
-  verifyUrl.searchParams.set("email", userEmail);
+  verifyUrl.searchParams.set("tokenHash", tokenHash);
+  verifyUrl.searchParams.set("email", encodeURIComponent(userEmail));
 
   try {
     await transporter.sendMail({

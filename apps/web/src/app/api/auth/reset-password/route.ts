@@ -22,7 +22,6 @@ export async function POST(request: Request) {
   const tokens = await prisma.verificationToken.findMany({
     where: {
       tokenHash: tokenHash,
-      sendEmail: email,
     },
   });
   for (const token of tokens) {

@@ -33,20 +33,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    setLoading(false);
-
-    if (result?.error) {
-      setError("Account created. Please log in.");
-      return;
-    }
-
-    window.location.href = "/";
+    window.location.href = `/auth/verify-email?email=${encodeURIComponent(email)}`;
   }
 
   return (

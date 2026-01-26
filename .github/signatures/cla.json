@@ -1,3 +1,12 @@
 {
-   "signedContributors": []
+  "signedContributors": [
+    {
+      "name": "KMSstudio",
+      "id": 68946300,
+      "comment_id": 3798270873,
+      "created_at": "2026-01-26T07:46:46Z",
+      "repoId": 1118805307,
+      "pullRequestNo": 42
+    }
+  ]
 }

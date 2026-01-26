@@ -67,19 +67,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Email already in use." }, { status: 409 });
       else return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
-  }
-
-  try {
-    const SendSuccess = await SendVerification({
-      stringVal: JSON.stringify({ displayName, email, password }),
-      userEmail: email,
-    });
-    if (SendSuccess) {
-      return NextResponse.json({ ok: true });
-    } else {
-      return NextResponse.json({ error: "Email send failed." }, { status: 502 });
+  } else {
+    try {
+      const SendSuccess = await SendVerification({
+        stringVal: JSON.stringify({ displayName, email, password }),
+        userEmail: email,
+      });
+      if (SendSuccess) {
+        return NextResponse.json({ ok: true });
+      } else {
+        return NextResponse.json({ error: "Email send failed." }, { status: 502 });
+      }
+    } catch {
+      return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
-  } catch {
-    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }

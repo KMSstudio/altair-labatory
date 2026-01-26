@@ -27,7 +27,7 @@ const isValidUrl = (v: unknown): v is string => {
 export async function submitPIApplicationAction(params: {
   requestedName: string;
   scholarUrl: string;
-  labId?: string | null;
+  labId: bigint | null;
   note?: string | null;
 }) {
   const session = await getServerSession(authOptions);
@@ -56,7 +56,11 @@ export async function submitPIApplicationAction(params: {
     throw Error("scholarUrl is invalid");
   }
 
-  const labId: bigint | null = null;
+  let labId: bigint | null = null;
+
+  if (params.labId) {
+    labId = params.labId;
+  }
 
   const existingPending = await prisma.pIApplication.findFirst({
     where: { userId: sessionUserId, status: "PENDING" },
@@ -65,7 +69,6 @@ export async function submitPIApplicationAction(params: {
   if (existingPending) {
     throw Error("A pending PI application already exists.");
   }
-
   try {
     await prisma.pIApplication.create({
       data: {
@@ -77,7 +80,77 @@ export async function submitPIApplicationAction(params: {
         note: note,
       },
     });
+  } catch (e) {
+    if (e instanceof Error) throw Error(e.message ?? "Internal server error");
+    else throw Error("Unknown error");
+  }
+}
+
+export async function FindLabs(params: { labNameEn: string }) {
+  params = await params;
+  const labNameEn = params.labNameEn ?? "";
+  if (!labNameEn) throw Error("Lab name required");
+  try {
+    return await prisma.lab.findMany({
+      where: {
+        nameEn: {
+          contains: labNameEn.trim(),
+          mode: "insensitive",
+        },
+      },
+      orderBy: { nameEn: "asc" },
+    });
   } catch {
     throw Error("Internal server error");
   }
+}
+/**
+ * Update PI info.
+ *
+ * @var piId - Id of pi whose infomation will be changed
+ * @param params - name, email, labId, scholarUrl
+ * @param params.name - Name user submitted as.
+ * @param params.email - Email of user
+ * @param params.scholarUrl - Url of user's scholar webpage.
+ * @param params.labId - labId as string | null
+ * @throws If name or email is empty, piId is not provided, or invalid
+ */
+export async function UpdatePI(
+  piId: bigint,
+  params: {
+    name: string;
+    email: string;
+    labId?: bigint | null;
+    scholarUrl?: string;
+  },
+) {
+  const email = params.email;
+  const name = params.name;
+  const scholarUrl = params.scholarUrl;
+
+  let labId: bigint | null = null;
+  if (params.labId) {
+    labId = params.labId;
+  }
+  if (!piId) throw Error("Invaild function call.");
+
+  if (!email || !name) {
+    throw Error("email and name are required.");
+  }
+
+  try {
+    await prisma.pI.update({
+      where: { id: piId },
+      data: {
+        name,
+        email,
+        labId,
+        scholarUrl,
+      },
+    });
+  } catch {
+    throw Error("PI info update Fail.");
+  }
+
+  return true;
 }

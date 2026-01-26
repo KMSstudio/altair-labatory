@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { submitPIApplicationAction } from "./actions";
+import { submitPIApplicationAction } from "../actions";
 import { useRouter } from "next/navigation";
+import { LabPicker } from "./LabPicker";
 
 export function PIApplicationForm() {
   const [submitting, setSubmitting] = useState(false);
 
   const [requestedName, SetRequestedName] = useState("");
-  const [labId, SetLabId] = useState("");
+  const [labId, SetLabId] = useState<bigint | null>(null);
   const [scholarUrl, SetScholarUrl] = useState("");
   const [note, SetNote] = useState("");
 
@@ -17,14 +18,15 @@ export function PIApplicationForm() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     setSubmitting(true);
     e.preventDefault();
-
+    console.log(labId);
     try {
       await submitPIApplicationAction({ requestedName, labId, scholarUrl, note });
-      router.push("/check");
     } catch (error) {
       if (error instanceof Error) alert(error.message);
       setSubmitting(false);
+      return;
     }
+    router.push("/auth/me");
   }
 
   return (
@@ -38,15 +40,7 @@ export function PIApplicationForm() {
           required
         />
       </div>
-      <div>
-        <label>Lab ID (optional)</label>
-        <input
-          name="labId"
-          value={labId}
-          onChange={(e) => SetLabId(e.target.value)}
-          placeholder="e.g. 10"
-        />
-      </div>
+      <LabPicker setLabId={SetLabId} />
       <div>
         <label>Scholar URL</label>
         <input

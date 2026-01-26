@@ -22,14 +22,13 @@ export default async function EditUserPage({ params }: { params: { pi_id: string
   try {
     pi_id = BigInt(params.pi_id);
   } catch {
-    console.log(2);
     notFound();
   }
 
   const pi = await GetPI(pi_id);
   const session = await getServerSession(authOptions);
   if (!session || !pi || !pi.userId) redirect("/");
-  // if (session.user.id !== pi.userId.toString()) redirect("/");
+  if (session.user.id !== pi.userId.toString()) redirect("/");
 
   const lab = pi.labId ? await GetLab(pi.labId) : null;
 

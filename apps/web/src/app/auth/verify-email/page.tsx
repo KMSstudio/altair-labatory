@@ -5,14 +5,14 @@ import { redirect } from "next/navigation";
 import { submitAction } from "./action";
 
 const IGNORE_EMAIL_VERIFY_string = process.env.IGNORE_EMAIL_VERIFY ?? "";
-const IGNORE_EMAIL_VERIFY = (IGNORE_EMAIL_VERIFY_string === "1" || IGNORE_EMAIL_VERIFY_string.toUpperCase() === "TRUE")
+const IGNORE_EMAIL_VERIFY =
+  IGNORE_EMAIL_VERIFY_string === "1" || IGNORE_EMAIL_VERIFY_string.toUpperCase() === "TRUE";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: { token_hash?: string; email?: string };
 }) {
-
   if (IGNORE_EMAIL_VERIFY) redirect("/");
 
   let error = null;
@@ -34,7 +34,6 @@ export default async function Page({
       return false;
     }
     return true;
-
   }
 
   if (await OnLoad()) redirect("/");

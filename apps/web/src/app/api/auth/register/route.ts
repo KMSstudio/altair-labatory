@@ -8,7 +8,8 @@ import { SendVerification } from "@/lib/mail";
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 const IGNORE_EMAIL_VERIFY_string = process.env.IGNORE_EMAIL_VERIFY ?? "";
-const IGNORE_EMAIL_VERIFY = (IGNORE_EMAIL_VERIFY_string === "1" || IGNORE_EMAIL_VERIFY_string.toUpperCase() === "TRUE")
+const IGNORE_EMAIL_VERIFY =
+  IGNORE_EMAIL_VERIFY_string === "1" || IGNORE_EMAIL_VERIFY_string.toUpperCase() === "TRUE";
 
 export async function POST(request: Request) {
   let body: { email?: string; password?: string; displayName?: string };
@@ -30,7 +31,6 @@ export async function POST(request: Request) {
 
   if (password.length < 8)
     return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
-
 
   if (IGNORE_EMAIL_VERIFY) {
     try {
@@ -65,8 +65,7 @@ export async function POST(request: Request) {
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002")
         return NextResponse.json({ error: "Email already in use." }, { status: 409 });
-      else
-        return NextResponse.json({ error: "Internal server error." }, { status: 500 });
+      else return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
   }
 
@@ -74,7 +73,7 @@ export async function POST(request: Request) {
     const SendSuccess = await SendVerification({
       stringVal: JSON.stringify({ displayName, email, password }),
       userEmail: email,
-    })
+    });
     if (SendSuccess) {
       return NextResponse.json({ ok: true });
     } else {

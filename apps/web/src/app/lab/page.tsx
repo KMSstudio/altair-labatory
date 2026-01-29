@@ -26,12 +26,12 @@ async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "sub
   const q = params.q.trim();
   if (q.length) {
     const labName = [
-      { nameKo: { contains: q, mode: "insensitive" } },
-      { nameEn: { contains: q, mode: "insensitive" } },
+      { nameKo: { contains: q, mode: Prisma.QueryMode.insensitive } },
+      { nameEn: { contains: q, mode: Prisma.QueryMode.insensitive } },
     ];
     const univName = [
-      { university: { nameKo: { contains: q, mode: "insensitive" } } },
-      { university: { nameEn: { contains: q, mode: "insensitive" } } },
+      { university: { nameKo: { contains: q, mode: Prisma.QueryMode.insensitive } } },
+      { university: { nameEn: { contains: q, mode: Prisma.QueryMode.insensitive } } },
     ];
     const subjName = [
       {
@@ -39,8 +39,8 @@ async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "sub
           some: {
             subject: {
               OR: [
-                { nameKo: { contains: q, mode: "insensitive" } },
-                { nameEn: { contains: q, mode: "insensitive" } },
+                { nameKo: { contains: q, mode: Prisma.QueryMode.insensitive } },
+                { nameEn: { contains: q, mode: Prisma.QueryMode.insensitive } },
               ],
             },
           },

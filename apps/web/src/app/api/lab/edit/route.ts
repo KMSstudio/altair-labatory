@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
 
+import { SerializeLab } from "@/util/serialize/SerializeLab";
 import {
   isKnownRequestError,
   parseLabUpdateInputFromJson,
@@ -12,45 +13,6 @@ import {
   create_subject_for_lab,
   replace_lab_subject_links,
 } from "@/util/lab.action";
-
-type SerializedLab = {
-  id: string;
-  nameKo: string;
-  nameEn: string | null;
-  websiteUrl: string | null;
-  description: string | null;
-  universityId: string | null;
-  subjects: { subjectId: string; nameKo: string; nameEn: string; isActive: boolean }[];
-  createdAt: string;
-  updatedAt: string;
-};
-
-const serializeLab = (lab: {
-  id: bigint;
-  nameKo: string;
-  nameEn: string | null;
-  websiteUrl: string | null;
-  description: string | null;
-  universityId: bigint | null;
-  createdAt: Date;
-  updatedAt: Date;
-  subjects: { subjectId: bigint; subject: { nameKo: string; nameEn: string; isActive: boolean } }[];
-}): SerializedLab => ({
-  id: lab.id.toString(),
-  nameKo: lab.nameKo,
-  nameEn: lab.nameEn,
-  websiteUrl: lab.websiteUrl,
-  description: lab.description,
-  universityId: lab.universityId ? lab.universityId.toString() : null,
-  subjects: lab.subjects.map((ls) => ({
-    subjectId: ls.subjectId.toString(),
-    nameKo: ls.subject.nameKo,
-    nameEn: ls.subject.nameEn,
-    isActive: ls.subject.isActive,
-  })),
-  createdAt: lab.createdAt.toISOString(),
-  updatedAt: lab.updatedAt.toISOString(),
-});
 
 const requireLabEditor = async (labId: bigint, user: { id: string; role: string }) => {
   if (user.role === "ADMIN") return;
@@ -137,12 +99,10 @@ export async function POST(request: Request) {
         },
       },
     });
-
     if (!lab) {
       return NextResponse.json({ error: "Lab not found" }, { status: 404 });
     }
-
-    return NextResponse.json({ ok: true, lab: serializeLab(lab) }, { status: 200 });
+    return NextResponse.json({ ok: true, lab: SerializeLab(lab) }, { status: 200 });
   } catch (e: unknown) {
     if (isKnownRequestError(e) && e.code === "P2025") {
       return NextResponse.json({ error: "Lab not found" }, { status: 404 });

@@ -17,6 +17,16 @@ export type LabUpsertInput = {
 
 /**
  * Normalizes an arbitrary input into a trimmed string.
+ * @param value - unknown input value
+ * @returns A trimmed string; null if value is invaild or empty string when trimmed
+ * 
+ * @example
+ * normalizeText(" hello ")
+ * // → "hello"
+ * normalizeText("   ");
+ * // → null
+ * normalizeText(123);
+ * // → null
  */
 const normalizeText = (value: unknown): string | null => {
   if (typeof value !== "string") return null;
@@ -25,7 +35,37 @@ const normalizeText = (value: unknown): string | null => {
 };
 
 /**
- * Reads a required text field.
+ * Normalizes an arbitrary input into a trimmed string.
+ * @param value - unknown input value
+ * @returns A trimmed string; empty string if value is invaild
+ * 
+ * @example
+ * normalizeText(" hello ")
+ * // → "hello"
+ * normalizeText("   ");
+ * // → ""
+ * normalizeText(123);
+ * // → ""
+ */
+const normalizeText2String = (value: unknown): string => {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  return trimmed;
+};
+
+/**
+ * Reads a required text field. 
+ * @param value - unknown input value
+ * @param field - Field name used in the error message.
+ * @returns A trimmed string; throw error if value is null, or empty string, or invalid
+ * @throws {Error} value is required
+ * @example
+ * requireText(" hello ", "field1")
+ * // → "hello"
+ * requireText("   ", "field2");
+ * // → throw Error: field2 is required
+ * requireText(123, "field3");
+ * // → throw Error: field3 is required
  */
 const requireText = (value: unknown, field: string): string => {
   const normalized = normalizeText(value);
@@ -35,6 +75,19 @@ const requireText = (value: unknown, field: string): string => {
 
 /**
  * Parses an integer id represented as a string into `bigint`.
+ * @param raw - unknown input value
+ * @param field - Field name used in the error message.
+ * @returns A bigint parsed from the trimmed string; throw Error if invaild
+ * @throws {Error} If input value is invaild or not a string
+ * @example
+ * requireText("123", "field1");
+ * // → 123: bigint
+ * requireText(" hello ", "field2")
+ * // → throw Error: field2 must be an integer string
+ * requireText("   ", "field3");
+ * // → throw Error: field3 is required
+ * requireText(1234, "field4");
+ * // → throw Error: field4 must be a string
  */
 export const parseId = (raw: unknown, field: string): bigint => {
   if (typeof raw !== "string") throw new Error(`${field} must be a string`);
@@ -49,6 +102,18 @@ export const parseId = (raw: unknown, field: string): bigint => {
 
 /**
  * Parses an optional id.
+ * @param raw - unknown input value
+ * @returns A bigint parsed from the trimmed string; throw Error if invaild
+ * @throws {Error} If input value is invaild or not a string
+ * @example
+ * requireText("123", "field1");
+ * // → 123: bigint
+ * requireText(" hello ", "field2")
+ * // → throw Error: universityId must be an integer string
+ * requireText("   ", "field3");
+ * // → throw Error: field3 is required
+ * requireText(1234, "field4");
+ * // → throw Error: field4 must be a string
  */
 const parseOptionalId = (raw: unknown): bigint | null => {
   if (raw === null || raw === undefined) return null;
@@ -64,7 +129,21 @@ const parseOptionalId = (raw: unknown): bigint | null => {
     throw new Error("universityId must be an integer string");
   }
 };
-
+/**
+ * Check whether input value is a vaild Url
+ * @param raw = unknown input value
+ * @returns trimmed input value; null if input value is invalid
+ * @throws {Error} if input value is not an Url
+ * @example
+ * isValidUrlOrNull("http://example.com")
+ * "http://example.com"
+ * isValidUrlOrNull("  ")
+ * null
+ * isValidUrlOrNull(123)
+ * null
+ * isValidUrlOrNull("example")
+ * throw Error: websiteUrl must be a valid URL
+ */
 const isValidUrlOrNull = (raw: unknown): string | null => {
   const v = normalizeText(raw);
   if (!v) return null;
@@ -79,6 +158,16 @@ const isValidUrlOrNull = (raw: unknown): string | null => {
 
 /**
  * Parses subject ids from FormData entries.
+ * @param formData - input value 
+ * @param fieldName - name of field in formData
+ * @returns List of deduplicated bigint subject IDs parsed from the given FormData field.
+ * List of map 
+ * @example
+ * const fd = new FormData();
+ * fd.append("subjectIds", "1");
+ * fd.append("subjectIds", "2");
+ * fd.append("subjectIds", "1");
+ * parseSubjectIdsFromFormData(fd,"subjectIds");
  */
 const parseSubjectIdsFromFormData = (formData: FormData, fieldName: string): bigint[] => {
   const raw = formData
@@ -94,6 +183,10 @@ const parseSubjectIdsFromFormData = (formData: FormData, fieldName: string): big
 
 /**
  * Parses subject ids from JSON.
+ * @param raw - unknown input value
+ * @param fieldName - Name of field displayed in Error message
+ * @throws If input value is not Array type or input value's item is not string type
+ * @returns List of deduplicated bigint subject IDs parsed from the given FormData field.
  */
 const parseSubjectIdsFromJson = (raw: unknown, fieldName: string): bigint[] => {
   if (raw === null || raw === undefined) return [];
@@ -129,7 +222,7 @@ const parseNewSubjectFromJson = (
 
 /**
  * Parses a Lab create/update payload from JSON.
- *
+ *@param body - serialized data:
  * Expected JSON:
  * - nameKo: string (required)
  * - nameEn: string | null (optional)
@@ -138,6 +231,15 @@ const parseNewSubjectFromJson = (
  * - universityId: string | null (optional; bigint string)
  * - subjectIds: string[] (optional; bigint strings)
  * - newSubject: { nameKo, nameEn, description? } | null (optional)
+ * @return List of string type
+ * @example
+ * const fd = new FormData();
+ * fd.append("nameKo", "홍길동");
+ * fd.append("nameEn", "Hong gil dong");
+ * fd.append("subjectIds", "1");
+ * fd.append("subjectIds", "2");
+ * 
+ * parseLabUpsertInputFromJson(fd);
  */
 export const parseLabUpsertInputFromJson = (body: unknown): LabUpsertInput => {
   if (body === null || typeof body !== "object") throw new Error("Body must be an object");
@@ -166,6 +268,26 @@ export const parseLabUpsertInputFromJson = (body: unknown): LabUpsertInput => {
  * Parses a Lab update payload from JSON.
  *
  * This expects a full lab payload (same as create) plus an `id`.
+ * @param body - serialized data:
+ * - `nameKo` — Korean name
+ * - `nameEn` — English name
+ * - `websiteUrl` — Website URL
+ * - `description` — Lab description
+ * - `universityId` — University ID as string
+ * - `subjectIds` — subject IDs; List of string types
+ * - `newSubjectNameKo` — New subject Korean name
+ * - `newSubjectNameEn` — New subject English name
+ * - `newSubjectDescription` — New subject description
+ * @returns id and List of string type
+ * @example
+ * const fd = new FormData();
+ * fd.append("id",1)
+ * fd.append("nameKo", "홍길동");
+ * fd.append("nameEn", "Hong gil dong");
+ * fd.append("subjectIds", "1");
+ * fd.append("subjectIds", "2");
+ * 
+ * parseLabUpsertInputFromJson(fd);
  */
 export const parseLabUpdateInputFromJson = (
   body: unknown,
@@ -181,6 +303,28 @@ export const parseLabUpdateInputFromJson = (
 
 /**
  * Parses a Lab create/update payload from FormData.
+ * @param formData - Submission data:
+ * - `nameKo` — Korean name
+ * - `nameEn` — English name
+ * - `websiteUrl` — Website URL
+ * - `description` — Lab description
+ * - `universityId` — University ID as string
+ * - `subjectIds` — subject IDs; List of string types
+ * - `newSubjectNameKo` — New subject Korean name
+ * - `newSubjectNameEn` — New subject English name
+ * - `newSubjectDescription` — New subject description
+ * @returns List of string types
+ * @example
+ * const fd = new FormData();
+ * fd.append("nameKo", "홍길동");
+ * fd.append("nameEn", "Hong gil dong");
+ * fd.append("subjectIds", "1");
+ * fd.append("subjectIds", "2");
+ * fd.append("newSubjectNameKo","이름");
+ * fd.append("newSubjectNameEn","Name");
+ * fd.append("newSubjectDescription","discription");
+ * 
+ * parseLabUpsertInputFromJson(fd);
  */
 export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertInput => {
   const nameKo = requireText(formData.get("nameKo"), "nameKo");
@@ -197,10 +341,10 @@ export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertIn
   const hasAnyNewSubjectField = !!newSubjectNameKo || !!newSubjectNameEn || !!newSubjectDescription;
   const newSubject = hasAnyNewSubjectField
     ? {
-        nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
-        nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
-        description: newSubjectDescription,
-      }
+      nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
+      nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
+      description: newSubjectDescription,
+    }
     : null;
 
   return {
@@ -216,6 +360,28 @@ export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertIn
 
 /**
  * Extracts a best-effort draft from FormData for UX-friendly redirects.
+ * @param formData - Submission data:
+ * - `nameKo` — Korean name
+ * - `nameEn` — English name
+ * - `websiteUrl` — Website URL
+ * - `description` — Lab description
+ * - `universityId` — University ID as string
+ * - `subjectIds` — Comma-separated subject IDs
+ * - `newSubjectNameKo` — New subject Korean name
+ * - `newSubjectNameEn` — New subject English name
+ * - `newSubjectDescription` — New subject description
+ * @returns List of string types
+ * @example
+ * const fd = new FormData();
+ * fd.append("nameKo", "홍길동");
+ * fd.append("nameEn", "Hong gil dong");
+ * fd.append("subjectIds", "1");
+ * fd.append("subjectIds", "2");
+ * fd.append("newSubjectNameKo","이름");
+ * fd.append("newSubjectNameEn","Name");
+ * fd.append("newSubjectDescription","discription");
+ * 
+ * parseLabUpsertInputFromJson(fd);
  */
 export const extractLabDraftFromFormData = (
   formData: FormData,

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
+import { SerializeLab } from "@/util/serialize/SerializeLab";
 
 import {
   isKnownRequestError,
@@ -11,45 +12,6 @@ import {
   create_lab,
   create_subject_for_lab,
 } from "@/util/lab.action";
-
-type SerializedLab = {
-  id: string;
-  nameKo: string;
-  nameEn: string | null;
-  websiteUrl: string | null;
-  description: string | null;
-  universityId: string | null;
-  subjects: { subjectId: string; nameKo: string; nameEn: string; isActive: boolean }[];
-  createdAt: string;
-  updatedAt: string;
-};
-
-const serializeLab = (lab: {
-  id: bigint;
-  nameKo: string;
-  nameEn: string | null;
-  websiteUrl: string | null;
-  description: string | null;
-  universityId: bigint | null;
-  createdAt: Date;
-  updatedAt: Date;
-  subjects: { subjectId: bigint; subject: { nameKo: string; nameEn: string; isActive: boolean } }[];
-}): SerializedLab => ({
-  id: lab.id.toString(),
-  nameKo: lab.nameKo,
-  nameEn: lab.nameEn,
-  websiteUrl: lab.websiteUrl,
-  description: lab.description,
-  universityId: lab.universityId ? lab.universityId.toString() : null,
-  subjects: lab.subjects.map((ls) => ({
-    subjectId: ls.subjectId.toString(),
-    nameKo: ls.subject.nameKo,
-    nameEn: ls.subject.nameEn,
-    isActive: ls.subject.isActive,
-  })),
-  createdAt: lab.createdAt.toISOString(),
-  updatedAt: lab.updatedAt.toISOString(),
-});
 
 /**
  * POST /api/lab/new
@@ -127,7 +89,6 @@ export async function POST(request: Request) {
       if (role === "PI" && pi) {
         await tx.pI.update({ where: { id: pi.id }, data: { labId: lab.id } });
       }
-
       return lab.id;
     });
 
@@ -144,7 +105,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Created lab not found" }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true, lab: serializeLab(lab) }, { status: 201 });
+    return NextResponse.json({ ok: true, lab: SerializeLab(lab) }, { status: 201 });
   } catch (e: unknown) {
     // Unique constraint violations: subject name, PI.labId, etc.
     if (isKnownRequestError(e) && e.code === "P2002") {

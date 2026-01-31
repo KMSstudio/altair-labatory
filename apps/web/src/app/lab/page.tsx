@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 
 import styles from "./lab.module.css";
+import { LabListItem } from "./LabListItem";
 
 type ListPageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -24,14 +25,17 @@ const normalizeScope = (value: string): "all" | "lab" | "univ" | "subj" => {
 async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "subj" }) {
   const where: Prisma.LabWhereInput = {};
   const q = params.q.trim();
+  const query = (q: string) => ({
+    contains: q, mode: Prisma.QueryMode.insensitive
+  })
   if (q.length) {
     const labName = [
-      { nameKo: { contains: q, mode: Prisma.QueryMode.insensitive } },
-      { nameEn: { contains: q, mode: Prisma.QueryMode.insensitive } },
+      { nameKo: query(q) },
+      { nameEn: query(q) },
     ];
     const univName = [
-      { university: { nameKo: { contains: q, mode: Prisma.QueryMode.insensitive } } },
-      { university: { nameEn: { contains: q, mode: Prisma.QueryMode.insensitive } } },
+      { university: { nameKo: query(q) } },
+      { university: { nameEn: query(q) } },
     ];
     const subjName = [
       {
@@ -39,8 +43,8 @@ async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "sub
           some: {
             subject: {
               OR: [
-                { nameKo: { contains: q, mode: Prisma.QueryMode.insensitive } },
-                { nameEn: { contains: q, mode: Prisma.QueryMode.insensitive } },
+                { nameKo: query(q) },
+                { nameEn: query(q) },
               ],
             },
           },
@@ -149,57 +153,7 @@ export default async function LabListPage({ searchParams }: ListPageProps) {
             {labs.map((lab) => {
               const subjectNames = lab.subjects.map((s) => s.subject.nameKo);
               const canEdit = isAdmin || (editableLabId !== null && editableLabId === lab.id);
-              return (
-                <li key={lab.id.toString()}>
-                  <Link
-                    href={`/lab/${lab.id.toString()}`}
-                    className={`${styles.card} ${styles.cardLink}`}
-                  >
-                    <div className={styles.cardHead}>
-                      <div>
-                        <h3>{lab.nameKo}</h3>
-                        <p className={styles.muted}>{lab.nameEn ?? ""}</p>
-                      </div>
-                      {canEdit && <div className={styles.statusTag}>Editable</div>}
-                    </div>
-
-                    <p className={styles.muted}>
-                      {lab.university ? `University: ${lab.university.nameKo}` : "University: -"}
-                    </p>
-
-                    {subjectNames.length > 0 ? (
-                      <div className={styles.tagList}>
-                        {subjectNames.slice(0, 6).map((t, idx) => (
-                          <span key={`${lab.id.toString()}-tag-${idx}`} className={styles.tag}>
-                            {t}
-                          </span>
-                        ))}
-                        {subjectNames.length > 6 && (
-                          <span className={styles.tag}>+{subjectNames.length - 6}</span>
-                        )}
-                      </div>
-                    ) : (
-                      <p className={styles.muted}>No subjects</p>
-                    )}
-
-                    {lab.websiteUrl && <p className={styles.muted}>{lab.websiteUrl}</p>}
-                    {lab.description && <p className={styles.muted}>{lab.description}</p>}
-                  </Link>
-
-                  {canEdit && (
-                    <div className={`${styles.actions} ${styles.space}`}>
-                      <Link href={`/lab/${lab.id.toString()}`} className={styles.ghost}>
-                        View
-                      </Link>
-                      {canEdit && (
-                        <Link href={`/lab/edit/${lab.id.toString()}`} className={styles.primary}>
-                          Edit
-                        </Link>
-                      )}
-                    </div>
-                  )}
-                </li>
-              );
+              return LabListItem({ lab, subjectNames, canEdit });
             })}
           </ul>
         )}

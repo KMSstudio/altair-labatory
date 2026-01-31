@@ -8,7 +8,7 @@ import { prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
 
 import {
-  LabUpsertInput,
+  type LabUpsertInput,
   extractLabDraftFromFormData,
   parseId,
   parseLabUpsertInputFromFormData,
@@ -109,9 +109,9 @@ export async function createLab(formData: FormData) {
   const pi =
     role === "PI"
       ? await prisma.pI.findUnique({
-          where: { userId: sessionUserId },
-          select: { id: true, labId: true },
-        })
+        where: { userId: sessionUserId },
+        select: { id: true, labId: true },
+      })
       : null;
 
   if (role === "PI") {
@@ -149,11 +149,9 @@ export async function createLab(formData: FormData) {
           skipDuplicates: true,
         });
       }
-
       if (role === "PI" && pi) {
         await tx.pI.update({ where: { id: pi.id }, data: { labId: lab.id } });
       }
-
       return lab;
     });
 

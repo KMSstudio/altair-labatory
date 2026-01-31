@@ -109,9 +109,9 @@ export async function createLab(formData: FormData) {
   const pi =
     role === "PI"
       ? await prisma.pI.findUnique({
-        where: { userId: sessionUserId },
-        select: { id: true, labId: true },
-      })
+          where: { userId: sessionUserId },
+          select: { id: true, labId: true },
+        })
       : null;
 
   if (role === "PI") {

@@ -19,7 +19,7 @@ export type LabUpsertInput = {
  * Normalizes an arbitrary input into a trimmed string.
  * @param value - unknown input value
  * @returns A trimmed string; null if value is invaild or empty string when trimmed
- * 
+ *
  * @example
  * normalizeText(" hello ")
  * // → "hello"
@@ -35,26 +35,7 @@ const normalizeText = (value: unknown): string | null => {
 };
 
 /**
- * Normalizes an arbitrary input into a trimmed string.
- * @param value - unknown input value
- * @returns A trimmed string; empty string if value is invaild
- * 
- * @example
- * normalizeText(" hello ")
- * // → "hello"
- * normalizeText("   ");
- * // → ""
- * normalizeText(123);
- * // → ""
- */
-const normalizeText2String = (value: unknown): string => {
-  if (typeof value !== "string") return "";
-  const trimmed = value.trim();
-  return trimmed;
-};
-
-/**
- * Reads a required text field. 
+ * Reads a required text field.
  * @param value - unknown input value
  * @param field - Field name used in the error message.
  * @returns A trimmed string; throw error if value is null, or empty string, or invalid
@@ -158,10 +139,10 @@ const isValidUrlOrNull = (raw: unknown): string | null => {
 
 /**
  * Parses subject ids from FormData entries.
- * @param formData - input value 
+ * @param formData - input value
  * @param fieldName - name of field in formData
  * @returns List of deduplicated bigint subject IDs parsed from the given FormData field.
- * List of map 
+ * List of map
  * @example
  * const fd = new FormData();
  * fd.append("subjectIds", "1");
@@ -238,7 +219,7 @@ const parseNewSubjectFromJson = (
  * fd.append("nameEn", "Hong gil dong");
  * fd.append("subjectIds", "1");
  * fd.append("subjectIds", "2");
- * 
+ *
  * parseLabUpsertInputFromJson(fd);
  */
 export const parseLabUpsertInputFromJson = (body: unknown): LabUpsertInput => {
@@ -286,7 +267,7 @@ export const parseLabUpsertInputFromJson = (body: unknown): LabUpsertInput => {
  * fd.append("nameEn", "Hong gil dong");
  * fd.append("subjectIds", "1");
  * fd.append("subjectIds", "2");
- * 
+ *
  * parseLabUpsertInputFromJson(fd);
  */
 export const parseLabUpdateInputFromJson = (
@@ -323,7 +304,7 @@ export const parseLabUpdateInputFromJson = (
  * fd.append("newSubjectNameKo","이름");
  * fd.append("newSubjectNameEn","Name");
  * fd.append("newSubjectDescription","discription");
- * 
+ *
  * parseLabUpsertInputFromJson(fd);
  */
 export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertInput => {
@@ -341,10 +322,10 @@ export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertIn
   const hasAnyNewSubjectField = !!newSubjectNameKo || !!newSubjectNameEn || !!newSubjectDescription;
   const newSubject = hasAnyNewSubjectField
     ? {
-      nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
-      nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
-      description: newSubjectDescription,
-    }
+        nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
+        nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
+        description: newSubjectDescription,
+      }
     : null;
 
   return {
@@ -380,7 +361,7 @@ export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertIn
  * fd.append("newSubjectNameKo","이름");
  * fd.append("newSubjectNameEn","Name");
  * fd.append("newSubjectDescription","discription");
- * 
+ *
  * parseLabUpsertInputFromJson(fd);
  */
 export const extractLabDraftFromFormData = (

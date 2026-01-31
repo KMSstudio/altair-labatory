@@ -26,26 +26,18 @@ async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "sub
   const where: Prisma.LabWhereInput = {};
   const q = params.q.trim();
   const query = (q: string) => ({
-    contains: q, mode: Prisma.QueryMode.insensitive
-  })
+    contains: q,
+    mode: Prisma.QueryMode.insensitive,
+  });
   if (q.length) {
-    const labName = [
-      { nameKo: query(q) },
-      { nameEn: query(q) },
-    ];
-    const univName = [
-      { university: { nameKo: query(q) } },
-      { university: { nameEn: query(q) } },
-    ];
+    const labName = [{ nameKo: query(q) }, { nameEn: query(q) }];
+    const univName = [{ university: { nameKo: query(q) } }, { university: { nameEn: query(q) } }];
     const subjName = [
       {
         subjects: {
           some: {
             subject: {
-              OR: [
-                { nameKo: query(q) },
-                { nameEn: query(q) },
-              ],
+              OR: [{ nameKo: query(q) }, { nameEn: query(q) }],
             },
           },
         },

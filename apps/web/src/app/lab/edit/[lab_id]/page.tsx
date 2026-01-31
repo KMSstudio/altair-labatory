@@ -90,18 +90,15 @@ export default async function LabEditPage({ params, searchParams }: LabEditPageP
   const nameEn = fromSearch(searchParams?.nameEn, lab.nameEn);
   const websiteUrl = fromSearch(searchParams?.websiteUrl, lab.websiteUrl);
   const description = fromSearch(searchParams?.description, lab.description);
-  const universityId = fromSearch(
-    searchParams?.universityId,
-    lab.universityId?.toString(),
-  );
+  const universityId = fromSearch(searchParams?.universityId, lab.universityId?.toString());
 
   const subjectIdsParam = asString(searchParams?.subjectIds);
   const subjectIdsSelected =
     subjectIdsParam !== undefined
       ? subjectIdsParam
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
       : lab.subjects.map((x) => x.subjectId.toString());
 
   const newSubjectNameKo = asString(searchParams?.newSubjectNameKo) ?? "";
@@ -110,15 +107,14 @@ export default async function LabEditPage({ params, searchParams }: LabEditPageP
 
   const errorHandlers: Record<string, () => string> = {
     unique: () =>
-      `Unique constraint failed${fields.length ? `: ${fields.join(", ")}` : ""
+      `Unique constraint failed${
+        fields.length ? `: ${fields.join(", ")}` : ""
       }. Use a different value.`,
     validation: () => message ?? "Invalid input.",
   };
 
   const errorText =
-    error == null
-      ? null
-      : (errorHandlers[error]?.() ?? message ?? "Request failed.");
+    error == null ? null : (errorHandlers[error]?.() ?? message ?? "Request failed.");
 
   return (
     <main className={styles.labFormShell}>

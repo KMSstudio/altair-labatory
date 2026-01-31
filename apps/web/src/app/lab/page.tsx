@@ -2,11 +2,12 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 
 import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 
 import styles from "./lab.module.css";
 import { LabListItem } from "./LabListItem";
+
+import { getLabs } from "./actions";
 
 type ListPageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -22,55 +23,7 @@ const normalizeScope = (value: string): "all" | "lab" | "univ" | "subj" => {
   return "all";
 };
 
-async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "subj" }) {
-  const where: Prisma.LabWhereInput = {};
-  const q = params.q.trim();
-  const query = (q: string) => ({
-    contains: q,
-    mode: Prisma.QueryMode.insensitive,
-  });
-  if (q.length) {
-    const labName = [{ nameKo: query(q) }, { nameEn: query(q) }];
-    const univName = [{ university: { nameKo: query(q) } }, { university: { nameEn: query(q) } }];
-    const subjName = [
-      {
-        subjects: {
-          some: {
-            subject: {
-              OR: [{ nameKo: query(q) }, { nameEn: query(q) }],
-            },
-          },
-        },
-      },
-    ];
 
-    if (params.scope === "lab") where.OR = labName;
-    else if (params.scope === "univ") where.OR = univName;
-    else if (params.scope === "subj") where.OR = subjName;
-    else where.OR = [...labName, ...univName, ...subjName];
-  }
-
-  return prisma.lab.findMany({
-    where,
-    orderBy: [{ createdAt: "desc" }],
-    select: {
-      id: true,
-      nameKo: true,
-      nameEn: true,
-      websiteUrl: true,
-      description: true,
-      createdAt: true,
-      university: { select: { id: true, nameKo: true, nameEn: true } },
-      subjects: {
-        take: 8,
-        orderBy: { createdAt: "desc" },
-        select: {
-          subject: { select: { id: true, nameKo: true, nameEn: true } },
-        },
-      },
-    },
-  });
-}
 
 export default async function LabListPage({ searchParams }: ListPageProps) {
   const sp = (await searchParams) ?? {};

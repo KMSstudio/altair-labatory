@@ -15,23 +15,24 @@ export type LabUpsertInput = {
   } | null;
 };
 
+
 /**
  * Normalizes an arbitrary input into a trimmed string.
  * @param value - unknown input value
- * @returns A trimmed string; null if value is invaild or empty string when trimmed
+ * @returns A trimmed string; returns empty string if value is invaild or empty string when trimmed
  *
  * @example
  * normalizeText(" hello ")
  * // → "hello"
  * normalizeText("   ");
- * // → null
+ * // → ""
  * normalizeText(123);
- * // → null
+ * // → ""
  */
-const normalizeText = (value: unknown): string | null => {
-  if (typeof value !== "string") return null;
+const normalizeText2String = (value: unknown): string => {
+  if (typeof value !== "string") return "";
   const trimmed = value.trim();
-  return trimmed.length ? trimmed : null;
+  return trimmed.length ? trimmed : "";
 };
 
 /**
@@ -49,7 +50,7 @@ const normalizeText = (value: unknown): string | null => {
  * // → throw Error: field3 is required
  */
 const requireText = (value: unknown, field: string): string => {
-  const normalized = normalizeText(value);
+  const normalized = normalizeText2String(value);
   if (!normalized) throw new Error(`${field} is required`);
   return normalized;
 };
@@ -126,7 +127,7 @@ const parseOptionalId = (raw: unknown): bigint | null => {
  * throw Error: websiteUrl must be a valid URL
  */
 const isValidUrlOrNull = (raw: unknown): string | null => {
-  const v = normalizeText(raw);
+  const v = normalizeText2String(raw);
   if (!v) return null;
   try {
     // Accept http/https and other absolute URLs.
@@ -188,9 +189,9 @@ const parseNewSubjectFromJson = (
   if (raw === null || raw === undefined) return null;
   if (typeof raw !== "object") throw new Error("newSubject must be an object or null");
   const b = raw as Record<string, unknown>;
-  const nameKo = normalizeText(b.nameKo);
-  const nameEn = normalizeText(b.nameEn);
-  const description = normalizeText(b.description);
+  const nameKo = normalizeText2String(b.nameKo);
+  const nameEn = normalizeText2String(b.nameEn);
+  const description = normalizeText2String(b.description);
 
   const hasAny = !!nameKo || !!nameEn || !!description;
   if (!hasAny) return null;
@@ -227,9 +228,9 @@ export const parseLabUpsertInputFromJson = (body: unknown): LabUpsertInput => {
   const b = body as Record<string, unknown>;
 
   const nameKo = requireText(b.nameKo, "nameKo");
-  const nameEn = normalizeText(b.nameEn);
+  const nameEn = normalizeText2String(b.nameEn);
   const websiteUrl = isValidUrlOrNull(b.websiteUrl);
-  const description = normalizeText(b.description);
+  const description = normalizeText2String(b.description);
   const universityId = parseOptionalId(b.universityId);
   const subjectIds = parseSubjectIdsFromJson(b.subjectIds, "subjectIds");
   const newSubject = parseNewSubjectFromJson(b.newSubject);
@@ -309,23 +310,23 @@ export const parseLabUpdateInputFromJson = (
  */
 export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertInput => {
   const nameKo = requireText(formData.get("nameKo"), "nameKo");
-  const nameEn = normalizeText(formData.get("nameEn"));
+  const nameEn = normalizeText2String(formData.get("nameEn"));
   const websiteUrl = isValidUrlOrNull(formData.get("websiteUrl"));
-  const description = normalizeText(formData.get("description"));
+  const description = normalizeText2String(formData.get("description"));
   const universityId = parseOptionalId(formData.get("universityId"));
   const subjectIds = parseSubjectIdsFromFormData(formData, "subjectIds");
 
-  const newSubjectNameKo = normalizeText(formData.get("newSubjectNameKo"));
-  const newSubjectNameEn = normalizeText(formData.get("newSubjectNameEn"));
-  const newSubjectDescription = normalizeText(formData.get("newSubjectDescription"));
+  const newSubjectNameKo = normalizeText2String(formData.get("newSubjectNameKo"));
+  const newSubjectNameEn = normalizeText2String(formData.get("newSubjectNameEn"));
+  const newSubjectDescription = normalizeText2String(formData.get("newSubjectDescription"));
 
   const hasAnyNewSubjectField = !!newSubjectNameKo || !!newSubjectNameEn || !!newSubjectDescription;
   const newSubject = hasAnyNewSubjectField
     ? {
-        nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
-        nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
-        description: newSubjectDescription,
-      }
+      nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
+      nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
+      description: newSubjectDescription,
+    }
     : null;
 
   return {
@@ -383,15 +384,15 @@ export const extractLabDraftFromFormData = (
     .join(",");
 
   return {
-    nameKo: normalizeText(formData.get("nameKo")) ?? "",
-    nameEn: normalizeText(formData.get("nameEn")) ?? "",
-    websiteUrl: normalizeText(formData.get("websiteUrl")) ?? "",
-    description: normalizeText(formData.get("description")) ?? "",
-    universityId: normalizeText(formData.get("universityId")) ?? "",
+    nameKo: normalizeText2String(formData.get("nameKo")) ?? "",
+    nameEn: normalizeText2String(formData.get("nameEn")) ?? "",
+    websiteUrl: normalizeText2String(formData.get("websiteUrl")) ?? "",
+    description: normalizeText2String(formData.get("description")) ?? "",
+    universityId: normalizeText2String(formData.get("universityId")) ?? "",
     subjectIds,
-    newSubjectNameKo: normalizeText(formData.get("newSubjectNameKo")) ?? "",
-    newSubjectNameEn: normalizeText(formData.get("newSubjectNameEn")) ?? "",
-    newSubjectDescription: normalizeText(formData.get("newSubjectDescription")) ?? "",
+    newSubjectNameKo: normalizeText2String(formData.get("newSubjectNameKo")) ?? "",
+    newSubjectNameEn: normalizeText2String(formData.get("newSubjectNameEn")) ?? "",
+    newSubjectDescription: normalizeText2String(formData.get("newSubjectDescription")) ?? "",
   };
 };
 

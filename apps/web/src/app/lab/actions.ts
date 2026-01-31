@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 
 import { prisma } from "@labatory/db";
+import { Prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
 
 import {
@@ -20,6 +21,66 @@ import {
   create_subject_for_lab,
   replace_lab_subject_links,
 } from "@/util/lab.action";
+
+export async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "subj" }) {
+  const where: Prisma.LabWhereInput = {};
+
+  const q = params.q.trim();
+  if (q.length) {
+    const query = (value: string) =>
+      ({ contains: value, mode: Prisma.QueryMode.insensitive } as const);
+    const orGroups = {
+      lab: [
+        { nameKo: query(q) },
+        { nameEn: query(q) },
+      ],
+      univ: [
+        { university: { nameKo: query(q) } },
+        { university: { nameEn: query(q) } },
+      ],
+      subj: [
+        {
+          subjects: {
+            some: {
+              subject: {
+                OR: [
+                  { nameKo: query(q) },
+                  { nameEn: query(q) },
+                ],
+              },
+            },
+          },
+        },
+      ],
+    } satisfies Record<"lab" | "univ" | "subj", Prisma.LabWhereInput["OR"]>;
+    const scope = params.scope as keyof typeof orGroups | undefined;
+    where.OR =
+      scope && scope in orGroups
+        ? orGroups[scope]
+        : [...orGroups.lab, ...orGroups.univ, ...orGroups.subj];
+  }
+
+  return prisma.lab.findMany({
+    where,
+    orderBy: [{ createdAt: "desc" }],
+    select: {
+      id: true,
+      nameKo: true,
+      nameEn: true,
+      websiteUrl: true,
+      description: true,
+      createdAt: true,
+      university: { select: { id: true, nameKo: true, nameEn: true } },
+      subjects: {
+        take: 8,
+        orderBy: { createdAt: "desc" },
+        select: {
+          subject: { select: { id: true, nameKo: true, nameEn: true } },
+        },
+      },
+    },
+  });
+}
 
 type LabDraft = ReturnType<typeof extractLabDraftFromFormData>;
 
@@ -109,9 +170,9 @@ export async function createLab(formData: FormData) {
   const pi =
     role === "PI"
       ? await prisma.pI.findUnique({
-          where: { userId: sessionUserId },
-          select: { id: true, labId: true },
-        })
+        where: { userId: sessionUserId },
+        select: { id: true, labId: true },
+      })
       : null;
 
   if (role === "PI") {

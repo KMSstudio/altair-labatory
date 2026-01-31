@@ -15,7 +15,6 @@ export type LabUpsertInput = {
   } | null;
 };
 
-
 /**
  * Normalizes an arbitrary input into a trimmed string.
  * @param value - unknown input value
@@ -323,10 +322,10 @@ export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertIn
   const hasAnyNewSubjectField = !!newSubjectNameKo || !!newSubjectNameEn || !!newSubjectDescription;
   const newSubject = hasAnyNewSubjectField
     ? {
-      nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
-      nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
-      description: newSubjectDescription,
-    }
+        nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
+        nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
+        description: newSubjectDescription,
+      }
     : null;
 
   return {

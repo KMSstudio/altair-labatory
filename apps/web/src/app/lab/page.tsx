@@ -23,8 +23,6 @@ const normalizeScope = (value: string): "all" | "lab" | "univ" | "subj" => {
   return "all";
 };
 
-
-
 export default async function LabListPage({ searchParams }: ListPageProps) {
   const sp = (await searchParams) ?? {};
   const q = normalizeQuery(sp.q);

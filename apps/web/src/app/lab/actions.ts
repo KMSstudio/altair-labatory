@@ -28,25 +28,16 @@ export async function getLabs(params: { q: string; scope: "all" | "lab" | "univ"
   const q = params.q.trim();
   if (q.length) {
     const query = (value: string) =>
-      ({ contains: value, mode: Prisma.QueryMode.insensitive } as const);
+      ({ contains: value, mode: Prisma.QueryMode.insensitive }) as const;
     const orGroups = {
-      lab: [
-        { nameKo: query(q) },
-        { nameEn: query(q) },
-      ],
-      univ: [
-        { university: { nameKo: query(q) } },
-        { university: { nameEn: query(q) } },
-      ],
+      lab: [{ nameKo: query(q) }, { nameEn: query(q) }],
+      univ: [{ university: { nameKo: query(q) } }, { university: { nameEn: query(q) } }],
       subj: [
         {
           subjects: {
             some: {
               subject: {
-                OR: [
-                  { nameKo: query(q) },
-                  { nameEn: query(q) },
-                ],
+                OR: [{ nameKo: query(q) }, { nameEn: query(q) }],
               },
             },
           },
@@ -170,9 +161,9 @@ export async function createLab(formData: FormData) {
   const pi =
     role === "PI"
       ? await prisma.pI.findUnique({
-        where: { userId: sessionUserId },
-        select: { id: true, labId: true },
-      })
+          where: { userId: sessionUserId },
+          select: { id: true, labId: true },
+        })
       : null;
 
   if (role === "PI") {

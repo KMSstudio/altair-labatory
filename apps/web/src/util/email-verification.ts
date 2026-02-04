@@ -2,7 +2,7 @@
 
 import { Prisma } from "@labatory/db";
 import { prisma } from "@labatory/db";
-import { passwordHashing } from "@/lib/auth";
+import { CreateUserSuite, passwordHashing } from "@/lib/auth";
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
@@ -52,9 +52,7 @@ export async function EmailVerificationAction(params: { email: string; tokenHash
         if (anyCredSameEmail) {
           userId = anyCredSameEmail.userId;
         } else {
-          const user = await tx.user.create({
-            data: { displayName, primaryEmail: email },
-          });
+          const user = await CreateUserSuite(tx, displayName, email);
           userId = user.id;
         }
 

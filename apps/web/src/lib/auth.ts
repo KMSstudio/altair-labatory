@@ -109,11 +109,7 @@ export const authOptions: NextAuthOptions = {
                 ? displayNameRaw.trim()
                 : email.split("@")[0] || "User";
 
-            const created = await tx.user.create({
-              data: { displayName, primaryEmail: email },
-              select: { id: true, primaryEmail: true },
-            });
-
+            const created = await CreateUserSuite(tx, displayName, email);
             userId = created.id;
             userPrimaryEmail = created.primaryEmail;
           }
@@ -196,3 +192,67 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
+
+async function LinkUserWithPIByEmail(tx: Prisma.TransactionClient, userId: bigint) {
+  const user = await tx.user.findUnique({
+    where: { id: userId },
+    select: {
+      primaryEmail: true,
+    }
+  });
+  if (!user) {
+    throw Error("Invaild user id.");
+  }
+  const userEmail = user.primaryEmail;
+  if (!userEmail) {
+    return false;
+  }
+
+  const piWithSameEmail = await tx.pI.findMany({
+    where: {
+      email: userEmail,
+      user: null,
+    },
+    select: {
+      id: true,
+    }
+  });
+  if (piWithSameEmail.length == 0) return false;
+  if (piWithSameEmail.length != 1) {
+    throw Error("Multiple PI data detected.");
+  }
+
+  const pi = piWithSameEmail[0];
+
+  await tx.pI.update({
+    where: { id: pi.id },
+    data: {
+      userId,
+    },
+  });
+  await tx.user.update({
+    where: { id: userId },
+    data: {
+      pi: {
+        connect: { id: pi.id },
+      },
+    },
+  });
+
+  return true;
+}
+
+
+export async function CreateUserSuite(
+  tx: Prisma.TransactionClient,
+  userName: string,
+  userEmail: string | null,
+) {
+  const createdUser = await tx.user.create({
+    data: { displayName: userName, primaryEmail: userEmail },
+    select: { id: true, primaryEmail: true },
+  });
+  await LinkUserWithPIByEmail(tx, createdUser.id);
+
+  return createdUser;
+}

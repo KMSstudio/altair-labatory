@@ -1,7 +1,7 @@
 // @/app/api/auth/register/route.ts
 
 import { NextResponse } from "next/server";
-import { passwordHashing } from "@/lib/auth";
+import { CreateUserSuite, passwordHashing } from "@/lib/auth";
 import { prisma } from "@labatory/db";
 import { Prisma } from "@prisma/client";
 import { SendVerification } from "@/lib/mail";
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         if (anyCredSameEmail) {
           userId = anyCredSameEmail.userId;
         } else {
-          const user = await tx.user.create({ data: { displayName, primaryEmail: email } });
+          const user = await CreateUserSuite(tx, displayName, email);
           userId = user.id;
         }
 

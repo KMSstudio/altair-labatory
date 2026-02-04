@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@labatory/db";
+import { Prisma, prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -13,6 +13,40 @@ const isValidUrl = (v: unknown): v is string => {
     return false;
   }
 };
+
+const PISelect = {
+  id: true,
+  userId: true,
+  name: true,
+  email: true,
+  scholarUrl: true,
+  createdAt: true,
+  labId: true,
+};
+const LabSelect = {
+  id: true,
+  nameEn: true,
+  nameKo: true,
+  websiteUrl: true,
+  description: true,
+};
+
+export async function GetPI(PIId: bigint) {
+  return prisma.pI.findUnique({
+    where: { id: PIId },
+    select: PISelect,
+  });
+}
+
+export async function GetLab(LabId: bigint) {
+  return prisma.lab.findUnique({
+    where: { id: LabId },
+    select: LabSelect,
+  });
+}
+
+export type GetPIResult = NonNullable<Awaited<ReturnType<typeof GetPI>>>;
+export type GetLabResult = NonNullable<Awaited<ReturnType<typeof GetLab>>>;
 
 /**
  * Submit PI Application.
@@ -86,19 +120,34 @@ export async function submitPIApplicationAction(params: {
   }
 }
 
-export async function FindLabs(params: { labNameEn: string }) {
-  params = await params;
-  const labNameEn = params.labNameEn ?? "";
-  if (!labNameEn) throw Error("Lab name required");
+/**
+ * Searches for labs using the provided query.
+ * Searches by Korean and English names by default, or by URL if the query starts with "http://" or "https://".
+ *
+ * @param params.query - The provided search query.
+ * @returns Search result; ordered By english name.
+ * @throws If internal server error
+ */
+export async function SearchLabs(query: string) {
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) {
+    throw Error("query is required");
+  }
+
+  const prismaQuery = (value: string) =>
+    ({ contains: value, mode: Prisma.QueryMode.insensitive }) as const;
+  const where: Prisma.LabWhereInput = {};
+  if (/^https?:\/\//i.test(query)) {
+    where.websiteUrl = prismaQuery(trimmedQuery);
+  } else {
+    where.OR = [{ nameEn: prismaQuery(query) }, { nameKo: prismaQuery(query) }];
+  }
+
   try {
     return await prisma.lab.findMany({
-      where: {
-        nameEn: {
-          contains: labNameEn.trim(),
-          mode: "insensitive",
-        },
-      },
+      where,
       orderBy: { nameEn: "asc" },
+      select: LabSelect,
     });
   } catch {
     throw Error("Internal server error");

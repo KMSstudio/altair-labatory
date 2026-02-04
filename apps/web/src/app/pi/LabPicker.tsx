@@ -1,34 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { Lab } from "@labatory/db";
-import { FindLabs } from "../../actions";
+import { useState, useRef } from "react";
+import { GetLabResult, SearchLabs } from "./actions";
 
 export function LabPicker({
   selectedLab,
   setLabId,
 }: {
-  selectedLab?: Lab | null;
+  selectedLab?: GetLabResult | null;
   setLabId: (labId: bigint | null) => void;
 }) {
+  const isComposing = useRef(false);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [labs, setLabs] = useState<Lab[] | null>(null);
-  const [selectedLabs, setSelectedLabs] = useState<Lab | null>(selectedLab ?? null);
+  const [labs, setLabs] = useState<GetLabResult[] | null>(null);
+  const [selectedLabs, setSelectedLabs] = useState<GetLabResult | null>(selectedLab ?? null);
   async function SearchLab() {
     setError(null);
     setLoading(true);
 
-    const labNameEn = query.trim();
+    const trimmedQuery = query.trim();
 
-    // 검색 안 하면 리스트 비우기
-    if (!labNameEn) {
+    // Make list empty if query is empty
+    if (!trimmedQuery) {
       setLoading(false);
       return;
     }
     try {
-      setLabs(await FindLabs({ labNameEn }));
+      setLabs(await SearchLabs(trimmedQuery));
     } catch (e) {
       if (e instanceof Error) setError(e.message);
       else setError("Unknown error");
@@ -37,7 +37,7 @@ export function LabPicker({
     setLoading(false);
   }
 
-  function onSelect(lab: Lab | null) {
+  function onSelect(lab: GetLabResult | null) {
     if (!lab) {
       setLabId(null);
       setSelectedLabs(null);
@@ -55,10 +55,21 @@ export function LabPicker({
         <div>Lab</div>
         Search by name(korean)
         <input
-          name="labName"
+          name="query"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="artificial intelligence"
+          onCompositionStart={() => {
+            isComposing.current = true;
+          }}
+          onCompositionEnd={(e) => {
+            isComposing.current = false;
+            setQuery(e.currentTarget.value);
+          }}
+          onChange={(e) => {
+            if (!isComposing.current) {
+              setQuery(e.currentTarget.value);
+            }
+          }}
+          placeholder="type http(s)://... to search from Url"
         />
         <button type="button" disabled={loading} onClick={() => SearchLab()} formNoValidate>
           {loading ? "Searching..." : "Search"}
@@ -75,8 +86,8 @@ export default function LabSearchList({
   labs,
   onSelect,
 }: {
-  labs: Lab[] | null;
-  onSelect: (lab: Lab) => void;
+  labs: GetLabResult[] | null;
+  onSelect: (lab: GetLabResult) => void;
 }) {
   if (!labs) return <p>Please input Lab name</p>;
   if (labs.length === 0) return <p>No search result.</p>;
@@ -92,7 +103,10 @@ export default function LabSearchList({
   );
 }
 
-function LabSearchItem(params: { lab: Lab | null; onSelect: (lab: Lab) => void }) {
+function LabSearchItem(params: {
+  lab: GetLabResult | null;
+  onSelect: (lab: GetLabResult) => void;
+}) {
   if (!params.lab) return <></>;
   const lab = params.lab;
   return (

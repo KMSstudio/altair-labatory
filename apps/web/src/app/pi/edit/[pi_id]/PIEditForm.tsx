@@ -1,11 +1,10 @@
 "use client";
 
-import { PI, Lab } from "@labatory/db";
 import { useState } from "react";
-import { UpdatePI } from "../../actions";
-import { LabPicker } from "./LabPicker";
+import { type GetLabResult, type GetPIResult, UpdatePI } from "../../actions";
+import { LabPicker } from "../../LabPicker";
 import { useRouter } from "next/navigation";
-export function PIEditFormClient({ pi, lab }: { pi: PI; lab: Lab | null }) {
+export function PIEditFormClient({ pi, lab }: { pi: GetPIResult; lab: GetLabResult | null }) {
   const [name, setName] = useState(pi.name);
   const [email, setEmail] = useState(pi.email);
   const [scholarUrl, setScholarUrl] = useState(pi.scholarUrl);

@@ -1,17 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@labatory/db";
-
-async function GetPI(PIId: bigint) {
-  return prisma.pI.findUnique({
-    where: { id: PIId },
-  });
-}
-
-async function GetLab(LabId: bigint) {
-  return prisma.lab.findUnique({
-    where: { id: LabId },
-  });
-}
+import { GetLab, GetPI } from "../actions";
 
 export default async function PIDetailPage({ params }: { params: { pi_id: string } }) {
   params = await params;

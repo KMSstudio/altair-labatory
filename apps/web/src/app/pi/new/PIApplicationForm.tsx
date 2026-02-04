@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { submitPIApplicationAction } from "../actions";
 import { useRouter } from "next/navigation";
-import { LabPicker } from "./LabPicker";
+import { LabPicker } from "../LabPicker";
 
 export function PIApplicationForm() {
   const [submitting, setSubmitting] = useState(false);
@@ -18,7 +18,6 @@ export function PIApplicationForm() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     setSubmitting(true);
     e.preventDefault();
-    console.log(labId);
     try {
       await submitPIApplicationAction({ requestedName, labId, scholarUrl, note });
     } catch (error) {

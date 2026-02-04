@@ -198,7 +198,7 @@ async function LinkUserWithPIByEmail(tx: Prisma.TransactionClient, userId: bigin
     where: { id: userId },
     select: {
       primaryEmail: true,
-    }
+    },
   });
   if (!user) {
     throw Error("Invaild user id.");
@@ -215,7 +215,7 @@ async function LinkUserWithPIByEmail(tx: Prisma.TransactionClient, userId: bigin
     },
     select: {
       id: true,
-    }
+    },
   });
   if (piWithSameEmail.length == 0) return false;
   if (piWithSameEmail.length != 1) {
@@ -241,7 +241,6 @@ async function LinkUserWithPIByEmail(tx: Prisma.TransactionClient, userId: bigin
 
   return true;
 }
-
 
 export async function CreateUserSuite(
   tx: Prisma.TransactionClient,

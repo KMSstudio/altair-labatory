@@ -60,14 +60,16 @@ export default async function LabNewPage({ searchParams }: NewPageProps) {
   const newSubjectNameEnDraft = asString(searchParams?.newSubjectNameEn) ?? "";
   const newSubjectDescriptionDraft = asString(searchParams?.newSubjectDescription) ?? "";
 
+  const errorHandlers: Record<string, () => string> = {
+    unique: () =>
+      `Unique constraint failed${
+        fields.length ? `: ${fields.join(", ")}` : ""
+      }. Use a different value.`,
+    validation: () => message ?? "Invalid input.",
+  };
+
   const errorText =
-    error === "unique"
-      ? `Unique constraint failed${fields.length ? `: ${fields.join(", ")}` : ""}. Use a different value.`
-      : error === "validation"
-        ? (message ?? "Invalid input.")
-        : error
-          ? (message ?? "Request failed.")
-          : null;
+    error == null ? null : (errorHandlers[error]?.() ?? message ?? "Request failed.");
 
   return (
     <main className={styles.labFormShell}>

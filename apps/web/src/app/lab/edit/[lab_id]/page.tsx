@@ -79,22 +79,18 @@ export default async function LabEditPage({ params, searchParams }: LabEditPageP
   const message = asString(searchParams?.message);
 
   const nameKo = asString(searchParams?.nameKo) ?? lab.nameKo;
-  const nameEn =
-    asString(searchParams?.nameEn) !== undefined
-      ? (asString(searchParams?.nameEn) ?? "")
-      : (lab.nameEn ?? "");
-  const websiteUrl =
-    asString(searchParams?.websiteUrl) !== undefined
-      ? (asString(searchParams?.websiteUrl) ?? "")
-      : (lab.websiteUrl ?? "");
-  const description =
-    asString(searchParams?.description) !== undefined
-      ? (asString(searchParams?.description) ?? "")
-      : (lab.description ?? "");
-  const universityId =
-    asString(searchParams?.universityId) !== undefined
-      ? (asString(searchParams?.universityId) ?? "")
-      : (lab.universityId?.toString() ?? "");
+  const fromSearch = (
+    sp: string | string[] | undefined,
+    fallback: string | null | undefined,
+  ): string => {
+    const v = asString(sp) ?? "";
+    return v !== undefined ? (v ?? "") : (fallback ?? "");
+  };
+
+  const nameEn = fromSearch(searchParams?.nameEn, lab.nameEn);
+  const websiteUrl = fromSearch(searchParams?.websiteUrl, lab.websiteUrl);
+  const description = fromSearch(searchParams?.description, lab.description);
+  const universityId = fromSearch(searchParams?.universityId, lab.universityId?.toString());
 
   const subjectIdsParam = asString(searchParams?.subjectIds);
   const subjectIdsSelected =
@@ -109,14 +105,16 @@ export default async function LabEditPage({ params, searchParams }: LabEditPageP
   const newSubjectNameEn = asString(searchParams?.newSubjectNameEn) ?? "";
   const newSubjectDescription = asString(searchParams?.newSubjectDescription) ?? "";
 
+  const errorHandlers: Record<string, () => string> = {
+    unique: () =>
+      `Unique constraint failed${
+        fields.length ? `: ${fields.join(", ")}` : ""
+      }. Use a different value.`,
+    validation: () => message ?? "Invalid input.",
+  };
+
   const errorText =
-    error === "unique"
-      ? `Unique constraint failed${fields.length ? `: ${fields.join(", ")}` : ""}. Use a different value.`
-      : error === "validation"
-        ? (message ?? "Invalid input.")
-        : error
-          ? (message ?? "Request failed.")
-          : null;
+    error == null ? null : (errorHandlers[error]?.() ?? message ?? "Request failed.");
 
   return (
     <main className={styles.labFormShell}>

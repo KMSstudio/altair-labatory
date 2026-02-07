@@ -9,7 +9,6 @@ export default async function PIApplicationApplyPage() {
   if (!session?.user || session.user.role !== "USER") {
     redirect("/");
   }
-
   return (
     <main>
       <h1>Apply as PI</h1>

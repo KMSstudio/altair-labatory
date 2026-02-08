@@ -432,7 +432,7 @@ model Tag {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@index([kind], map: "idx_tags_type")
+  @@index([kind], map: "idx_tags_kind")
   @@index([labId], map: "idx_tags_lab_id")
   @@index([subjId], map: "idx_tags_subj_id")
   @@index([univId], map: "idx_tags_univ_id")

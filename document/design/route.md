@@ -63,8 +63,8 @@
 
 ## Builetin Board System
 
-/bbs/:bbs_id/list
-/bbs/:bbs_id/new
+/board/:board_slug/list
+/board/:board_slug/new
 
 /article/:article_id/
 /article/:article_id/update
@@ -72,4 +72,3 @@
 /api/article/update
 /api/article/new
 /api/article/comment/new
-

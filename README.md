@@ -24,6 +24,35 @@ npm install
 - Copy or edit `.env` in the repo root to match your local Postgres settings. The default values in the sample `.env` work with the provided Docker setup.
 - `DATABASE_URL` must match the container port (`4821` by default).
 
+## .env 파일
+
+.env file must be located at root and written in given form.
+
+```env example
+EMAIL_ID=emailID@gmail.com
+EMAIL_PASSWORD=emailPassword
+EMAIL_NAME=emailName
+EMAIL_DOMAIN_NAME=gmail.com
+EXPIRE_DURATION=30
+```
+
+| Key Name             | Description                                                      |
+|----------------------|------------------------------------------------------------------|
+| `NODE_ENV`                     | Application execution mode.  |
+| `GOOGLE_CLIENT_ID`             | The OAuth client ID issued by Google. |
+| `GOOGLE_CLIENT_SECRET`         | The OAuth client secret associated with the Google client ID. |
+| `NEXTAUTH_SECRET`              | A secret key used by NextAuth to sign and encrypt sensitive authentication data. |
+| `NEXTAUTH_URL`                 | The canonical base URL of the application. |
+| `EMAIL_ID`                     | The email account ID (email address) used as the sender. |
+| `EMAIL_PASSWORD`               | The password or app-specific password for the email account. |
+| `EMAIL_NAME`                   | The display name shown as the sender in the recipient’s inbox. |
+| `EMAIL_DOMAIN`                 | The domain associated with the sender’s email address. |
+| `EXPIRE_DURATION`              | The number of minutes before a verification email token expires. |
+| `IGNORE_EMAIL_VERIFY`          | When set to '1' or 'true', verification email will not be sent. This option is for development purpose only. |
+| `POSTGRES_DB`                  | The name of the PostgreSQL database. |
+| `POSTGRES_USER`                | The PostgreSQL user with access to the database. |
+| `POSTGRES_PASSWORD`            | The password for the PostgreSQL user. |
+| `DATABASE_URL`                 | The PostgreSQL connection string. |
 ## Start the stack
 1) Start Postgres
 ```bash

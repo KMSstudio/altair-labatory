@@ -304,7 +304,7 @@ model VerificationToken {
 model Board {
   id          BigInt @id @default(autoincrement())
 
-  slug        String @unique @db.VarChar(80)
+  slug        String @unique @db.VarChar(80) //URL에 표시되는 내용
   name        String @db.VarChar(80)
   description String? @db.VarChar(500)
 
@@ -417,7 +417,7 @@ enum TagKind {
 
 model Tag {
   id   BigInt  @id @default(autoincrement())
-  type TagKind @map("type")
+  kind TagKind @map("kind")
 
   // nominate 대상 (셋 중 하나만 사용)
   labId  BigInt? @unique @map("lab_id")
@@ -432,7 +432,7 @@ model Tag {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@index([type], map: "idx_tags_type")
+  @@index([kind], map: "idx_tags_type")
   @@index([labId], map: "idx_tags_lab_id")
   @@index([subjId], map: "idx_tags_subj_id")
   @@index([univId], map: "idx_tags_univ_id")

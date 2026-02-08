@@ -298,7 +298,7 @@ model VerificationToken {
 }
 
 // =========================
-// BOARD / BOARD ACL / BOARD CONTENT
+// BOARD / BOARD ACL / BOARD ARTICLE / COMMENT
 // =========================
 
 model Board {
@@ -349,8 +349,7 @@ model Article {
   content   String
   viewCount Int    @default(0) @map("view_count")
 
-  // 암시적 M:N (조인 테이블은 Prisma 내부 생성 → 매핑 불가)
-  tags      Tag[]
+  tags      ArticleTag[]
 
   authorId  BigInt? @map("author_id")
   author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
@@ -374,40 +373,6 @@ model Article {
 
   @@index([createdAt], map: "idx_articles_created_at")
   @@map("articles")
-}
-
-// =========================
-// ARTICLE TAG / COMMENT
-// =========================
-
-enum TagKind {
-  LAB
-  SUBJECT
-  UNIV
-}
-
-model Tag {
-  id   BigInt  @id @default(autoincrement())
-  type TagKind @map("type")
-
-  // nominate 대상 (셋 중 하나만 사용)
-  labId  BigInt? @unique @map("lab_id")
-  subjId BigInt? @unique @map("subj_id")
-  univId BigInt? @unique @map("univ_id")
-
-  lab   Lab?        @relation(fields: [labId], references: [id], onDelete: Cascade)
-  subj  Subject?    @relation(fields: [subjId], references: [id], onDelete: Cascade)
-  univ  University? @relation(fields: [univId], references: [id], onDelete: Cascade)
-
-  articles Article[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@index([type], map: "idx_tags_type")
-  @@index([labId], map: "idx_tags_lab_id")
-  @@index([subjId], map: "idx_tags_subj_id")
-  @@index([univId], map: "idx_tags_univ_id")
-  @@map("tags")
 }
 
 model Comment {
@@ -438,4 +403,52 @@ model Comment {
   @@index([parentId, createdAt], map: "idx_comments_parent_id_created_at")
   @@index([deletedAt], map: "idx_comments_deleted_at")
   @@map("comments")
+}
+
+// =========================
+// ARTICLE TAG /  ARTICLE_TAGS
+// =========================
+
+enum TagKind {
+  LAB
+  SUBJECT
+  UNIV
+}
+
+model Tag {
+  id   BigInt  @id @default(autoincrement())
+  type TagKind @map("type")
+
+  // nominate 대상 (셋 중 하나만 사용)
+  labId  BigInt? @unique @map("lab_id")
+  subjId BigInt? @unique @map("subj_id")
+  univId BigInt? @unique @map("univ_id")
+
+  lab   Lab?        @relation(fields: [labId], references: [id], onDelete: Cascade)
+  subj  Subject?    @relation(fields: [subjId], references: [id], onDelete: Cascade)
+  univ  University? @relation(fields: [univId], references: [id], onDelete: Cascade)
+
+  articles ArticleTag[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([type], map: "idx_tags_type")
+  @@index([labId], map: "idx_tags_lab_id")
+  @@index([subjId], map: "idx_tags_subj_id")
+  @@index([univId], map: "idx_tags_univ_id")
+  @@map("tags")
+}
+
+model ArticleTag {
+  articleId BigInt    @map("article_id")
+  article   Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  tagId  BigInt @map("tag_id")
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+  @@map("article_tags")
 }

@@ -50,7 +50,7 @@ model User {
 
   credentials UserCredential[]
   piApplications PIApplication[]
-  posts Post[]
+  articles Article[]
   comments Comment[]
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -308,68 +308,76 @@ model Board {
   name        String @db.VarChar(80)
   description String? @db.VarChar(500)
 
-  isActive    Boolean @default(true) //점검 시 임시로 게시판 접근을 금지하기 위한 스위치
-  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true) @map("is_active") // 점검 시 임시로 게시판 접근을 금지하기 위한 스위치
+  sortOrder   Int     @default(0)    @map("sort_order")
 
-  posts       Post[]
+  articles    Article[]
   aclRules    BoardAcl[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
 
-  @@index(sortOrder)
+  @@index([sortOrder], map: "idx_boards_sort_order")
+  @@map("bulletin_board_systems")
 }
 
 model BoardAcl {
   id      BigInt @id @default(autoincrement())
 
-  boardId BigInt
+  boardId BigInt @map("board_id")
   board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
   action  String
   role    UserRole?
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
   // 같은 게시판에 같은 (action, role) 규칙 중복 방지
-  @@unique([boardId, action, role])
-  @@index([boardId, action])
+  @@unique([boardId, action, role], map: "uq_board_acls_board_id_action_role")
+  @@index([boardId, action], map: "idx_board_acls_board_id_action")
+  @@map("board_acls")
 }
 
-model Post {
-  id            BigInt   @id @default(autoincrement())
+model Article {
+  id        BigInt @id @default(autoincrement())
 
-  boardId BigInt
-  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId   BigInt @map("board_id")
+  board     Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
-  title         String   @db.VarChar(200)
-  content       String   // 필요하면 Markdown/HTML 등 그대로 저장
-  viewCount     Int      @default(0)
+  title     String @db.VarChar(200)
+  content   String
+  viewCount Int    @default(0) @map("view_count")
 
-  Tags          Tag[]
+  // 암시적 M:N (조인 테이블은 Prisma 내부 생성 → 매핑 불가)
+  tags      Tag[]
 
-  authorId      BigInt?
-  author        User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId  BigInt? @map("author_id")
+  author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
-  authorIp      String?  @db.VarChar(45) // IPv4/IPv6 대비 (최대 45)
+  authorIp  String? @db.VarChar(45) @map("author_ip") // IPv4/IPv6 대비 (최대 45)
 
-  cheerCount      Int      @default(0) // 응원해요
-  empathyCount    Int      @default(0) // 공감해요
-  likeCount       Int      @default(0) // 좋아요
-  questionCount   Int      @default(0) // 궁금해요
-  badCount        Int      @default(0) // 별로에요
-  comments        Comment[]
+  cheerCount    Int @default(0) @map("cheer_count")
+  empathyCount  Int @default(0) @map("empathy_count")
+  likeCount     Int @default(0) @map("like_count")
+  questionCount Int @default(0) @map("question_count")
+  badCount      Int @default(0) @map("bad_count")
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  comments  Comment[]
 
-  deletedAt     DateTime?
-  isPinned      Boolean  @default(false)
-  isHidden      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
 
-  @@index([createdAt])
+  deletedAt DateTime? @map("deleted_at")
+  isPinned  Boolean   @default(false) @map("is_pinned")
+  isHidden  Boolean   @default(false) @map("is_hidden")
+
+  @@index([createdAt], map: "idx_articles_created_at")
+  @@map("articles")
 }
 
 // =========================
-// POST TAG / COMMENT
+// ARTICLE TAG / COMMENT
 // =========================
 
 enum TagKind {
@@ -380,55 +388,54 @@ enum TagKind {
 
 model Tag {
   id   BigInt  @id @default(autoincrement())
-  type TagKind
+  type TagKind @map("type")
 
   // nominate 대상 (셋 중 하나만 사용)
-  labId  BigInt? @unique
-  subjId BigInt? @unique
-  univId BigInt? @unique
+  labId  BigInt? @unique @map("lab_id")
+  subjId BigInt? @unique @map("subj_id")
+  univId BigInt? @unique @map("univ_id")
 
   lab   Lab?        @relation(fields: [labId], references: [id], onDelete: Cascade)
   subj  Subject?    @relation(fields: [subjId], references: [id], onDelete: Cascade)
   univ  University? @relation(fields: [univId], references: [id], onDelete: Cascade)
 
-  posts Post[]
+  articles Article[]
 
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
 
-  @@index([type])
-  @@index([labId])
-  @@index([subjId])
-  @@index([univId])
+  @@index([type], map: "idx_tags_type")
+  @@index([labId], map: "idx_tags_lab_id")
+  @@index([subjId], map: "idx_tags_subj_id")
+  @@index([univId], map: "idx_tags_univ_id")
+  @@map("tags")
 }
 
 model Comment {
   id        BigInt @id @default(autoincrement())
 
-  postId    BigInt
-  post      Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  articleId BigInt  @map("article_id")
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
-  authorId  BigInt?
-  author    User?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId  BigInt? @map("author_id")
+  author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
-  authorIp  String? @db.VarChar(45) // IPv4/IPv6
+  authorIp  String? @db.VarChar(45) @map("author_ip")
 
-  // 내용
   content   String
 
-  // 대댓글(스레드) 지원
-  parentId  BigInt?
+  parentId  BigInt?   @map("parent_id")
   parent    Comment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("CommentThread")
 
-  // 운영/노출 제어
-  deletedAt DateTime?
-  isHidden  Boolean  @default(false)
+  deletedAt DateTime? @map("deleted_at")
+  isHidden  Boolean   @default(false) @map("is_hidden")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
 
-  @@index([postId, createdAt])
-  @@index([authorId, createdAt])
-  @@index([parentId, createdAt])
-  @@index([deletedAt])
+  @@index([articleId, createdAt], map: "idx_comments_article_id_created_at")
+  @@index([authorId, createdAt], map: "idx_comments_author_id_created_at")
+  @@index([parentId, createdAt], map: "idx_comments_parent_id_created_at")
+  @@index([deletedAt], map: "idx_comments_deleted_at")
+  @@map("comments")
 }

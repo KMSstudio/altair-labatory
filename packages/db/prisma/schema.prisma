@@ -50,6 +50,8 @@ model User {
 
   credentials UserCredential[]
   piApplications PIApplication[]
+  posts Post[]
+  comments Comment[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -93,6 +95,8 @@ model University {
   websiteUrl String? @db.VarChar(1024) @map("website_url")
 
   labs Lab[]
+
+  tag Tag?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -171,6 +175,8 @@ model Lab {
   subjects LabSubject[]
   reviews  LabReview[]
 
+  tag Tag?
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
@@ -191,6 +197,8 @@ model Subject {
   isActive    Boolean @default(true) @map("is_active")
 
   labs LabSubject[]
+
+  tag Tag?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -287,4 +295,140 @@ model VerificationToken {
 
   @@map("verification_token")
   @@index(tokenHash)
+}
+
+// =========================
+// BOARD / BOARD ACL / BOARD CONTENT
+// =========================
+
+model Board {
+  id          BigInt @id @default(autoincrement())
+
+  slug        String @unique @db.VarChar(80)
+  name        String @db.VarChar(80)
+  description String? @db.VarChar(500)
+
+  isActive    Boolean @default(true) //점검 시 임시로 게시판 접근을 금지하기 위한 스위치
+  sortOrder   Int     @default(0)
+
+  posts       Post[]
+  aclRules    BoardAcl[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index(sortOrder)
+}
+
+model BoardAcl {
+  id      BigInt @id @default(autoincrement())
+
+  boardId BigInt
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  action  String
+  role    UserRole?
+
+  // 같은 게시판에 같은 (action, role) 규칙 중복 방지
+  @@unique([boardId, action, role])
+  @@index([boardId, action])
+}
+
+model Post {
+  id            BigInt   @id @default(autoincrement())
+
+  boardId BigInt
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  title         String   @db.VarChar(200)
+  content       String   // 필요하면 Markdown/HTML 등 그대로 저장
+  viewCount     Int      @default(0)
+
+  Tags          Tag[]
+
+  authorId      BigInt?
+  author        User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  authorIp      String?  @db.VarChar(45) // IPv4/IPv6 대비 (최대 45)
+
+  cheerCount      Int      @default(0) // 응원해요
+  empathyCount    Int      @default(0) // 공감해요
+  likeCount       Int      @default(0) // 좋아요
+  questionCount   Int      @default(0) // 궁금해요
+  badCount        Int      @default(0) // 별로에요
+  comments        Comment[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  deletedAt     DateTime?
+  isPinned      Boolean  @default(false)
+  isHidden      Boolean  @default(false)
+
+  @@index([createdAt])
+}
+
+// =========================
+// POST TAG / COMMENT
+// =========================
+
+enum TagKind {
+  LAB
+  SUBJECT
+  UNIV
+}
+
+model Tag {
+  id   BigInt  @id @default(autoincrement())
+  type TagKind
+
+  // nominate 대상 (셋 중 하나만 사용)
+  labId  BigInt? @unique
+  subjId BigInt? @unique
+  univId BigInt? @unique
+
+  lab   Lab?        @relation(fields: [labId], references: [id], onDelete: Cascade)
+  subj  Subject?    @relation(fields: [subjId], references: [id], onDelete: Cascade)
+  univ  University? @relation(fields: [univId], references: [id], onDelete: Cascade)
+
+  posts Post[]
+
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([labId])
+  @@index([subjId])
+  @@index([univId])
+}
+
+model Comment {
+  id        BigInt @id @default(autoincrement())
+
+  postId    BigInt
+  post      Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  authorId  BigInt?
+  author    User?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  authorIp  String? @db.VarChar(45) // IPv4/IPv6
+
+  // 내용
+  content   String
+
+  // 대댓글(스레드) 지원
+  parentId  BigInt?
+  parent    Comment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Comment[] @relation("CommentThread")
+
+  // 운영/노출 제어
+  deletedAt DateTime?
+  isHidden  Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId, createdAt])
+  @@index([authorId, createdAt])
+  @@index([parentId, createdAt])
+  @@index([deletedAt])
 }

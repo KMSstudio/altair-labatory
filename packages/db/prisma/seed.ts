@@ -239,8 +239,8 @@ async function main() {
 
   const freeBoard = await prisma.board.create({
     data: {
-      slug: "free",
-      name: "자유게시판",
+      nameKo: "자유게시판",
+      nameEn: "General discussion",
       description: "A board for any theme and subject.",
       sortOrder: 1,
     }
@@ -248,8 +248,8 @@ async function main() {
 
   const bestBoard = await prisma.board.create({
     data: {
-      slug: "best",
-      name: "베스트게시판",
+      nameKo: "베스트게시판",
+      nameEn: "Top articles",
       description: "A board featuring the most popular and highly rated posts.",
       sortOrder: 2,
     }

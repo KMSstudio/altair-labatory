@@ -8,7 +8,7 @@ CREATE TYPE "pi_application_status" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 CREATE TYPE "visibility" AS ENUM ('PUBLIC', 'PRIVATE', 'PROTECT');
 
 -- CreateEnum
-CREATE TYPE "TagKind" AS ENUM ('LAB', 'SUBJECT', 'UNIV');
+CREATE TYPE "TagKind" AS ENUM ('LAB', 'SUBJECT', 'UNIV', 'TEXT');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -167,11 +167,12 @@ CREATE TABLE "verification_token" (
 -- CreateTable
 CREATE TABLE "bulletin_board_systems" (
     "id" BIGSERIAL NOT NULL,
-    "slug" VARCHAR(80) NOT NULL,
-    "name" VARCHAR(80) NOT NULL,
+    "name_ko" VARCHAR(80) NOT NULL,
+    "name_en" VARCHAR(80) NOT NULL,
     "description" VARCHAR(500),
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "sort_order" INTEGER NOT NULL DEFAULT 0,
+    "updated_by" BIGINT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -236,6 +237,7 @@ CREATE TABLE "tags" (
     "lab_id" BIGINT,
     "subj_id" BIGINT,
     "univ_id" BIGINT,
+    "text" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "tags_pkey" PRIMARY KEY ("id")
@@ -323,9 +325,6 @@ CREATE UNIQUE INDEX "lab_review_reports_review_id_reporter_id_key" ON "lab_revie
 CREATE INDEX "verification_token_token_hash_idx" ON "verification_token"("token_hash");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "bulletin_board_systems_slug_key" ON "bulletin_board_systems"("slug");
-
--- CreateIndex
 CREATE INDEX "idx_boards_sort_order" ON "bulletin_board_systems"("sort_order");
 
 -- CreateIndex
@@ -405,6 +404,9 @@ ALTER TABLE "lab_review_reports" ADD CONSTRAINT "lab_review_reports_review_id_fk
 
 -- AddForeignKey
 ALTER TABLE "lab_review_reports" ADD CONSTRAINT "lab_review_reports_reporter_id_fkey" FOREIGN KEY ("reporter_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "bulletin_board_systems" ADD CONSTRAINT "bulletin_board_systems_updated_by_fkey" FOREIGN KEY ("updated_by") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "board_acls" ADD CONSTRAINT "board_acls_board_id_fkey" FOREIGN KEY ("board_id") REFERENCES "bulletin_board_systems"("id") ON DELETE CASCADE ON UPDATE CASCADE;

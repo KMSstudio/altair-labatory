@@ -58,7 +58,8 @@ model User {
 
   reviews        LabReview[]
   reviewReports  LabReviewReport[]
-
+  
+  updatedBoard   Board[]
   @@map("users")
 }
 
@@ -304,15 +305,18 @@ model VerificationToken {
 model Board {
   id          BigInt @id @default(autoincrement())
 
-  slug        String @unique @db.VarChar(80) //URL에 표시되는 내용
-  name        String @db.VarChar(80)
-  description String? @db.VarChar(500)
+  nameKo        String  @db.VarChar(80) @map("name_ko")
+  nameEn        String  @db.VarChar(80) @map("name_en")
+  description   String? @db.VarChar(500)
 
-  isActive    Boolean @default(true) @map("is_active") // 점검 시 임시로 게시판 접근을 금지하기 위한 스위치
+  isActive    Boolean @default(true) @map("is_active") // Switch to turn off board when maintenance is needed
   sortOrder   Int     @default(0)    @map("sort_order")
 
   articles    Article[]
   aclRules    BoardAcl[]
+
+  updatedById BigInt? @map("updated_by")
+  updatedBy   User?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt      @map("updated_at")
@@ -333,7 +337,7 @@ model BoardAcl {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
-  // 같은 게시판에 같은 (action, role) 규칙 중복 방지
+  // Prevent duplicated (action, role) Acl in same board
   @@unique([boardId, action, role], map: "uq_board_acls_board_id_action_role")
   @@index([boardId, action], map: "idx_board_acls_board_id_action")
   @@map("board_acls")
@@ -353,8 +357,7 @@ model Article {
 
   authorId  BigInt? @map("author_id")
   author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-
-  authorIp  String? @db.VarChar(45) @map("author_ip") // IPv4/IPv6 대비 (최대 45)
+  authorIp  String? @db.VarChar(45) @map("author_ip") // To take account of IPv4/IPv6 (max 45)
 
   cheerCount    Int @default(0) @map("cheer_count")
   empathyCount  Int @default(0) @map("empathy_count")
@@ -380,21 +383,18 @@ model Comment {
 
   articleId BigInt  @map("article_id")
   article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
   authorId  BigInt? @map("author_id")
   author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-
   authorIp  String? @db.VarChar(45) @map("author_ip")
 
   content   String
 
-  parentId  BigInt?   @map("parent_id")
+  parentId  BigInt?   @map("parent_id") //If parent is null, Consider comment as comment on the article.
   parent    Comment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("CommentThread")
 
   deletedAt DateTime? @map("deleted_at")
   isHidden  Boolean   @default(false) @map("is_hidden")
-
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
@@ -413,16 +413,18 @@ enum TagKind {
   LAB
   SUBJECT
   UNIV
+  TEXT
 }
 
 model Tag {
   id   BigInt  @id @default(autoincrement())
   kind TagKind @map("kind")
 
-  // nominate 대상 (셋 중 하나만 사용)
+  // nominate option (Choose only one out of four option)
   labId  BigInt? @unique @map("lab_id")
   subjId BigInt? @unique @map("subj_id")
   univId BigInt? @unique @map("univ_id")
+  text  String?
 
   lab   Lab?        @relation(fields: [labId], references: [id], onDelete: Cascade)
   subj  Subject?    @relation(fields: [subjId], references: [id], onDelete: Cascade)

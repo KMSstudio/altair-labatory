@@ -63,8 +63,8 @@
 
 ## Builetin Board System
 
-/board/:board_slug/list
-/board/:board_slug/new
+/board/:board_id/list
+/board/:board_id/new
 
 /article/:article_id/
 /article/:article_id/update

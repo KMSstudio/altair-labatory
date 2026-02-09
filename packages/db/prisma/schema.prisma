@@ -395,7 +395,8 @@ model Comment {
   questionCount Int @default(0) @map("question_count")
   badCount      Int @default(0) @map("bad_count")
 
-  parentId  BigInt?   @map("parent_id") //If parent is null, Consider comment as comment on the article.
+  //If parent is null, Consider comment as comment on the article.
+  parentId  BigInt?   @map("parent_id") 
   parent    Comment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("CommentThread")
 
@@ -426,7 +427,7 @@ model Tag {
   id   BigInt  @id @default(autoincrement())
   kind TagKind @map("kind")
 
-  // nominate option (Choose only one out of four option)
+  // nominate option (Choose only one of the four options.)
   labId  BigInt? @unique @map("lab_id")
   subjId BigInt? @unique @map("subj_id")
   univId BigInt? @unique @map("univ_id")

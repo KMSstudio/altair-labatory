@@ -389,6 +389,12 @@ model Comment {
 
   content   String
 
+  cheerCount    Int @default(0) @map("cheer_count")
+  empathyCount  Int @default(0) @map("empathy_count")
+  likeCount     Int @default(0) @map("like_count")
+  questionCount Int @default(0) @map("question_count")
+  badCount      Int @default(0) @map("bad_count")
+
   parentId  BigInt?   @map("parent_id") //If parent is null, Consider comment as comment on the article.
   parent    Comment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("CommentThread")

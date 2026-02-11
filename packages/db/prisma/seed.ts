@@ -255,16 +255,24 @@ async function main() {
     }
   })
 
-  const freeArticle = await prisma.article.create({
+  const freeArticle1 = await prisma.article.create({
     data: {
       boardId: freeBoard.id,
-      title: "Example title",
-      content: "Example content.",
+      title: "First Example title",
+      content: "first Example content.",
       authorId: student.id,
       authorIp: "172.0.0.1",
     }
   })
-
+  const freeArticle2 = await prisma.article.create({
+    data: {
+      boardId: freeBoard.id,
+      title: "Second Example title",
+      content: "Second example content.",
+      authorId: piUser.id,
+      authorIp: "172.0.0.2",
+    }
+  })
   await prisma.labReviewReport.create({
     data: {
       reviewId: reviewAi.id,
@@ -282,7 +290,7 @@ async function main() {
     piApplicationId: piApplication.id,
     reviewId: reviewAi.id,
     boardId: [freeBoard.id, bestBoard.id],
-    articleId: freeArticle.id,
+    articleId: [freeArticle1.id, freeArticle2.id],
   });
 }
 

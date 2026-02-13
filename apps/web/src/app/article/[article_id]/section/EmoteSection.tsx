@@ -41,19 +41,29 @@ export function EmoteSection({
   return (
     <div>
       <div>
-        <button onClick={() => onClick("CHEER")}>응원해요: {counts["CHEER"] ?? 0}</button>
+        <button onClick={() => onClick("CHEER")}>
+          {isPressed["CHEER"] ? "응원 취소" : "응원해요:"} {counts["CHEER"] ?? 0}
+        </button>
       </div>
       <div>
-        <button onClick={() => onClick("EMPATHY")}>공감해요: {counts["EMPATHY"] ?? 0}</button>
+        <button onClick={() => onClick("EMPATHY")}>
+          {isPressed["EMPATHY"] ? "공감 취소" : "공감해요:"} {counts["EMPATHY"] ?? 0}
+        </button>
       </div>
       <div>
-        <button onClick={() => onClick("LIKE")}>좋아해요: {counts["LIKE"] ?? 0}</button>
+        <button onClick={() => onClick("LIKE")}>
+          {isPressed["LIKE"] ? "좋아요 취소" : "좋아해요:"} {counts["LIKE"] ?? 0}
+        </button>
       </div>
       <div>
-        <button onClick={() => onClick("QUESTION")}>궁금해요: {counts["QUESTION"] ?? 0}</button>
+        <button onClick={() => onClick("QUESTION")}>
+          {isPressed["QUESTION"] ? "궁금 취소" : "궁금해요:"} {counts["QUESTION"] ?? 0}
+        </button>
       </div>
       <div>
-        <button onClick={() => onClick("BAD")}>별로예요: {counts["BAD"] ?? 0}</button>
+        <button onClick={() => onClick("BAD")}>
+          {isPressed["BAD"] ? "취소" : "별로예요:"} {counts["BAD"] ?? 0}
+        </button>
       </div>
     </div>
   );

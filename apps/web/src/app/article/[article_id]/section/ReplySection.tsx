@@ -13,7 +13,7 @@ export function ReplySection({ articleId, parentId }: { articleId: bigint; paren
   async function OnSubmit() {
     setLoading(true);
     try {
-      const res = await PostComment({ content: text, articleId, parentCommentId: parentId });
+      await PostComment({ content: text, articleId, parentCommentId: parentId });
     } catch (e) {
       if (e instanceof Error) {
         alert(e.message);

@@ -71,6 +71,10 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
   if (!newTitle) {
     throw Error("Title is required.");
   }
+  const clientIp = await getClientIp();
+  if (!clientIp) {
+    throw Error("Cannot read client id properly.");
+  }
   const session = await getServerSession(authOptions);
   if (!session) {
     throw Error("Unauthorized.");
@@ -103,8 +107,7 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
     throw Error("Article does not Exist.");
   }
 
-  const userId = BigInt(session.user.id);
-  if (userId !== article.authorId) {
+  if (sessionId !== article.authorId) {
     throw Error("Unauthorized");
   }
 
@@ -129,6 +132,7 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
         data: {
           title: newTitle,
           content: newContent,
+          authorIp: clientIp,
         },
       });
       await prisma.articleTag.deleteMany({
@@ -321,6 +325,10 @@ export async function UpdateComment({
   } catch {
     throw Error("Invaild user id.");
   }
+  const clientIp = await getClientIp();
+  if (!clientIp) {
+    throw Error("Cannot read client id properly.");
+  }
   const comment = await prisma.comment.findUnique({
     where: {
       id: commentId,
@@ -337,8 +345,7 @@ export async function UpdateComment({
   if (comment.content === newContent) {
     return false;
   }
-  const userId = BigInt(session.user.id);
-  if (userId !== comment.authorId) {
+  if (sessionId !== comment.authorId) {
     throw Error("Unauthorized");
   }
   try {
@@ -356,6 +363,7 @@ export async function UpdateComment({
         },
         data: {
           content: newContent,
+          authorIp: clientIp,
         },
       });
     });

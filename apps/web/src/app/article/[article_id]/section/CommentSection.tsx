@@ -17,7 +17,7 @@ export async function CommentSection({
       {comments.map(async (comment) => {
         const emoteCount = await GetEmoteCount({ id: comment.id, targetPlace: "COMMENT" });
         return (
-          <div>
+          <div key={comment.id}>
             <div>
               <h3>{comment.author?.displayName ?? "anonymous"}</h3>
             </div>

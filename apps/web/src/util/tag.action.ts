@@ -25,16 +25,51 @@ const getTagSelect = {
 const nameToText = (nameKo: string, nameEn: string | null) => {
   return `${nameKo}(${nameEn ?? ""})`;
 };
-async function fetchNameText<T>(model: { findUnique: Function }, id: bigint | null) {
+async function fetchNameText(kind: TagKind, db: DbClient = prisma, id: bigint | null) {
   if (!id) throw Error("Invaild tag.");
-  const result = await model.findUnique({
-    where: { id },
-    select: { nameKo: true, nameEn: true },
-  });
+  if (kind === TagKind.TEXT) {
+    return "";
+  }
+  switch (kind) {
+    case TagKind.LAB: {
+      if (!id) throw Error("Invalid tag.");
 
-  if (!result) throw Error("Invalid tag.");
+      const result = await db.lab.findUnique({
+        where: { id },
+        select: { nameKo: true, nameEn: true },
+      });
 
-  return nameToText(result.nameKo, result.nameEn);
+      if (!result) throw Error("Invalid tag.");
+      return nameToText(result.nameKo, result.nameEn);
+    }
+
+    case TagKind.UNIV: {
+      if (!id) throw Error("Invalid tag.");
+
+      const result = await db.university.findUnique({
+        where: { id },
+        select: { nameKo: true, nameEn: true },
+      });
+
+      if (!result) throw Error("Invalid tag.");
+      return nameToText(result.nameKo, result.nameEn);
+    }
+
+    case TagKind.SUBJECT: {
+      if (!id) throw Error("Invalid tag.");
+
+      const result = await db.subject.findUnique({
+        where: { id },
+        select: { nameKo: true, nameEn: true },
+      });
+
+      if (!result) throw Error("Invalid tag.");
+      return nameToText(result.nameKo, result.nameEn);
+    }
+
+    default:
+      throw Error("Invalid tag.");
+  }
 }
 
 type DbClient = Prisma.TransactionClient | typeof prisma;
@@ -52,7 +87,7 @@ export async function CreateTag({
   if ((kind === TagKind.TEXT && !text) || (kind !== TagKind.TEXT && !id)) {
     throw Error("Invalid tag creation.");
   }
-  let data: Prisma.TagCreateInput = {
+  const data: Prisma.TagCreateInput = {
     kind,
   };
 
@@ -62,21 +97,21 @@ export async function CreateTag({
         throw Error("Invalid tag creation.");
       }
       data.lab = { connect: { id } };
-      data.text = await fetchNameText(db.lab, id);
+      data.text = await fetchNameText("LAB", db, id);
       break;
     case TagKind.SUBJECT:
       if (!id) {
         throw Error("Invalid tag creation.");
       }
       data.subj = { connect: { id } };
-      data.text = await fetchNameText(db.subject, id);
+      data.text = await fetchNameText("SUBJECT", db, id);
       break;
     case TagKind.UNIV:
       if (!id) {
         throw Error("Invalid tag creation.");
       }
       data.univ = { connect: { id } };
-      data.text = await fetchNameText(db.university, id);
+      data.text = await fetchNameText("UNIV", db, id);
       break;
     case TagKind.TEXT:
       data.text = text;
@@ -107,13 +142,13 @@ export async function UpdateTag({
   if (!Tagtext) {
     switch (tag.kind) {
       case "LAB":
-        Tagtext = await fetchNameText(db.lab, tag.labId);
+        Tagtext = await fetchNameText("LAB", db, tag.labId);
         break;
       case "SUBJECT":
-        Tagtext = await fetchNameText(db.subject, tag.subjId);
+        Tagtext = await fetchNameText("SUBJECT", db, tag.labId);
         break;
       case "UNIV":
-        Tagtext = await fetchNameText(db.university, tag.univId);
+        Tagtext = await fetchNameText("UNIV", db, tag.labId);
         break;
       case "TEXT":
         if (!tag.text) break;
@@ -148,7 +183,7 @@ export async function SearchTags({
   queryRaw: string;
   db?: DbClient;
 }) {
-  let where: Prisma.TagWhereInput = {};
+  const where: Prisma.TagWhereInput = {};
   const query = queryRaw.trim();
   const whereQuery = (query: string) =>
     ({ contains: query, mode: Prisma.QueryMode.insensitive }) as const;

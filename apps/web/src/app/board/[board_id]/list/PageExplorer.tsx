@@ -39,5 +39,9 @@ async function PageExplorerItem({
   pageNumber: number;
   isCurrentPage: boolean;
 }) {
-  return <Link href={`/board/${BoardId}/list?page=${pageNumber}`}>{pageNumber}</Link>;
+  return isCurrentPage ? (
+    <p>{pageNumber}</p>
+  ) : (
+    <Link href={`/board/${BoardId}/list?page=${pageNumber}`}>{pageNumber}</Link>
+  );
 }

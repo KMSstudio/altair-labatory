@@ -121,7 +121,6 @@ export async function CreateArticle(formData: FormData) {
   if (!clientIp) {
     throw Error("Cannot read client id properly.");
   }
-  console.log(clientIp);
   const rawBoardId = formData.get("boardId")?.toString().trim() ?? "";
   let boardId: bigint;
   try {

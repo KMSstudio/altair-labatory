@@ -80,7 +80,7 @@ export async function updateUniversity(formData: FormData) {
   const id = BigInt(idValue);
   const data = parseUnivInput(formData);
   await prisma.$transaction(async (tx) => {
-    const univ = await prisma.university.update({
+    const univ = await tx.university.update({
       where: { id },
       data,
       select: {
@@ -91,7 +91,7 @@ export async function updateUniversity(formData: FormData) {
         },
       },
     });
-    await UpdateTag({ tagId: id, db: tx });
+    if (univ.tag) await UpdateTag({ tagId: univ.tag.id, db: tx });
   });
   const target = `/univ/${idValue}`;
   revalidatePath("/univ");

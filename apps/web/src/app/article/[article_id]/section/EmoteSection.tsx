@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { GetEmoteCount, type GetEmoteCountResult, PostEmote } from "../../actions";
-import { type ClientEmoteKind } from "../../actions";
+import { type EmoteKind } from "@labatory/db";
 export function EmoteSection({
   emotes,
   id,
@@ -12,15 +12,15 @@ export function EmoteSection({
   id: bigint;
   kind: "COMMENT" | "ARTICLE";
 }) {
-  const [counts, setCounts] = useState<Record<ClientEmoteKind, number>>(emotes);
-  const [isPressed, setIsPressed] = useState<Record<ClientEmoteKind, boolean>>({
+  const [counts, setCounts] = useState<Record<EmoteKind, number>>(emotes);
+  const [isPressed, setIsPressed] = useState<Record<EmoteKind, boolean>>({
     CHEER: false,
     EMPATHY: false,
     LIKE: false,
     QUESTION: false,
     BAD: false,
   });
-  async function onClick(emoteType: ClientEmoteKind) {
+  async function onClick(emoteType: EmoteKind) {
     try {
       const res = await PostEmote({ id, targetPlace: kind, emoteKind: emoteType });
       setIsPressed((prev) => ({

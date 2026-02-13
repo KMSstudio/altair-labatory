@@ -543,4 +543,3 @@ export async function GetEmoteCount({ id, targetPlace }: { id: bigint; targetPla
 }
 
 export type GetEmoteCountResult = NonNullable<Awaited<ReturnType<typeof GetEmoteCount>>>;
-export type ClientEmoteKind = EmoteKind;

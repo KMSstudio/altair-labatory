@@ -3,6 +3,8 @@
 import { prisma, Prisma, type TagKind } from "@labatory/db";
 import { headers } from "next/headers";
 
+export type ClientTagKind = TagKind;
+
 export async function getClientIp() {
   const h = await headers();
 

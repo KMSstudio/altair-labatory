@@ -1,8 +1,8 @@
 "use client";
 
 import { GetTagResult, SearchTags } from "@/util/tag.action";
-import { type TagKind } from "@labatory/db";
-import { useState, useRef } from "react";
+import { type ClientTagKind } from "@/util/tag.action";
+import { useState } from "react";
 
 export function TagSelector({
   SelectedTags,
@@ -12,11 +12,10 @@ export function TagSelector({
   setSelectedTags: (tag: GetTagResult[]) => void;
 }) {
   const [tags, setTags] = useState<GetTagResult[]>([]);
-  const [tagKind, setTagKind] = useState<TagKind>("LAB");
+  const [tagKind, setTagKind] = useState<ClientTagKind>("LAB");
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const isComposing = useRef(false);
 
   function AddTag(tag: GetTagResult) {
     if (SelectedTags.some((SelectedTag) => SelectedTag.id === tag.id)) return;
@@ -55,20 +54,11 @@ export function TagSelector({
             <input
               name="query"
               value={query}
-              onCompositionStart={() => {
-                isComposing.current = true;
-              }}
-              onCompositionEnd={(e) => {
-                isComposing.current = false;
+              onChange={(e) => {
                 setQuery(e.currentTarget.value);
               }}
-              onChange={(e) => {
-                if (!isComposing.current) {
-                  setQuery(e.currentTarget.value);
-                }
-              }}
             />
-            <select value={tagKind} onChange={(e) => setTagKind(e.target.value as TagKind)}>
+            <select value={tagKind} onChange={(e) => setTagKind(e.target.value as ClientTagKind)}>
               <option value={"TEXT"}>Text</option>
               <option value={"LAB"}>Lab</option>
               <option value={"UNIV"}>Univ</option>

@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma, Prisma, TagKind } from "@labatory/db";
+import { prisma, Prisma, type TagKind } from "@labatory/db";
 import { headers } from "next/headers";
 
 export async function getClientIp() {
@@ -27,11 +27,11 @@ const nameToText = (nameKo: string, nameEn: string | null) => {
 };
 async function fetchNameText(kind: TagKind, db: DbClient = prisma, id: bigint | null) {
     if (!id) throw Error("Invaild tag.");
-    if (kind === TagKind.TEXT) {
+    if (kind === "TEXT") {
         return "";
     }
     switch (kind) {
-        case TagKind.LAB: {
+        case "LAB": {
             if (!id) throw Error("Invalid tag.");
 
             const result = await db.lab.findUnique({
@@ -43,7 +43,7 @@ async function fetchNameText(kind: TagKind, db: DbClient = prisma, id: bigint | 
             return nameToText(result.nameKo, result.nameEn);
         }
 
-        case TagKind.UNIV: {
+        case "UNIV": {
             if (!id) throw Error("Invalid tag.");
 
             const result = await db.university.findUnique({
@@ -55,7 +55,7 @@ async function fetchNameText(kind: TagKind, db: DbClient = prisma, id: bigint | 
             return nameToText(result.nameKo, result.nameEn);
         }
 
-        case TagKind.SUBJECT: {
+        case "SUBJECT": {
             if (!id) throw Error("Invalid tag.");
 
             const result = await db.subject.findUnique({
@@ -84,7 +84,7 @@ export async function CreateTag({
     text?: string;
     db?: DbClient;
 }) {
-    if ((kind === TagKind.TEXT && !text) || (kind !== TagKind.TEXT && !id)) {
+    if ((kind === "TEXT" && !text) || (kind !== "TEXT" && !id)) {
         throw Error("Invalid tag creation.");
     }
     const data: Prisma.TagCreateInput = {
@@ -92,28 +92,28 @@ export async function CreateTag({
     };
 
     switch (kind) {
-        case TagKind.LAB:
+        case "LAB":
             if (!id) {
                 throw Error("Invalid tag creation.");
             }
             data.lab = { connect: { id } };
             data.text = await fetchNameText("LAB", db, id);
             break;
-        case TagKind.SUBJECT:
+        case "SUBJECT":
             if (!id) {
                 throw Error("Invalid tag creation.");
             }
             data.subj = { connect: { id } };
             data.text = await fetchNameText("SUBJECT", db, id);
             break;
-        case TagKind.UNIV:
+        case "UNIV":
             if (!id) {
                 throw Error("Invalid tag creation.");
             }
             data.univ = { connect: { id } };
             data.text = await fetchNameText("UNIV", db, id);
             break;
-        case TagKind.TEXT:
+        case "TEXT":
             data.text = text;
             break;
     }

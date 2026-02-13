@@ -23,4 +23,6 @@ export {
   UserRole,
   PIApplicationStatus,
   Visibility,
+  EmoteKind,
+  EmotePlace,
 } from "@prisma/client";

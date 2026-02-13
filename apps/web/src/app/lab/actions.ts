@@ -21,6 +21,7 @@ import {
   create_subject_for_lab,
   replace_lab_subject_links,
 } from "@/util/lab.action";
+import { CreateTag, UpdateTag } from "@/util/tag.action";
 
 export async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "subj" }) {
   const where: Prisma.LabWhereInput = {};
@@ -189,17 +190,19 @@ export async function createLab(formData: FormData) {
         },
         tx,
       );
-
+      CreateTag({ kind: "LAB", id: lab.id, db: tx });
       const createdSubject = data.newSubject
         ? await create_subject_for_lab(data.newSubject, tx)
         : null;
-
       const subjectIds = [...data.subjectIds, ...(createdSubject ? [createdSubject.id] : [])];
       if (subjectIds.length) {
         await tx.labSubject.createMany({
           data: subjectIds.map((subjectId) => ({ labId: lab.id, subjectId })),
           skipDuplicates: true,
         });
+      }
+      if (createdSubject) {
+        CreateTag({ kind: "SUBJECT", id: createdSubject.id, db: tx });
       }
       if (role === "PI" && pi) {
         await tx.pI.update({ where: { id: pi.id }, data: { labId: lab.id } });
@@ -251,7 +254,7 @@ export async function updateLab(formData: FormData) {
 
   try {
     await with_transaction(async (tx) => {
-      await update_lab(
+      const updatedLab = await update_lab(
         labId,
         {
           nameKo: data.nameKo,
@@ -262,12 +265,19 @@ export async function updateLab(formData: FormData) {
         },
         tx,
       );
-
+      const tag = await tx.tag.findUnique({
+        where: { labId: updatedLab.id },
+        select: { id: true },
+      });
+      if (tag) UpdateTag({ tagId: tag.id, db: tx });
       const createdSubject = data.newSubject
         ? await create_subject_for_lab(data.newSubject, tx)
         : null;
       const nextSubjectIds = [...data.subjectIds, ...(createdSubject ? [createdSubject.id] : [])];
       await replace_lab_subject_links(labId, nextSubjectIds, tx);
+      if (createdSubject) {
+        CreateTag({ kind: "SUBJECT", id: createdSubject.id, db: tx });
+      }
     });
 
     const target = `/lab/${labId.toString()}`;

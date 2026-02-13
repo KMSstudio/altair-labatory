@@ -52,6 +52,7 @@ model User {
   piApplications PIApplication[]
   articles Article[]
   comments Comment[]
+  articleEmote Emote[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -59,7 +60,7 @@ model User {
   reviews        LabReview[]
   reviewReports  LabReviewReport[]
   
-  updatedBoard   Board[]
+  updatedBoard    Board[]
   @@map("users")
 }
 
@@ -351,19 +352,16 @@ model Article {
 
   title     String @db.VarChar(200)
   content   String
+  articleHistory ArticleHistory[]
   viewCount Int    @default(0) @map("view_count")
 
   tags      ArticleTag[]
 
   authorId  BigInt? @map("author_id")
   author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorIp  String? @db.VarChar(45) @map("author_ip") // To take account of IPv4/IPv6 (max 45)
+  authorIp  String  @db.VarChar(45) @map("author_ip") // To take account of IPv4/IPv6 (max 45)
 
-  cheerCount    Int @default(0) @map("cheer_count")
-  empathyCount  Int @default(0) @map("empathy_count")
-  likeCount     Int @default(0) @map("like_count")
-  questionCount Int @default(0) @map("question_count")
-  badCount      Int @default(0) @map("bad_count")
+  emotes Emote[]
 
   comments  Comment[]
 
@@ -378,6 +376,17 @@ model Article {
   @@map("articles")
 }
 
+model ArticleHistory {
+  id BigInt @id @default(autoincrement())
+  articleId BigInt @map("article_id")
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  oldTitle    String @map("old_title")
+  oldContent  String @map("old_content")
+  oldAuthorIp String @db.VarChar(45) @map("old_author_ip")
+  editedAt DateTime @default(now())
+}
+
 model Comment {
   id        BigInt @id @default(autoincrement())
 
@@ -385,15 +394,12 @@ model Comment {
   article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
   authorId  BigInt? @map("author_id")
   author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorIp  String? @db.VarChar(45) @map("author_ip")
+  authorIp  String  @db.VarChar(45) @map("author_ip")
 
   content   String
+  commentHistory CommentHistory[]
 
-  cheerCount    Int @default(0) @map("cheer_count")
-  empathyCount  Int @default(0) @map("empathy_count")
-  likeCount     Int @default(0) @map("like_count")
-  questionCount Int @default(0) @map("question_count")
-  badCount      Int @default(0) @map("bad_count")
+  emotes Emote[]
 
   //If parent is null, Consider comment as comment on the article.
   parentId  BigInt?   @map("parent_id") 
@@ -412,6 +418,15 @@ model Comment {
   @@map("comments")
 }
 
+model CommentHistory {
+  id BigInt @id @default(autoincrement())
+  commentId BigInt @map("comment_id")
+  comment Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  oldContent String   @map("old_title")
+  oldAuthorIp String @db.VarChar(45) @map("old_author_ip")
+  editedAt   DateTime @default(now())
+}
 // =========================
 // ARTICLE TAG /  ARTICLE_TAGS
 // =========================
@@ -425,7 +440,7 @@ enum TagKind {
 
 model Tag {
   id   BigInt  @id @default(autoincrement())
-  kind TagKind @map("kind")
+  kind TagKind
 
   // nominate option (Choose only one of the four options.)
   labId  BigInt? @unique @map("lab_id")
@@ -460,4 +475,41 @@ model ArticleTag {
   @@id([articleId, tagId])
   @@index([tagId])
   @@map("article_tags")
+}
+
+
+// =========================
+// EMOTE
+// =========================
+
+enum EmoteKind {
+  CHEER
+  EMPATHY
+  LIKE
+  QUESTION
+  BAD
+}
+
+enum EmotePlace {
+  ARTICLE
+  COMMENT
+}
+
+model Emote {
+  id BigInt @id @default(autoincrement())
+  kind EmoteKind
+  place EmotePlace
+
+  articleId BigInt? @map("board_id")
+  article Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  commentId BigInt? @map("comment_id")
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  userId BigInt @map("user_id")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([articleId, commentId, kind, userId])
+  @@index([articleId, commentId, kind, userId])
+  @@map("emote")
 }

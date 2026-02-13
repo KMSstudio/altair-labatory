@@ -1,39 +1,37 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CreateArticle } from "../../actions";
-import { type GetTagResult } from "@/util/tag.action";
-import { TagSelector } from "../../TagSelector";
+import { UpdateArticle, type GetArticleResult } from "../../actions";
+import { TagSelector } from "@/app/board/TagSelector";
+import { useRouter } from "next/navigation";
 import { SerializeTag } from "@/util/serialize/SerializeTag";
 
-export default function NewArticleForm({ boardId }: { boardId: string }) {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+export function ArticleUpdateForm({ article }: { article: GetArticleResult }) {
+  const [title, setTitle] = useState(article.title);
+  const [content, setContent] = useState(article.content);
+  const [selectedTags, setSelectedTags] = useState(
+    article.tags.map((articleTag) => {
+      return articleTag.tag;
+    }),
+  );
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedTags, setSelectedTags] = useState<GetTagResult[]>([]);
   const router = useRouter();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("boardId", boardId);
     formData.append("title", title);
     formData.append("content", content);
+    formData.append("articleId", article.id.toString());
     const serializedTags = selectedTags.map((tag) => {
       return SerializeTag(tag);
     });
     formData.append("tags", JSON.stringify(serializedTags));
-    console.log(boardId);
     setLoading(true);
 
-    let articleId: bigint | undefined;
     try {
-      articleId = await CreateArticle(formData);
-      if (articleId === undefined) {
-        throw Error("Article creation failed.");
-      }
+      await UpdateArticle({ formData });
     } catch (e) {
       if (e instanceof Error) {
         alert(e.message);
@@ -44,7 +42,7 @@ export default function NewArticleForm({ boardId }: { boardId: string }) {
       return;
     }
 
-    router.push(`/article/${articleId}`);
+    router.push(`/article/${article.id}`);
   }
 
   return (

@@ -1,29 +1,29 @@
 // @/app/board/action.tsx
 
-"use server"
+"use server";
 
 import { authOptions } from "@/lib/auth";
-import { getClientIp, GetTagResult } from "@/util/board.action";
+import { getClientIp } from "@/util/tag.action";
 import { SerializeTagResult } from "@/util/serialize/SerializeTag";
 import { Prisma, prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 
 export async function GetBoard(id: bigint) {
-    return prisma.board.findUnique({
-        where: { id },
+  return prisma.board.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      nameKo: true,
+      nameEn: true,
+      description: true,
+      isActive: true,
+      _count: {
         select: {
-            id: true,
-            nameKo: true,
-            nameEn: true,
-            description: true,
-            isActive: true,
-            _count: {
-                select: {
-                    articles: true,
-                }
-            }
-        }
-    })
+          articles: true,
+        },
+      },
+    },
+  });
 }
 
 /**
@@ -34,53 +34,44 @@ export async function GetBoard(id: bigint) {
  * @param {bigint} boardId Id of board where target articles are located.
  * @param {number} page  The page number to retrieve. default is 1.
  * @param {number} pageSize  The number of articles in one page.
- * 
- * @return list of article. 
+ *
+ * @return list of article.
  * @throws if page or pageSize if less than 1.
  */
-export async function GetArticles(
-    boardId: bigint,
-    page: number = 1,
-    pageSize: number
-) {
-    if (page < 1) {
-        throw new Error("page must be greater than 1.");
-    }
+export async function GetArticles(boardId: bigint, page: number = 1, pageSize: number) {
+  if (page < 1) {
+    throw new Error("page must be greater than 1.");
+  }
 
+  const skip = (page - 1) * pageSize;
 
-    const skip = (page - 1) * pageSize;
-
-    return prisma.article.findMany({
-        where: {
-            boardId,
-            isHidden: false,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-        skip,
-        take: pageSize,
+  return prisma.article.findMany({
+    where: {
+      boardId,
+      isHidden: false,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    skip,
+    take: pageSize,
+    select: {
+      id: true,
+      title: true,
+      viewCount: true,
+      tags: true,
+      createdAt: true,
+      _count: {
         select: {
-            id: true,
-            title: true,
-            viewCount: true,
-            tags: true,
-            createdAt: true,
-            cheerCount: true,
-            likeCount: true,
-            empathyCount: true,
-            questionCount: true,
-            badCount: true,
-            _count: {
-                select: {
-                    comments: true,
-                }
-            }
-        }
-    });
+          comments: true,
+          emotes: true,
+        },
+      },
+    },
+  });
 }
 
-export type GetArticlesResult = NonNullable<Awaited<ReturnType<typeof GetArticles>>>
+export type GetArticlesResult = NonNullable<Awaited<ReturnType<typeof GetArticles>>>;
 
 /**
  * Retrieve a id and title of pinned articles for a specific board.
@@ -88,102 +79,96 @@ export type GetArticlesResult = NonNullable<Awaited<ReturnType<typeof GetArticle
  * filter hidden articles.
  *
  * @param {bigint} boardId Id of board where target articles are located.
- * 
- * @return list of article. 
+ *
+ * @return list of article.
  * @throws if page or pageSize if less than 1.
  */
-export async function GetPinnedArticles(
-    boardId: bigint
-) {
-    return prisma.article.findMany({
-        where: {
-            boardId,
-            isHidden: false,
-            isPinned: true,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-        select: {
-            id: true,
-            title: true,
-        }
-    });
+export async function GetPinnedArticles(boardId: bigint) {
+  return prisma.article.findMany({
+    where: {
+      boardId,
+      isHidden: false,
+      isPinned: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      title: true,
+    },
+  });
 }
 
-export type GetPinnedArticlesResult = NonNullable<Awaited<ReturnType<typeof GetPinnedArticles>>>
+export type GetPinnedArticlesResult = NonNullable<Awaited<ReturnType<typeof GetPinnedArticles>>>;
 
 export async function CreateArticle(formData: FormData) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-        throw Error("User must be logged in.");
-    }
-    if (!session.user.id) {
-        throw Error("Invalid Session.");
-    }
-    let authorId: bigint;
-    try {
-        authorId = BigInt(session.user.id);
-    } catch {
-        throw Error("Invaild user id.");
-    }
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    throw Error("User must be logged in.");
+  }
+  if (!session.user.id) {
+    throw Error("Invalid Session.");
+  }
+  let authorId: bigint;
+  try {
+    authorId = BigInt(session.user.id);
+  } catch {
+    throw Error("Invaild user id.");
+  }
 
+  const clientIp = await getClientIp();
+  if (!clientIp) {
+    throw Error("Cannot read client id properly.");
+  }
+  console.log(clientIp);
+  const rawBoardId = formData.get("boardId")?.toString().trim() ?? "";
+  let boardId: bigint;
+  try {
+    boardId = BigInt(rawBoardId);
+  } catch {
+    throw Error("Invaild board id.");
+  }
 
-    const clientIp = await getClientIp();
-    if (!clientIp) {
-        throw Error("Cannot read client id properly.")
-    }
-    console.log(clientIp)
-    const rawBoardId = formData.get("boardId")?.toString().trim() ?? "";
-    let boardId: bigint;
-    try {
-        boardId = BigInt(rawBoardId);
-    } catch {
-        throw Error("Invaild board id.");
-    }
+  const title = formData.get("title")?.toString() ?? "";
+  const content = formData.get("content")?.toString() ?? "";
+  if (!title || !content) {
+    throw Error("Title and content are required");
+  }
+  const serializedTags = formData.get("tags")?.toString() ?? "";
+  const tags = JSON.parse(serializedTags) as SerializeTagResult[];
+  try {
+    return prisma.$transaction(async (tx) => {
+      const newArticle = await tx.article.create({
+        data: {
+          title,
+          boardId,
+          authorId,
+          authorIp: clientIp,
+          content,
+        },
+        select: {
+          id: true,
+        },
+      });
 
-    const title = formData.get("title")?.toString() ?? "";
-    const content = formData.get("content")?.toString() ?? "";
-    if (!title || !content) {
-        throw Error("Title and content are required");
+      if (tags.length) {
+        const data: Prisma.ArticleTagCreateManyInput[] = tags.map((tag) => ({
+          articleId: newArticle.id,
+          tagId: BigInt(tag.id),
+        }));
+        await tx.articleTag.createMany({
+          data,
+        });
+      }
+      return newArticle.id;
+    });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === "P2003") throw Error("Invaild Tag exists.");
+      if (e.code === "P2002") throw Error("duplicate Tags exist.");
+    } else {
+      throw Error("Internal server error.");
     }
-    const serializedTags = formData.get("tags")?.toString() ?? ""
-    const tags = JSON.parse(serializedTags) as SerializeTagResult[];
-    try {
-        return prisma.$transaction(async (tx) => {
-            const newArticle = await tx.article.create({
-                data: {
-                    title,
-                    boardId,
-                    authorId,
-                    authorIp: clientIp,
-                    content,
-                },
-                select: {
-                    id: true,
-                }
-            })
-
-            if (tags.length) {
-                const data: Prisma.ArticleTagCreateManyInput[] = tags.map((tag) => ({
-                    articleId: newArticle.id,
-                    tagId: BigInt(tag.id),
-                }))
-                await tx.articleTag.createMany({
-                    data
-                })
-            }
-            return newArticle.id;
-        })
-    } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-            if (e.code === "P2003")
-                throw Error("Invaild Tag exists.")
-            if (e.code === "P2002")
-                throw Error("duplicate Tags exist.")
-        }
-        else {
-            throw Error("Internal server error.")
-        }
-    }
+  }
 }

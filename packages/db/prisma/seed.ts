@@ -172,17 +172,16 @@ async function main() {
 
   await prisma.tag.createMany({
     data: [
-      { kind: TagKind.LAB, labId: labAi.id },
-      { kind: TagKind.LAB, labId: labBio.id },
-      { kind: TagKind.LAB, labId: labRobotics.id },
-      { kind: TagKind.SUBJECT, subjId: subjectAi.id },
-      { kind: TagKind.SUBJECT, subjId: subjectBio.id },
-      { kind: TagKind.SUBJECT, subjId: subjectRobotics.id },
-      { kind: TagKind.UNIV, univId: seoulUni.id },
-      { kind: TagKind.UNIV, univId: kaist.id },
+      { kind: TagKind.LAB, labId: labAi.id, text: `${labAi.nameKo}(${labAi.nameEn})` },
+      { kind: TagKind.LAB, labId: labBio.id, text: `${labBio.nameKo}(${labBio.nameEn})` },
+      { kind: TagKind.LAB, labId: labRobotics.id, text: `${labRobotics.nameKo}(${labRobotics.nameEn})` },
+      { kind: TagKind.SUBJECT, subjId: subjectAi.id, text: `${subjectAi.nameKo}(${subjectAi.nameEn})` },
+      { kind: TagKind.SUBJECT, subjId: subjectBio.id, text: `${subjectBio.nameKo}(${subjectBio.nameEn})` },
+      { kind: TagKind.SUBJECT, subjId: subjectRobotics.id, text: `${subjectRobotics.nameKo}(${subjectRobotics.nameEn})` },
+      { kind: TagKind.UNIV, univId: seoulUni.id, text: `${seoulUni.nameKo}(${seoulUni.nameEn})` },
+      { kind: TagKind.UNIV, univId: kaist.id, text: `${kaist.nameKo}(${kaist.nameEn})` },
     ]
   })
-
   await prisma.pI.create({
     data: {
       name: "Jihoon Park",

@@ -204,7 +204,7 @@ CREATE TABLE "articles" (
     "title" VARCHAR(200) NOT NULL,
     "content" TEXT NOT NULL,
     "view_count" INTEGER NOT NULL DEFAULT 0,
-    "author_id" BIGINT NOT NULL,
+    "author_id" BIGINT,
     "author_ip" VARCHAR(45) NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -231,7 +231,7 @@ CREATE TABLE "ArticleHistory" (
 CREATE TABLE "comments" (
     "id" BIGSERIAL NOT NULL,
     "article_id" BIGINT NOT NULL,
-    "author_id" BIGINT NOT NULL,
+    "author_id" BIGINT,
     "author_ip" VARCHAR(45) NOT NULL,
     "content" TEXT NOT NULL,
     "parent_id" BIGINT,

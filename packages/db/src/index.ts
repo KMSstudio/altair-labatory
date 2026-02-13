@@ -25,4 +25,5 @@ export {
   Visibility,
   EmoteKind,
   EmotePlace,
+  TagKind,
 } from "@prisma/client";

@@ -190,7 +190,7 @@ export async function createLab(formData: FormData) {
         },
         tx,
       );
-      CreateTag({ kind: "LAB", id: lab.id, db: tx });
+      await CreateTag({ kind: "LAB", id: lab.id, db: tx });
       const createdSubject = data.newSubject
         ? await create_subject_for_lab(data.newSubject, tx)
         : null;
@@ -202,7 +202,7 @@ export async function createLab(formData: FormData) {
         });
       }
       if (createdSubject) {
-        CreateTag({ kind: "SUBJECT", id: createdSubject.id, db: tx });
+        await CreateTag({ kind: "SUBJECT", id: createdSubject.id, db: tx });
       }
       if (role === "PI" && pi) {
         await tx.pI.update({ where: { id: pi.id }, data: { labId: lab.id } });
@@ -269,7 +269,7 @@ export async function updateLab(formData: FormData) {
         where: { labId: updatedLab.id },
         select: { id: true },
       });
-      if (tag) UpdateTag({ tagId: tag.id, db: tx });
+      if (tag) await UpdateTag({ tagId: tag.id, db: tx });
       const createdSubject = data.newSubject
         ? await create_subject_for_lab(data.newSubject, tx)
         : null;

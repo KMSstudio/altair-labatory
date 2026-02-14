@@ -28,13 +28,6 @@ npm install
 
 .env file must be located at root and written in given form.
 
-```env example
-EMAIL_ID=emailID@gmail.com
-EMAIL_PASSWORD=emailPassword
-EMAIL_NAME=emailName
-EMAIL_DOMAIN_NAME=gmail.com
-EXPIRE_DURATION=30
-```
 
 | Key Name             | Description                                                      |
 |----------------------|------------------------------------------------------------------|

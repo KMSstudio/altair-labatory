@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { CreateArticle } from "../../actions";
 import { TagSelector } from "../../TagSelector";
+import Script from "next/script";
 
 async function onSubmit(formData: FormData) {
   "use server";
@@ -21,7 +22,7 @@ async function onSubmit(formData: FormData) {
 
 export default function NewArticleForm({ boardId }: { boardId: string }) {
   return (
-    <form action={onSubmit}>
+    <form action={onSubmit} id="target-form">
       <input type="hidden" name="boardId" value={boardId} />
       <div>
         <label htmlFor="title">Title</label>
@@ -32,7 +33,8 @@ export default function NewArticleForm({ boardId }: { boardId: string }) {
         <textarea id="content" name="content" required defaultValue="" />
       </div>
       <TagSelector />
-      <button type="submit">submit</button>
+      <button type="submit" id="submit-btn">submit</button>
+      <Script src="/js/disable-on-submit.js" strategy="afterInteractive" />
     </form>
   );
 }

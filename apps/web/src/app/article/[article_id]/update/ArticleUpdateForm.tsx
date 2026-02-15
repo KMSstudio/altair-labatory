@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { UpdateArticle, type GetArticleResult } from "../../actions";
 import { TagSelector } from "@/app/board/TagSelector";
+import Script from "next/script";
 
-async function onSubmit(formData: FormData) {
+async function OnSubmit(formData: FormData) {
   "use server";
   let id: string;
   try {
@@ -23,7 +24,7 @@ export function ArticleUpdateForm({ article }: { article: GetArticleResult }) {
   });
 
   return (
-    <form action={onSubmit}>
+    <form action={OnSubmit} id="target-form">
       <input type="hidden" name="articleId" value={article.id.toString()} />
       <div>
         <label htmlFor="title">title</label>
@@ -34,7 +35,10 @@ export function ArticleUpdateForm({ article }: { article: GetArticleResult }) {
         <textarea id="content" name="content" required defaultValue={article.content} />
       </div>
       <TagSelector SelectedTags={selectedTags} />
-      <button type="submit">submit</button>
+      <button id="submit-btn" type="submit">submit</button>
+
+      {/*Make button freeze during form submission */}
+      <Script src="/js/disable-on-submit.js" strategy="afterInteractive" />
     </form>
   );
 }

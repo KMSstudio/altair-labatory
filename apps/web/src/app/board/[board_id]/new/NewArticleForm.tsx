@@ -33,7 +33,9 @@ export default function NewArticleForm({ boardId }: { boardId: string }) {
         <textarea id="content" name="content" required defaultValue="" />
       </div>
       <TagSelector />
-      <button type="submit" id="submit-btn">submit</button>
+      <button type="submit" id="submit-btn">
+        submit
+      </button>
       <Script src="/js/disable-on-submit.js" strategy="afterInteractive" />
     </form>
   );

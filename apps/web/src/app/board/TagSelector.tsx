@@ -31,6 +31,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: GetTagResult
     }
     setLoading(false);
   }
+
   return (
     <div>
       {error ? <p>{error}</p> : null}

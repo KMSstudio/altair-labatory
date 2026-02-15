@@ -35,7 +35,9 @@ export function ArticleUpdateForm({ article }: { article: GetArticleResult }) {
         <textarea id="content" name="content" required defaultValue={article.content} />
       </div>
       <TagSelector SelectedTags={selectedTags} />
-      <button id="submit-btn" type="submit">submit</button>
+      <button id="submit-btn" type="submit">
+        submit
+      </button>
 
       {/*Make button freeze during form submission */}
       <Script src="/js/disable-on-submit.js" strategy="afterInteractive" />

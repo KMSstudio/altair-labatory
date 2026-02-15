@@ -49,9 +49,7 @@ export function CommentUpdateSection({
 
   return (
     <div>
-      <button onClick={() => setOpen((v) => !v)} style={{ opacity: isPressed["CHEER"] ? 0.6 : 1 }}>
-        {"Edit"}
-      </button>
+      <button onClick={() => setOpen((v) => !v)} style={{ opacity: open ? 0.6 : 1 }}>{"Edit"}</button>
       {open && (
         <div>
           <textarea

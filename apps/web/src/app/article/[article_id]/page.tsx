@@ -1,3 +1,5 @@
+"use server";
+
 import { notFound } from "next/navigation";
 import { GetArticle, GetComments, LinkComments, GetEmoteCount } from "../actions";
 import Link from "next/link";
@@ -8,8 +10,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { WriterSection } from "./section/WriterSection";
 
-export default async function Page({ params }: { params: { article_id: string } }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { article_id: string };
+  searchParams?: { error: string };
+}) {
   params = await params;
+  searchParams = await searchParams;
   if (!params.article_id) notFound();
   let articleId: bigint;
   try {
@@ -35,10 +44,13 @@ export default async function Page({ params }: { params: { article_id: string } 
   }
   return (
     <article>
+      {/*Display Name, author, created date, and updated Date.
+       If user is the writer of this article, also display edit and delete button.*/}
       <header>
         <div>
-          <Link href={`/board/${article.boardId}/list`}>게시판으로 이동.</Link>
+          <Link href={`/board/${article.boardId}/list`}>Return to board.</Link>
         </div>
+        {searchParams?.error && <p>{decodeURIComponent(searchParams.error)}</p>}
         <h1>{article.title}</h1>
         <div>
           <p>{article.author?.displayName ?? "anonymous"}</p>
@@ -49,23 +61,24 @@ export default async function Page({ params }: { params: { article_id: string } 
           </time>
           {article.updatedAt.getTime() !== article.createdAt.getTime() && (
             <>
-              <span> · 수정 </span>
+              <span> · Edited </span>
               <time dateTime={article.updatedAt.toISOString()}>
                 {article.updatedAt.toLocaleString()}
               </time>
             </>
           )}
+          {sessionId === article.author?.id && <WriterSection articleId={articleId} />}
         </div>
-        {sessionId === article.author?.id ? <WriterSection articleId={articleId} /> : <></>}
       </header>
+      {/*Display viewcount, the number of comments and emote of this article.*/}
       <section>
         <dl>
           <div>
-            <dt>조회</dt>
+            <dt>view</dt>
             <dd>{article.viewCount}</dd>
           </div>
           <div>
-            <dt>댓글</dt>
+            <dt>comments</dt>
             <dd>{article._count.comments ?? 0}</dd>
           </div>
         </dl>
@@ -73,29 +86,30 @@ export default async function Page({ params }: { params: { article_id: string } 
       <section>
         <div>{article.content}</div>
       </section>
+      {/*Display the number of emotes left in this article in detail.*/}
       <section>
-        <h2>반응</h2>
+        <h2>Emote</h2>
         <EmoteSection id={articleId} emotes={emoteCount} kind="ARTICLE" />
       </section>
+      {/*Display tags of this article.*/}
       <section>
-        <h2>태그</h2>
-        {article.tags ? (
+        <h2>Tags</h2>
+        {article.tags && (
           <ol>
             {article.tags.map((articleTag) => (
               <p key={articleTag.tagId}>{articleTag.tag.text ?? articleTag.tag.id}</p>
             ))}
           </ol>
-        ) : (
-          <></>
         )}
       </section>
+      {/*Display comments of this article.*/}
       <section>
-        <h2>댓글 {article._count.comments ?? 0}</h2>
+        <h2>Coment {article._count.comments ?? 0}</h2>
 
-        {(article._count.comments ?? 0) === 0 ? (
-          <p>아직 댓글이 없습니다.</p>
-        ) : (
+        {(article._count.comments ?? 0) !== 0 ? (
           <CommentSection comments={comments} depth={0} viewerId={sessionId} />
+        ) : (
+          <p>No comment.</p>
         )}
         <CommentForm articleId={articleId} />
       </section>

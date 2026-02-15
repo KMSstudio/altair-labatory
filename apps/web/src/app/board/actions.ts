@@ -4,7 +4,6 @@
 
 import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/util/tag.action";
-import { SerializeTagResult } from "@/util/serialize/SerializeTag";
 import { Prisma, prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 
@@ -134,8 +133,14 @@ export async function CreateArticle(formData: FormData) {
   if (!title || !content) {
     throw Error("Title and content are required");
   }
-  const serializedTags = formData.get("tags")?.toString() ?? "";
-  const tags = JSON.parse(serializedTags) as SerializeTagResult[];
+  const tagIdsRaw = formData.getAll("tagIds") as string[];
+  const tagIds = tagIdsRaw.map((tagId) => {
+    try {
+      return BigInt(tagId);
+    } catch {
+      throw Error("Invaild Tag id.");
+    }
+  });
   try {
     return prisma.$transaction(async (tx) => {
       const newArticle = await tx.article.create({
@@ -151,10 +156,10 @@ export async function CreateArticle(formData: FormData) {
         },
       });
 
-      if (tags.length) {
-        const data: Prisma.ArticleTagCreateManyInput[] = tags.map((tag) => ({
+      if (tagIds.length) {
+        const data: Prisma.ArticleTagCreateManyInput[] = tagIds.map((tagId) => ({
           articleId: newArticle.id,
-          tagId: BigInt(tag.id),
+          tagId,
         }));
         await tx.articleTag.createMany({
           data,

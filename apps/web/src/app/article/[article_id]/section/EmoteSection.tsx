@@ -29,38 +29,41 @@ export function EmoteSection({
       }));
       setCounts(await GetEmoteCount({ id, targetPlace: kind }));
     } catch (e) {
-      if (e instanceof Error) {
-        alert(e.message);
-      } else {
-        alert("Unknown Error.");
-      }
+      alert(`Posting emote error: ${e instanceof Error ? e.message : "Unknown error."}`);
     }
   }
+
   return (
     <div>
       <div>
-        <button onClick={() => onClick("CHEER")}>
-          {isPressed["CHEER"] ? "응원 취소" : "응원해요:"} {counts["CHEER"] ?? 0}
+        <button onClick={() => onClick("CHEER")} style={{ opacity: isPressed["CHEER"] ? 0.6 : 1 }}>
+          CHEER {counts["CHEER"] ?? 0}
         </button>
       </div>
       <div>
-        <button onClick={() => onClick("EMPATHY")}>
-          {isPressed["EMPATHY"] ? "공감 취소" : "공감해요:"} {counts["EMPATHY"] ?? 0}
+        <button
+          onClick={() => onClick("EMPATHY")}
+          style={{ opacity: isPressed["EMPATHY"] ? 0.6 : 1 }}
+        >
+          EMPATHY {counts["EMPATHY"] ?? 0}
         </button>
       </div>
       <div>
-        <button onClick={() => onClick("LIKE")}>
-          {isPressed["LIKE"] ? "좋아요 취소" : "좋아해요:"} {counts["LIKE"] ?? 0}
+        <button onClick={() => onClick("LIKE")} style={{ opacity: isPressed["LIKE"] ? 0.6 : 1 }}>
+          LIKE {counts["LIKE"] ?? 0}
         </button>
       </div>
       <div>
-        <button onClick={() => onClick("QUESTION")}>
-          {isPressed["QUESTION"] ? "궁금 취소" : "궁금해요:"} {counts["QUESTION"] ?? 0}
+        <button
+          onClick={() => onClick("QUESTION")}
+          style={{ opacity: isPressed["QUESTION"] ? 0.6 : 1 }}
+        >
+          QUESTION {counts["QUESTION"] ?? 0}
         </button>
       </div>
       <div>
-        <button onClick={() => onClick("BAD")}>
-          {isPressed["BAD"] ? "비추천 취소" : "별로예요:"} {counts["BAD"] ?? 0}
+        <button onClick={() => onClick("BAD")} style={{ opacity: isPressed["BAD"] ? 0.6 : 1 }}>
+          BAD {counts["BAD"] ?? 0}
         </button>
       </div>
     </div>

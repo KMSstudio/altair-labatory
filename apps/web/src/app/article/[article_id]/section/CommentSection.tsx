@@ -21,16 +21,14 @@ export async function CommentSection({
             <div>
               <h3>{comment.author?.displayName ?? "anonymous"}</h3>
             </div>
-            {viewerId === comment.author?.id && !comment.isHidden ? (
+            {viewerId === comment.author?.id && !comment.isHidden && (
               <CommentUpdateSection commentId={comment.id} content={comment.content} />
-            ) : (
-              <></>
             )}
             <div>
               {comment.createdAt.toDateString()}
               {comment.createdAt.getDate() !== comment.updatedAt.getDate() && (
                 <>
-                  <span> · 수정 </span>
+                  <span> · Edited </span>
                   <time dateTime={comment.updatedAt.toISOString()}>
                     {comment.updatedAt.toLocaleString()}
                   </time>
@@ -38,7 +36,7 @@ export async function CommentSection({
               )}
             </div>
             {comment.isHidden ? (
-              <div>댓글이 가려졌습니다</div>
+              <div>This Comment is hidden.</div>
             ) : (
               <>
                 <div>{comment.content}</div>
@@ -46,10 +44,8 @@ export async function CommentSection({
               </>
             )}
             <ReplySection parentId={comment.id} articleId={comment.articleId} />
-            {comment.children.length !== 0 ? (
+            {comment.children.length !== 0 && (
               <CommentSection comments={comment.children} depth={depth + 1} viewerId={viewerId} />
-            ) : (
-              <></>
             )}
           </div>
         );

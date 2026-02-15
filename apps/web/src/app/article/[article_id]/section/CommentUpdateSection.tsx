@@ -1,9 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { DeleteComment, UpdateComment } from "../../actions";
 import { useRouter } from "next/navigation";
 
+async function OnDelete(setLoadingDelete: Dispatch<SetStateAction<boolean>>, commentId: bigint) {
+  setLoadingDelete(true);
+  try {
+    await DeleteComment({ commentId });
+  } catch (e) {
+    alert(`Updating comment error:${e instanceof Error ? e.message : "Unknown error."}`);
+    setLoadingDelete(false);
+    return false;
+  }
+  setLoadingDelete(false);
+  return true;
+}
+async function OnUpdate(
+  setLoadingUpdate: Dispatch<SetStateAction<boolean>>,
+  commentId: bigint,
+  text: string,
+  setOpen: Dispatch<SetStateAction<boolean>>,
+) {
+  setLoadingUpdate(true);
+  try {
+    await UpdateComment({ commentId, newContent: text });
+  } catch (e) {
+    alert(`Updating comment error:${e instanceof Error ? e.message : "Unknown error."}`);
+    setLoadingUpdate(false);
+    return false;
+  }
+  setLoadingUpdate(false);
+  setOpen(false);
+  return true;
+}
 export function CommentUpdateSection({
   commentId,
   content,
@@ -17,59 +47,44 @@ export function CommentUpdateSection({
   const [text, setText] = useState(content);
   const router = useRouter();
 
-  async function OnDelete() {
-    setLoadingDelete(true);
-    try {
-      await DeleteComment({ commentId });
-    } catch (e) {
-      if (e instanceof Error) {
-        alert(e.message);
-      } else {
-        alert("Unknown error.");
-      }
-      setLoadingDelete(false);
-      return;
-    }
-    setLoadingDelete(false);
-    router.refresh();
-  }
-  async function OnUpdate() {
-    setLoadingUpdate(true);
-    try {
-      await UpdateComment({ commentId, newContent: text });
-    } catch (e) {
-      if (e instanceof Error) {
-        alert(e.message);
-      } else {
-        alert("Unknown error.");
-      }
-      setLoadingUpdate(false);
-      return;
-    }
-    setLoadingUpdate(false);
-    setOpen(false);
-    router.refresh();
-  }
-
   return (
     <div>
-      <button onClick={() => setOpen((v) => !v)}>{open ? "수정 접기" : "수정"}</button>
+      <button onClick={() => setOpen((v) => !v)} style={{ opacity: isPressed["CHEER"] ? 0.6 : 1 }}>
+        {"Edit"}
+      </button>
       {open && (
         <div>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="답글을 입력하세요"
+            placeholder="Input reply"
           />
           <div>
-            <button type="button" onClick={OnUpdate} disabled={loadingUpdate}>
-              수정
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.preventDefault();
+                if (await OnUpdate(setLoadingUpdate, commentId, text, setOpen)) {
+                  router.refresh();
+                }
+              }}
+              disabled={loadingUpdate}
+            >
+              Edit
             </button>
           </div>
         </div>
       )}
-      <button onClick={OnDelete} disabled={loadingDelete}>
-        삭제
+      <button
+        onClick={async (e) => {
+          e.preventDefault();
+          if (await OnDelete(setLoadingDelete, commentId)) {
+            router.refresh();
+          }
+        }}
+        disabled={loadingDelete}
+      >
+        Delete
       </button>
     </div>
   );

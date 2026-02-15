@@ -1,38 +1,35 @@
-"use client";
+"use server";
+
 import Link from "next/link";
 import { DeleteArticle } from "../../actions";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
-export function WriterSection({ articleId }: { articleId: bigint }) {
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
-  async function OnDelete() {
-    setLoading(true);
-    try {
-      DeleteArticle({ articleId });
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "Unknown Error.");
-      setLoading(false);
-      return;
-    }
-    router.back();
+async function OnDelete(formData: FormData) {
+  "use server";
+  const articleIdRaw = formData.get("articleId")?.toString() ?? "ff";
+  console.log(articleIdRaw);
+  try {
+    const articleId = BigInt(articleIdRaw);
+    await DeleteArticle({ articleId });
+  } catch (e) {
+    redirect(
+      `?error=${encodeURIComponent(`Deleting article error: ${e instanceof Error ? e.message : "Unknown Error."}`)}`,
+    );
   }
+  redirect("/board");
+}
+
+export async function WriterSection({ articleId }: { articleId: bigint }) {
   return (
     <div>
       <div>
-        <Link href={`/article/${articleId}/update`}>수정</Link>
+        <Link href={`/article/${articleId}/update`}>Edit</Link>
       </div>
       <div>
-        <button
-          onClick={() => {
-            OnDelete();
-          }}
-          disabled={loading}
-        >
-          삭제
-        </button>
+        <form action={OnDelete}>
+          <input type="hidden" name="articleId" defaultValue={articleId.toString()} />
+          <button type="submit">Delete</button>
+        </form>
       </div>
     </div>
   );

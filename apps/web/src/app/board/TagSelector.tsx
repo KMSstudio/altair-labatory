@@ -4,25 +4,20 @@ import { GetTagResult, SearchTags } from "@/util/tag.action";
 import { type TagKind } from "@labatory/db";
 import { useState } from "react";
 
-export function TagSelector({
-  SelectedTags,
-  setSelectedTags,
-}: {
-  SelectedTags: GetTagResult[];
-  setSelectedTags: (tag: GetTagResult[]) => void;
-}) {
+export function TagSelector({ SelectedTags = [] }: { SelectedTags?: GetTagResult[] }) {
   const [tags, setTags] = useState<GetTagResult[]>([]);
   const [tagKind, setTagKind] = useState<TagKind>("LAB");
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<GetTagResult[]>(SelectedTags);
 
   function AddTag(tag: GetTagResult) {
-    if (SelectedTags.some((SelectedTag) => SelectedTag.id === tag.id)) return;
-    setSelectedTags([...SelectedTags, tag]);
+    if (selectedTags.some((SelectedTag) => SelectedTag.id === tag.id)) return;
+    setSelectedTags([...selectedTags, tag]);
   }
   function removeTag(tag: GetTagResult) {
-    setSelectedTags(SelectedTags.filter((t) => t.id !== tag.id));
+    setSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
   }
 
   async function onSearch() {
@@ -32,11 +27,7 @@ export function TagSelector({
     try {
       setTags(await SearchTags({ kind: tagKind, queryRaw: trimmedQuery }));
     } catch (e) {
-      if (e instanceof Error) {
-        setError(e.message);
-      } else {
-        setError("unknown error.");
-      }
+      setError(`Selecting tag error:${e instanceof Error ? e.message : "Unknown Error"}`);
     }
     setLoading(false);
   }
@@ -45,7 +36,10 @@ export function TagSelector({
       {error ? <p>{error}</p> : null}
       <div>
         <strong>Selected Tags</strong>
-        <TagList tags={SelectedTags} onSelect={removeTag} />
+        <TagList tags={selectedTags} onSelect={removeTag} />
+        {selectedTags.map((tag) => {
+          return <input key={tag.id} type="hidden" value={tag.id.toString()} name="tagIds" />;
+        })}
       </div>
       <div>
         <strong>Tags search</strong>
@@ -65,7 +59,7 @@ export function TagSelector({
               <option value={"SUBJECT"}>Subject</option>
             </select>
             <button type="button" disabled={loading} onClick={() => onSearch()} formNoValidate>
-              {loading ? "Searching..." : "Search"}
+              Search
             </button>
           </div>
         </label>
@@ -84,7 +78,6 @@ function TagList({
 }) {
   if (!tags) return <p>Please input Tag name</p>;
   if (tags.length === 0) return <p>No search result.</p>;
-
   return (
     <ul>
       {tags.map((tag) => (

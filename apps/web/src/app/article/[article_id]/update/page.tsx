@@ -4,8 +4,15 @@ import { notFound, redirect } from "next/navigation";
 import { GetArticle } from "../../actions";
 import { ArticleUpdateForm } from "./ArticleUpdateForm";
 
-export default async function Page({ params }: { params: { article_id: string } }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { article_id: string };
+  searchParams?: { error: string };
+}) {
   params = await params;
+  searchParams = await searchParams;
   let articleId: bigint;
   try {
     articleId = BigInt(params.article_id);
@@ -24,5 +31,10 @@ export default async function Page({ params }: { params: { article_id: string } 
   if (!article.author || sessionId !== article.author?.id) {
     redirect("/");
   }
-  return <ArticleUpdateForm article={article} />;
+  return (
+    <div>
+      {searchParams?.error && <p>{decodeURIComponent(searchParams.error)}</p>}
+      <ArticleUpdateForm article={article} />
+    </div>
+  );
 }

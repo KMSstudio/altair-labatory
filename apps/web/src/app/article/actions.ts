@@ -5,7 +5,6 @@ import { getClientIp } from "@/util/tag.action";
 import { SerializeComment } from "@/util/serialize/SerializeComment";
 import { type EmoteKind, type EmotePlace, Prisma, prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
-import { SerializeTagResult } from "@/util/serialize/SerializeTag";
 
 export async function GetArticle({ articleId }: { articleId: bigint }) {
   return prisma.article.findUnique({
@@ -111,9 +110,14 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
     throw Error("Unauthorized");
   }
 
-  const serializedTags = formData.get("tags")?.toString() ?? "";
-  const tags = JSON.parse(serializedTags) as SerializeTagResult[];
-
+  const tagIdsRaw = formData.getAll("tagIds") as string[];
+  const tagIds = tagIdsRaw.map((tagId) => {
+    try {
+      return BigInt(tagId);
+    } catch {
+      throw Error("Invaild Tag id.");
+    }
+  });
   try {
     await prisma.$transaction(async (tx) => {
       await tx.articleHistory.create({
@@ -140,21 +144,18 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
           articleId,
         },
       });
-      console.log(tags);
-      if (tags.length) {
-        const data: Prisma.ArticleTagCreateManyInput[] = tags.map((tag) => ({
+      if (tagIds.length) {
+        const data: Prisma.ArticleTagCreateManyInput[] = tagIds.map((tagId) => ({
           articleId,
-          tagId: BigInt(tag.id),
+          tagId,
         }));
         await tx.articleTag.createMany({
           data,
         });
       }
     });
-
-    return true;
   } catch (e) {
-    return Error(e instanceof Error ? e.message : "Internal server error.");
+    throw Error(e instanceof Error ? e.message : "Internal server error.");
   }
 }
 

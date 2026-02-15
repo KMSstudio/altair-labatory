@@ -45,7 +45,8 @@ export async function POST(request: Request) {
     const serializedComment = PostComment({ articleId, parentCommentId: parentId, content });
     return NextResponse.json({ ok: true, comment: serializedComment }, { status: 200 });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Internal server error.";
+    const message =
+      e instanceof Error ? `Creating comment error: ${e.message}` : "Internal server error.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

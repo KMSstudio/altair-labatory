@@ -65,7 +65,7 @@ export default async function Page({
         {board.description && <p>{board.description}</p>}
       </header>
       <div>
-        <Link href={`/board/${boardId}/new`}>글쓰기</Link>
+        <Link href={`/board/${boardId}/new`}>Write a new article</Link>
       </div>
       <ArticleList articles={articles} pinnedArticles={pinnedArticles} />
       <PageExplorer BoardId={board.id} currentPage={page} maxPage={maxPage} maxLength={5} />

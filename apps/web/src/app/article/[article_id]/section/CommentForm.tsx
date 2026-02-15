@@ -14,11 +14,7 @@ export function CommentForm({ articleId }: { articleId: bigint }) {
     try {
       await PostComment({ content: text, articleId, parentCommentId: null });
     } catch (e) {
-      if (e instanceof Error) {
-        alert(e.message);
-      } else {
-        alert("Unknown error.");
-      }
+      alert(`Creating comment error: ${e instanceof Error ? e.message : "Unknown error."}`);
       setLoading(false);
       return;
     }
@@ -33,11 +29,11 @@ export function CommentForm({ articleId }: { articleId: bigint }) {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="댓글을 입력하세요"
+          placeholder="Input comment."
         />
         <div>
           <button type="button" onClick={OnSubmit} disabled={loading}>
-            등록
+            submit
           </button>
         </div>
       </div>

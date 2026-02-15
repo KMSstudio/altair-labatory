@@ -46,7 +46,7 @@ export default async function ArticleList({
 }) {
   return (
     <section>
-      <h2>전체 글</h2>
+      <h2>Articles</h2>
       <ul>
         {pinnedArticles &&
           pinnedArticles.map((pinnedArticle) => (

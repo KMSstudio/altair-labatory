@@ -19,7 +19,7 @@ export async function PageExplorer({
     );
   }
   let start = Math.max(1, currentPage - Number(maxLength / 2));
-  const end = Math.min(maxPage, start + maxLength);
+  const end = Math.min(maxPage, start + maxLength - 1);
   if (end - start < maxLength) {
     start = Math.max(1, currentPage - maxLength);
   }

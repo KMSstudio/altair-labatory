@@ -137,7 +137,7 @@ export async function UpdateTag({
     },
     select: getTagSelect,
   });
-  if (!tag) throw Error("Invaild tag id");
+  if (!tag) throw Error("Invalid tag id");
   let Tagtext: string = text ?? "";
   if (!Tagtext) {
     switch (tag.kind) {

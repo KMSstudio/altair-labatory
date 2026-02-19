@@ -60,7 +60,6 @@ export async function createUniversity(formData: FormData) {
   const data = parseUnivInput(formData);
   const created = await prisma.$transaction(async (tx) => {
     const created = await tx.university.create({ data });
-    console.log(`${created.id}`);
     await CreateTag({ kind: "UNIV", id: created.id, db: tx });
     return created;
   });

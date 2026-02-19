@@ -3,27 +3,20 @@
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { PostComment } from "../../actions";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 
 async function OnSubmit(
   text: string,
   articleId: bigint,
   parentId: bigint | null,
-  setLoading: Dispatch<SetStateAction<boolean>>,
   setOpen: Dispatch<SetStateAction<boolean>>,
 ) {
-  setLoading(true);
   try {
     await PostComment({ content: text, articleId, parentCommentId: parentId });
   } catch (e) {
-    if (e instanceof Error) {
-      alert(e.message);
-    } else {
-      alert("Unknown error.");
-    }
-    setLoading(false);
+    alert(`Posting reply error: ${e instanceof Error ? e.message : "Unknown error."}`);
     return false;
   }
-  setLoading(false);
   setOpen(false);
   return true;
 }
@@ -31,7 +24,6 @@ async function OnSubmit(
 export function ReplySection({ articleId, parentId }: { articleId: bigint; parentId: bigint }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   return (
@@ -41,24 +33,28 @@ export function ReplySection({ articleId, parentId }: { articleId: bigint; paren
       </button>
       {open && (
         <div>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="input reply"
-          />
-          <div>
-            <button
-              type="button"
-              onClick={async () => {
-                if (await OnSubmit(text, articleId, parentId, setLoading, setOpen)) {
-                  router.refresh();
-                }
-              }}
-              disabled={loading}
-            >
-              submit
-            </button>
-          </div>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (await OnSubmit(text, articleId, parentId, setOpen)) {
+                router.refresh();
+              }
+            }}
+            id="target-form"
+          >
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="input reply"
+            />
+            <div>
+              <button type="submit" id="submit-btn">
+                submit
+              </button>
+            </div>
+            {/*Make button freeze during form submission */}
+            <Script src="/js/disable-on-submit.js" strategy="afterInteractive" />
+          </form>
         </div>
       )}
     </div>

@@ -6,6 +6,19 @@ import { SerializeComment } from "@/util/serialize/SerializeComment";
 import { type EmoteKind, type EmotePlace, Prisma, prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 
+/**
+ * Retrieve a specific article based on article id.
+ * filter hidden articles.
+ *
+ * @param {bigint} articleId Id of target article.
+ *
+ * @returns Article object containing:
+ * - basic fields: id, boardId, title, content, viewCount
+ * - tags: { tag: { id, kind, labId, univId, subjId, text } }[]
+ * - author: User
+ * - emotes: { userId, kind }[]
+ * - _count: { comments: number }
+ */
 export async function GetArticle({ articleId }: { articleId: bigint }) {
   return prisma.article.findUnique({
     where: {
@@ -51,6 +64,19 @@ export async function GetArticle({ articleId }: { articleId: bigint }) {
 }
 
 export type GetArticle_RetType = NonNullable<Awaited<ReturnType<typeof GetArticle>>>;
+
+/**
+ * Update article title, content, and tags.
+ * preserve previous version of article in articlehistory table.
+ *
+ * @param formData - FormData containing:
+ * - newTitle: updated article title
+ * - newContent: updated article content
+ * - articleId: article id.
+ * - tagIds: updated repeated tag id values
+ *
+ * @throws if article id is invaild, or content and title is empty, or user did not logged in, user is not the writer of this article, or cannot detect client ip.
+ */
 export async function UpdateArticle({ formData }: { formData: FormData }) {
   const newContent = formData.get("content")?.toString() ?? "";
   const newTitle = formData.get("title")?.toString() ?? "";
@@ -159,6 +185,16 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
   }
 }
 
+/**
+ * HIDE article from board.
+ * Do not completely delete article from database;
+ *
+ * @param {bigint} boardId Id of board where target articles are located.
+ * @param {number} page  The page number to retrieve. default is 1.
+ * @param {number} pageSize  The number of articles in one page.
+ *
+ * @throws if article id is invaild, or user did not logged in, user is not the writer of this article, or cannot detect client ip.
+ */
 export async function DeleteArticle({ articleId }: { articleId: bigint }) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -203,6 +239,24 @@ export async function DeleteArticle({ articleId }: { articleId: bigint }) {
   });
 }
 
+/**
+ * Retrieve pages of comment post on specific article.
+ * Include replies.
+ *
+ * @param {bigint} articleId Id of article where comments are posted.
+ *
+ * @returns Comment list containing:
+ * - id
+ * - author: { id, displayName }
+ * - articleId
+ * - isHidden
+ * - parentId
+ * - content
+ * - emotes: { userId, kind }[]
+ * - createdAt, updatedAt
+ *
+ * Ordered by createdAt ascending
+ */
 export async function GetComments({ articleId }: { articleId: bigint }) {
   return prisma.comment.findMany({
     where: {
@@ -234,6 +288,16 @@ export async function GetComments({ articleId }: { articleId: bigint }) {
     },
   });
 }
+/**
+ * post specific comment
+ *
+ * @param {bigint} articleId Id of article where comments are being posted.
+ * @param {string} content Content of comment.
+ * @param {bigint | null} parentCommentId Id of comment where this comment will be attached. null if this comment is not reply.
+ *
+ * @returns Serialized Comment data.
+ * @throws If user is not logged in or cannot detect client ip, or failed to post comment on database.
+ */
 export async function PostComment({
   content,
   articleId,

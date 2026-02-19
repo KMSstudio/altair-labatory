@@ -101,6 +101,18 @@ export async function GetPinnedArticles(boardId: bigint) {
 
 export type GetPinnedArticles_RetType = NonNullable<Awaited<ReturnType<typeof GetPinnedArticles>>>;
 
+/**
+ * Create an Article for a specific board.
+ *
+ * @param formData - FormData containing:
+ * - title: article title
+ * - content: article content
+ * - boardId: board id
+ * - tagIds: repeated tag id values
+ *
+ * @return Id of new article.
+ * @throws If user did not logged in or cannot find client Ip, or either title, content, or tag is invaild
+ */
 export async function CreateArticle(formData: FormData) {
   const session = await getServerSession(authOptions);
   if (!session) {

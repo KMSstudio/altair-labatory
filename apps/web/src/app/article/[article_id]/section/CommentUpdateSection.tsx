@@ -3,6 +3,7 @@
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { DeleteComment, UpdateComment } from "../../actions";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 
 async function OnDelete(setLoadingDelete: Dispatch<SetStateAction<boolean>>, commentId: bigint) {
   setLoadingDelete(true);
@@ -16,24 +17,22 @@ async function OnDelete(setLoadingDelete: Dispatch<SetStateAction<boolean>>, com
   setLoadingDelete(false);
   return true;
 }
+
 async function OnUpdate(
-  setLoadingUpdate: Dispatch<SetStateAction<boolean>>,
   commentId: bigint,
   text: string,
   setOpen: Dispatch<SetStateAction<boolean>>,
 ) {
-  setLoadingUpdate(true);
   try {
     await UpdateComment({ commentId, newContent: text });
   } catch (e) {
     alert(`Updating comment error:${e instanceof Error ? e.message : "Unknown error."}`);
-    setLoadingUpdate(false);
     return false;
   }
-  setLoadingUpdate(false);
   setOpen(false);
   return true;
 }
+
 export function CommentUpdateSection({
   commentId,
   content,
@@ -42,7 +41,6 @@ export function CommentUpdateSection({
   content: string;
 }) {
   const [loadingDelete, setLoadingDelete] = useState(false);
-  const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [open, setOpen] = useState(false);
   const [text, setText] = useState(content);
   const router = useRouter();
@@ -52,29 +50,36 @@ export function CommentUpdateSection({
       <button onClick={() => setOpen((v) => !v)} style={{ opacity: open ? 0.6 : 1 }}>
         {"Edit"}
       </button>
+
       {open && (
         <div>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Input reply"
-          />
-          <div>
-            <button
-              type="button"
-              onClick={async (e) => {
-                e.preventDefault();
-                if (await OnUpdate(setLoadingUpdate, commentId, text, setOpen)) {
-                  router.refresh();
-                }
-              }}
-              disabled={loadingUpdate}
-            >
-              Edit
-            </button>
-          </div>
+          <form
+            id="target-form"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (await OnUpdate(commentId, text, setOpen)) {
+                router.refresh();
+              }
+            }}
+          >
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Input reply"
+            />
+
+            <div>
+              <button type="submit" id="submit-btn">
+                Edit
+              </button>
+            </div>
+
+            {/* Make button freeze during form submission */}
+            <Script src="/js/disable-on-submit.js" strategy="afterInteractive" />
+          </form>
         </div>
       )}
+
       <button
         onClick={async (e) => {
           e.preventDefault();

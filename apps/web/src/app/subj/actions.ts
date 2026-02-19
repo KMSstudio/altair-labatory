@@ -216,7 +216,7 @@ export async function updateSubject(formData: FormData) {
   try {
     await prisma.$transaction(async (tx) => {
       const updateSubj = await update_subject(id, data);
-      const tag = await prisma.tag.findUnique({
+      const tag = await tx.tag.findUnique({
         where: {
           subjId: updateSubj.id,
         },

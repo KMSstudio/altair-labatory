@@ -50,7 +50,7 @@ export async function GetArticle({ articleId }: { articleId: bigint }) {
   });
 }
 
-export type GetArticleResult = NonNullable<Awaited<ReturnType<typeof GetArticle>>>;
+export type GetArticle_RetType = NonNullable<Awaited<ReturnType<typeof GetArticle>>>;
 export async function UpdateArticle({ formData }: { formData: FormData }) {
   const newContent = formData.get("content")?.toString() ?? "";
   const newTitle = formData.get("title")?.toString() ?? "";
@@ -139,7 +139,7 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
           authorIp: clientIp,
         },
       });
-      await prisma.articleTag.deleteMany({
+      await tx.articleTag.deleteMany({
         where: {
           articleId,
         },
@@ -414,9 +414,11 @@ export async function DeleteComment({ commentId }: { commentId: bigint }) {
   });
 }
 
-export async function LinkComments(comments: GetCommentsResult | null): Promise<CommentDisplay[]> {
-  const roots: CommentDisplay[] = [];
-  const map = new Map<CommentDisplay["id"], CommentDisplay>();
+export async function LinkComments(
+  comments: GetComments_RetType | null,
+): Promise<CommentDisplayType[]> {
+  const roots: CommentDisplayType[] = [];
+  const map = new Map<CommentDisplayType["id"], CommentDisplayType>();
   if (!comments) return roots;
 
   for (const comment of comments) {
@@ -439,8 +441,8 @@ export async function LinkComments(comments: GetCommentsResult | null): Promise<
   return roots;
 }
 
-export type GetCommentsResult = NonNullable<Awaited<ReturnType<typeof GetComments>>>;
-export type CommentDisplay = GetCommentsResult[number] & { children: CommentDisplay[] };
+export type GetComments_RetType = NonNullable<Awaited<ReturnType<typeof GetComments>>>;
+export type CommentDisplayType = GetComments_RetType[number] & { children: CommentDisplayType[] };
 
 export async function PostEmote({
   id,
@@ -543,4 +545,4 @@ export async function GetEmoteCount({ id, targetPlace }: { id: bigint; targetPla
   return countMap;
 }
 
-export type GetEmoteCountResult = NonNullable<Awaited<ReturnType<typeof GetEmoteCount>>>;
+export type GetEmoteCount_RetType = NonNullable<Awaited<ReturnType<typeof GetEmoteCount>>>;

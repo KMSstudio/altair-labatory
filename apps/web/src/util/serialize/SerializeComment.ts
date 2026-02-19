@@ -1,6 +1,6 @@
-import { GetCommentsResult } from "@/app/article/actions";
+import { GetComments_RetType } from "@/app/article/actions";
 
-export function SerializeComment(comment: GetCommentsResult[number]) {
+export function SerializeComment(comment: GetComments_RetType[number]) {
   const emotes = comment.emotes.map((emote) => {
     return {
       userId: emote.userId.toString(),

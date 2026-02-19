@@ -70,7 +70,7 @@ export async function GetArticles(boardId: bigint, page: number = 1, pageSize: n
   });
 }
 
-export type GetArticlesResult = NonNullable<Awaited<ReturnType<typeof GetArticles>>>;
+export type GetArticles_RetType = NonNullable<Awaited<ReturnType<typeof GetArticles>>>;
 
 /**
  * Retrieve a id and title of pinned articles for a specific board.
@@ -99,7 +99,7 @@ export async function GetPinnedArticles(boardId: bigint) {
   });
 }
 
-export type GetPinnedArticlesResult = NonNullable<Awaited<ReturnType<typeof GetPinnedArticles>>>;
+export type GetPinnedArticles_RetType = NonNullable<Awaited<ReturnType<typeof GetPinnedArticles>>>;
 
 export async function CreateArticle(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -168,11 +168,15 @@ export async function CreateArticle(formData: FormData) {
       return newArticle.id;
     });
   } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      if (e.code === "P2003") throw Error("Invaild Tag exists.");
-      if (e.code === "P2002") throw Error("duplicate Tags exist.");
-    } else {
+    if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
       throw Error("Internal server error.");
+    }
+    if (e.code === "P2003") {
+      throw Error("Invalid tag exists.");
+    } else if (e.code === "P2002") {
+      throw Error("Duplicate tags exist.");
+    } else {
+      throw Error("Internal database error.");
     }
   }
 }

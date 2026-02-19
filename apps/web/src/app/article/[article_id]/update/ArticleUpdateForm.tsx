@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { UpdateArticle, type GetArticleResult } from "../../actions";
+import { UpdateArticle, type GetArticle_RetType } from "../../actions";
 import { TagSelector } from "@/app/board/TagSelector";
 import Script from "next/script";
 
@@ -18,7 +18,7 @@ async function OnSubmit(formData: FormData) {
   redirect(`/article/${id}`);
 }
 
-export function ArticleUpdateForm({ article }: { article: GetArticleResult }) {
+export function ArticleUpdateForm({ article }: { article: GetArticle_RetType }) {
   const selectedTags = article.tags.map((articleTag) => {
     return articleTag.tag;
   });

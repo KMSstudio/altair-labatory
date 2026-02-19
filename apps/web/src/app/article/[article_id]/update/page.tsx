@@ -23,7 +23,12 @@ export default async function Page({
   if (!session || !session.user) {
     redirect("/");
   }
-  const sessionId = BigInt(session.user.id);
+  let sessionId: bigint;
+  try {
+    sessionId = BigInt(session.user.id);
+  } catch {
+    redirect("/");
+  }
   const article = await GetArticle({ articleId });
   if (!article) {
     notFound();

@@ -423,7 +423,7 @@ model CommentHistory {
   commentId BigInt @map("comment_id")
   comment Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
-  oldContent String   @map("old_title")
+  oldContent String   @map("old_content")
   oldAuthorIp String @db.VarChar(45) @map("old_author_ip")
   editedAt   DateTime @default(now())
 }
@@ -500,7 +500,7 @@ model Emote {
   kind EmoteKind
   place EmotePlace
 
-  articleId BigInt? @map("board_id")
+  articleId BigInt? @map("article_id")
   article Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
   commentId BigInt? @map("comment_id")
   comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)

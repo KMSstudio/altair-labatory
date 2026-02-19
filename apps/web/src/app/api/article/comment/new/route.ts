@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid client ip." }, { status: 400 });
   }
   try {
-    const serializedComment = PostComment({ articleId, parentCommentId: parentId, content });
+    const serializedComment = await PostComment({ articleId, parentCommentId: parentId, content });
     return NextResponse.json({ ok: true, comment: serializedComment }, { status: 200 });
   } catch (e) {
     const message =

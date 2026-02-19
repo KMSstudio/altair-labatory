@@ -247,7 +247,7 @@ CREATE TABLE "comments" (
 CREATE TABLE "CommentHistory" (
     "id" BIGSERIAL NOT NULL,
     "comment_id" BIGINT NOT NULL,
-    "old_title" TEXT NOT NULL,
+    "old_content" TEXT NOT NULL,
     "old_author_ip" VARCHAR(45) NOT NULL,
     "editedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -281,7 +281,7 @@ CREATE TABLE "emote" (
     "id" BIGSERIAL NOT NULL,
     "kind" "EmoteKind" NOT NULL,
     "place" "EmotePlace" NOT NULL,
-    "board_id" BIGINT,
+    "article_id" BIGINT,
     "comment_id" BIGINT,
     "user_id" BIGINT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -410,10 +410,10 @@ CREATE INDEX "idx_tags_univ_id" ON "tags"("univ_id");
 CREATE INDEX "article_tags_tag_id_idx" ON "article_tags"("tag_id");
 
 -- CreateIndex
-CREATE INDEX "emote_board_id_comment_id_kind_user_id_idx" ON "emote"("board_id", "comment_id", "kind", "user_id");
+CREATE INDEX "emote_article_id_comment_id_kind_user_id_idx" ON "emote"("article_id", "comment_id", "kind", "user_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "emote_board_id_comment_id_kind_user_id_key" ON "emote"("board_id", "comment_id", "kind", "user_id");
+CREATE UNIQUE INDEX "emote_article_id_comment_id_kind_user_id_key" ON "emote"("article_id", "comment_id", "kind", "user_id");
 
 -- AddForeignKey
 ALTER TABLE "user_credentials" ADD CONSTRAINT "user_credentials_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -491,7 +491,7 @@ ALTER TABLE "article_tags" ADD CONSTRAINT "article_tags_article_id_fkey" FOREIGN
 ALTER TABLE "article_tags" ADD CONSTRAINT "article_tags_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "tags"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "emote" ADD CONSTRAINT "emote_board_id_fkey" FOREIGN KEY ("board_id") REFERENCES "articles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "emote" ADD CONSTRAINT "emote_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "emote" ADD CONSTRAINT "emote_comment_id_fkey" FOREIGN KEY ("comment_id") REFERENCES "comments"("id") ON DELETE CASCADE ON UPDATE CASCADE;

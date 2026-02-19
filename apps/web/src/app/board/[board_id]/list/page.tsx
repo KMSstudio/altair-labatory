@@ -3,10 +3,10 @@
 import { notFound } from "next/navigation";
 import {
   GetArticles,
-  GetArticlesResult,
+  GetArticles_RetType,
   GetBoard,
   GetPinnedArticles,
-  GetPinnedArticlesResult,
+  GetPinnedArticles_RetType,
 } from "../../actions";
 import ArticleList from "./ArticleList";
 import { PageExplorer } from "./PageExplorer";
@@ -39,15 +39,16 @@ export default async function Page({
   let page: number = 1;
   if (searchParams?.page) {
     try {
-      page = Number(searchParams?.page);
+      page = Number.parseInt(searchParams?.page, 10);
+      if (Number.isFinite(page) || page < 1) throw new Error();
     } catch {
       notFound();
     }
   }
   const pageSize = 10;
   const maxPage = Math.ceil(board._count.articles / pageSize);
-  let articles: GetArticlesResult;
-  let pinnedArticles: GetPinnedArticlesResult;
+  let articles: GetArticles_RetType;
+  let pinnedArticles: GetPinnedArticles_RetType;
 
   try {
     articles = await GetArticles(boardId, page, pageSize);

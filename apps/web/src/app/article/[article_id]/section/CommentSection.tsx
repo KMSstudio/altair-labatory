@@ -1,4 +1,4 @@
-import { GetEmoteCount, type CommentDisplay } from "../../actions";
+import { GetEmoteCount, type CommentDisplayType } from "../../actions";
 import { CommentUpdateSection } from "./CommentUpdateSection";
 import { EmoteSection } from "./EmoteSection";
 import { ReplySection } from "./ReplySection";
@@ -8,7 +8,7 @@ export async function CommentSection({
   depth,
   viewerId,
 }: {
-  comments: CommentDisplay[];
+  comments: CommentDisplayType[];
   depth: number;
   viewerId: bigint | null;
 }) {

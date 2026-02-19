@@ -5,8 +5,9 @@ import Script from "next/script";
 
 async function onSubmit(formData: FormData) {
   "use server";
-  const articleId = await CreateArticle(formData);
+  let articleId;
   try {
+    articleId = await CreateArticle(formData);
     if (articleId === undefined || articleId === null) {
       throw new Error("Article creation failed.");
     }

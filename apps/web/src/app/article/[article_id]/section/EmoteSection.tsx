@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { GetEmoteCount, type GetEmoteCountResult, PostEmote } from "../../actions";
+import { GetEmoteCount, type GetEmoteCount_RetType, PostEmote } from "../../actions";
 import { type EmoteKind } from "@labatory/db";
 export function EmoteSection({
   emotes,
   id,
   kind,
 }: {
-  emotes: GetEmoteCountResult;
+  emotes: GetEmoteCount_RetType;
   id: bigint;
   kind: "COMMENT" | "ARTICLE";
 }) {

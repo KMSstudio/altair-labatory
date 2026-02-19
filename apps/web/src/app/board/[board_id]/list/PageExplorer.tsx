@@ -11,11 +11,18 @@ export async function PageExplorer({
   maxPage: number;
   maxLength: number;
 }) {
-  if (currentPage > maxPage) {
-    return <></>;
+  if (maxPage < 1 || maxLength < 1) {
+    return (
+      <div>
+        <p>No page exists.</p>
+      </div>
+    );
   }
-  const start = Math.max(1, currentPage - Number(maxLength / 2));
+  let start = Math.max(1, currentPage - Number(maxLength / 2));
   const end = Math.min(maxPage, start + maxLength);
+  if (end - start < maxLength) {
+    start = Math.max(1, currentPage - maxLength);
+  }
   return (
     <div>
       {Array.from({ length: end - start + 1 }, (_, i) => start + i).map((idx) => (

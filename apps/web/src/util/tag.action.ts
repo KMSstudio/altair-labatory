@@ -131,7 +131,7 @@ export async function UpdateTag({
   text?: string;
   db?: DbClient;
 }) {
-  const tag = await prisma.tag.findUnique({
+  const tag = await db.tag.findUnique({
     where: {
       id: tagId,
     },

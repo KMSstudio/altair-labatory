@@ -67,7 +67,9 @@ export default async function Page({
               </time>
             </>
           )}
-          {sessionId === article.author?.id && <WriterSection articleId={articleId} />}
+          {sessionId === article.author?.id && (
+            <WriterSection articleId={articleId} boardId={article.boardId} />
+          )}
         </div>
       </header>
       {/*Display viewcount, the number of comments and emote of this article.*/}

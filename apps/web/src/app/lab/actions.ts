@@ -276,7 +276,7 @@ export async function updateLab(formData: FormData) {
       const nextSubjectIds = [...data.subjectIds, ...(createdSubject ? [createdSubject.id] : [])];
       await replace_lab_subject_links(labId, nextSubjectIds, tx);
       if (createdSubject) {
-        CreateTag({ kind: "SUBJECT", id: createdSubject.id, db: tx });
+        await CreateTag({ kind: "SUBJECT", id: createdSubject.id, db: tx });
       }
     });
 

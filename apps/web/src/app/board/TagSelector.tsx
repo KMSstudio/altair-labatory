@@ -9,7 +9,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: GetTagResult
   const [tagKind, setTagKind] = useState<TagKind>("LAB");
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<GetTagResult[]>(SelectedTags);
 
   function AddTag(tag: GetTagResult) {
@@ -27,14 +27,14 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: GetTagResult
     try {
       setTags(await SearchTags({ kind: tagKind, queryRaw: trimmedQuery }));
     } catch (e) {
-      setError(`Selecting tag error:${e instanceof Error ? e.message : "Unknown Error"}`);
+      setErrorMessage(`Selecting tag error:${e instanceof Error ? e.message : "Unknown Error"}`);
     }
     setLoading(false);
   }
 
   return (
     <div>
-      {error ? <p>{error}</p> : null}
+      {errorMessage ? <p>{errorMessage}</p> : null}
       <div>
         <strong>Selected Tags</strong>
         <TagList tags={selectedTags} onSelect={removeTag} />

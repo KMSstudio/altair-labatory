@@ -1,10 +1,10 @@
-import { GetArticlesResult, GetPinnedArticlesResult } from "../../actions";
+import { GetArticles_RetType, GetPinnedArticles_RetType } from "../../actions";
 import Link from "next/link";
 
 async function PinnedArticleItem({
   pinnedArticle,
 }: {
-  pinnedArticle: GetPinnedArticlesResult[number];
+  pinnedArticle: GetPinnedArticles_RetType[number];
 }) {
   return (
     <li>
@@ -17,7 +17,7 @@ async function PinnedArticleItem({
   );
 }
 
-async function ArticleItem({ article }: { article: GetArticlesResult[number] }) {
+async function ArticleItem({ article }: { article: GetArticles_RetType[number] }) {
   return (
     <li>
       <div>
@@ -41,8 +41,8 @@ export default async function ArticleList({
   articles,
   pinnedArticles,
 }: {
-  articles: GetArticlesResult | null;
-  pinnedArticles: GetPinnedArticlesResult | null;
+  articles: GetArticles_RetType | null;
+  pinnedArticles: GetPinnedArticles_RetType | null;
 }) {
   return (
     <section>

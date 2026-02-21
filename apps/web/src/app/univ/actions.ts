@@ -83,6 +83,7 @@ export async function updateUniversity(formData: FormData) {
       where: { id },
       data,
       select: {
+        id: true,
         tag: {
           select: {
             id: true,
@@ -90,7 +91,11 @@ export async function updateUniversity(formData: FormData) {
         },
       },
     });
-    if (univ.tag) await UpdateTag({ tagId: univ.tag.id, db: tx });
+    if (univ.tag) {
+      await UpdateTag({ tagId: univ.tag.id, db: tx });
+    } else {
+      await CreateTag({ kind: "UNIV", id: univ.id, db: tx });
+    }
   });
   const target = `/univ/${idValue}`;
   revalidatePath("/univ");

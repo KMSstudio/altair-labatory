@@ -23,14 +23,14 @@ export async function POST(request: Request) {
   try {
     articleId = BigInt(body.articleIdRaw);
   } catch {
-    return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
+    return NextResponse.json({ error: "Invalid article id." }, { status: 400 });
   }
   let parentId: bigint | null = null;
   if (body.parentIdRaw) {
     try {
       parentId = BigInt(body.parentIdRaw);
     } catch {
-      return NextResponse.json({ error: "Invalid parent commemnt id." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid parent comment id." }, { status: 400 });
     }
   }
   const content = body.content;

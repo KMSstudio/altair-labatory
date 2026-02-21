@@ -99,7 +99,7 @@ export default async function Page({
         {article.tags && (
           <ol>
             {article.tags.map((articleTag) => (
-              <p key={articleTag.tagId}>{articleTag.tag.text ?? articleTag.tag.id}</p>
+              <p key={articleTag.tagId}>{articleTag.tag.text ?? articleTag.tag.id.toString()}</p>
             ))}
           </ol>
         )}

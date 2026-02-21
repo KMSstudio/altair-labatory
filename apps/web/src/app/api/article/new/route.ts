@@ -53,6 +53,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
   }
 
+  const board = await prisma.board.findUnique({
+    where: {
+      id: boardId,
+    },
+    select: {
+      isActive: true,
+    },
+  });
+  if (!board) {
+    return NextResponse.json({ error: "Board does not exists." }, { status: 400 });
+  }
+  if (!board.isActive) {
+    return NextResponse.json({ error: "Board is inactive." }, { status: 400 });
+  }
   let tagIds: bigint[];
   try {
     tagIds = tagIdsRaw.map((tagId) => BigInt(tagId));
@@ -96,7 +110,7 @@ export async function POST(request: Request) {
     }
 
     if (e.code === "P2003") {
-      return NextResponse.json({ error: "Invalid tag exists." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid reference." }, { status: 400 });
     } else if (e.code === "P2002") {
       return NextResponse.json({ error: "Duplicate tags exist." }, { status: 400 });
     } else {

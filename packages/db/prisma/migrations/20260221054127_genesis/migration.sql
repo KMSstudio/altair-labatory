@@ -272,6 +272,7 @@ CREATE TABLE "article_tags" (
     "article_id" BIGINT NOT NULL,
     "tag_id" BIGINT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "article_tags_pkey" PRIMARY KEY ("article_id","tag_id")
 );

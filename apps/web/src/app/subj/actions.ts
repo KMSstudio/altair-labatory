@@ -221,7 +221,11 @@ export async function updateSubject(formData: FormData) {
           subjId: updateSubj.id,
         },
       });
-      if (tag) await UpdateTag({ tagId: tag.id, db: tx });
+      if (tag) {
+        await UpdateTag({ tagId: tag.id, db: tx });
+      } else {
+        await CreateTag({ kind: "SUBJECT", id: updateSubj.id, db: tx });
+      }
     });
 
     revalidatePath("/subj/list");

@@ -3,6 +3,10 @@
 import { prisma, Prisma, type TagKind } from "@labatory/db";
 import { headers } from "next/headers";
 
+/**
+ * Extracts the client's IP address from incoming request headers.
+ * @returns {Promise<string | null>} The detected client IP address or null.
+ */
 export async function getClientIp() {
   const h = await headers();
 
@@ -73,6 +77,25 @@ async function fetchNameText(kind: TagKind, db: DbClient = prisma, id: bigint | 
 }
 
 type DbClient = Prisma.TransactionClient | typeof prisma;
+
+/**
+ * create a new tag.
+ * @param {TagKind} kind kind of tag. one of following string:
+ * - UNIV
+ * - LAB
+ * - SUBJECT
+ * - TEXT
+ * @param {bigint|null} id Id of SUBJECT/LAB/UNIVERSITY whose tag will be created. if kind is TEXT, id is null.
+ * @param {string|null} text Text of tag. Null if kind is not NULL.
+ * @param {Dbclient} db Prisma client where db function will be called. default prisma
+ * @returns newly created tag with:
+ *- id
+ *- kind
+ *- labId
+ *- subjId
+ *- univId
+ *- text
+ */
 export async function CreateTag({
   kind,
   id,
@@ -122,6 +145,19 @@ export async function CreateTag({
     select: getTagSelect,
   });
 }
+/**
+ * Update existing tag's text.
+ * @param {bigint} tagId Id of tag whose information will be changed.
+ * @param {string|null} text Text of tag. Null if kind is not NULL.
+ * @param {Dbclient} db Prisma client where db function will be called. default prisma
+ * @returns newly created tag with:
+ *- id
+ *- kind
+ *- labId
+ *- subjId
+ *- univId
+ *- text
+ */
 export async function UpdateTag({
   tagId,
   text,
@@ -166,7 +202,18 @@ export async function UpdateTag({
     select: getTagSelect,
   });
 }
-
+/**
+ * Get tag information.
+ * @param {bigint} tagId Id of tag.
+ * @param {Dbclient} db Prisma client where db function will be called. default prisma
+ * @returns newly created tag with:
+ *- id
+ *- kind
+ *- labId
+ *- subjId
+ *- univId
+ *- text
+ */
 export async function GetTag({ tagId, db = prisma }: { tagId: bigint; db?: DbClient }) {
   return db.tag.findUnique({
     where: { id: tagId },
@@ -174,6 +221,23 @@ export async function GetTag({ tagId, db = prisma }: { tagId: bigint; db?: DbCli
   });
 }
 
+/**
+ * Search a number of tags which have query as part of their text.
+ * @param {TagKind} kind Determine a field where search will be performed. one of following string:
+ * - UNIV
+ * - LAB
+ * - SUBJECT
+ * - TEXT
+ * @param {string} queryRaw User input. did not trimmed.
+ * @param {Dbclient} db Prisma client where db function will be called. default prisma.
+ * @returns List of tag met condition. return value contains:
+ *- id
+ *- kind
+ *- labId
+ *- subjId
+ *- univId
+ *- text
+ */
 export async function SearchTags({
   kind,
   queryRaw,

@@ -39,7 +39,10 @@ export async function GetBoard(id: bigint) {
  */
 export async function GetArticles(boardId: bigint, page: number = 1, pageSize: number) {
   if (page < 1) {
-    throw new Error("page must be greater than 1.");
+    throw new Error("page must be greater than 0.");
+  }
+  if (pageSize < 1) {
+    throw new Error("pageSize must be greater than 0.");
   }
 
   const skip = (page - 1) * pageSize;

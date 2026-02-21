@@ -28,8 +28,9 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: GetTagResult
       setTags(await SearchTags({ kind: tagKind, queryRaw: trimmedQuery }));
     } catch (e) {
       setErrorMessage(`Selecting tag error:${e instanceof Error ? e.message : "Unknown Error"}`);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

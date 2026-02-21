@@ -162,9 +162,9 @@ export async function createLab(formData: FormData) {
   const pi =
     role === "PI"
       ? await prisma.pI.findUnique({
-          where: { userId: sessionUserId },
-          select: { id: true, labId: true },
-        })
+        where: { userId: sessionUserId },
+        select: { id: true, labId: true },
+      })
       : null;
 
   if (role === "PI") {
@@ -269,7 +269,12 @@ export async function updateLab(formData: FormData) {
         where: { labId: updatedLab.id },
         select: { id: true },
       });
-      if (tag) await UpdateTag({ tagId: tag.id, db: tx });
+      if (tag) {
+        await UpdateTag({ tagId: tag.id, db: tx });
+      }
+      else {
+        await CreateTag({ kind: "LAB", id: updatedLab.id, db: tx });
+      }
       const createdSubject = data.newSubject
         ? await create_subject_for_lab(data.newSubject, tx)
         : null;

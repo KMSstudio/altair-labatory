@@ -471,6 +471,7 @@ model ArticleTag {
   tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
 
   @@id([articleId, tagId])
   @@index([tagId])

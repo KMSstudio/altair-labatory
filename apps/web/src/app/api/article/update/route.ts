@@ -121,7 +121,16 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Internal server error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
+      return NextResponse.json({ error: "Internal server error." }, { status: 500 });
+    }
+
+    if (e.code === "P2003") {
+      return NextResponse.json({ error: "Invalid reference." }, { status: 400 });
+    } else if (e.code === "P2002") {
+      return NextResponse.json({ error: "Duplicate tags exist." }, { status: 400 });
+    } else {
+      return NextResponse.json({ error: "Internal database error." }, { status: 500 });
+    }
   }
 }

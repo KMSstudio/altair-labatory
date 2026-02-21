@@ -30,7 +30,7 @@ const nameToText = (nameKo: string, nameEn: string | null) => {
   return `${nameKo}(${nameEn ?? ""})`;
 };
 async function fetchNameText(kind: TagKind, db: DbClient = prisma, id: bigint | null) {
-  if (!id) throw Error("Invaild tag.");
+  if (!id) throw Error("Invalid tag.");
   if (kind === "TEXT") {
     return "";
   }
@@ -95,6 +95,7 @@ type DbClient = Prisma.TransactionClient | typeof prisma;
  *- subjId
  *- univId
  *- text
+ * @throws If id is null while kind is not TEXT, or text is null whlie kind is TEXT. Throw If connected value is not valid.
  */
 export async function CreateTag({
   kind,
@@ -157,6 +158,7 @@ export async function CreateTag({
  *- subjId
  *- univId
  *- text
+ * @throws If id is null while kind is not TEXT, or text is null whlie kind is TEXT. Throw If connected value is not valid.
  */
 export async function UpdateTag({
   tagId,

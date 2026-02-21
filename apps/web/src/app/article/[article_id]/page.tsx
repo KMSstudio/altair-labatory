@@ -1,5 +1,3 @@
-"use server";
-
 import { notFound } from "next/navigation";
 import { GetArticle, GetComments, LinkComments, GetEmoteCount } from "../actions";
 import Link from "next/link";
@@ -99,14 +97,14 @@ export default async function Page({
         {article.tags && (
           <ol>
             {article.tags.map((articleTag) => (
-              <p key={articleTag.tagId}>{articleTag.tag.text ?? articleTag.tag.id.toString()}</p>
+              <li key={articleTag.tagId}>{articleTag.tag.text ?? articleTag.tag.id.toString()}</li>
             ))}
           </ol>
         )}
       </section>
       {/*Display comments of this article.*/}
       <section>
-        <h2>Coment {article._count.comments ?? 0}</h2>
+        <h2>Comment {article._count.comments ?? 0}</h2>
 
         {(article._count.comments ?? 0) !== 0 ? (
           <CommentSection comments={comments} depth={0} viewerId={sessionId} />

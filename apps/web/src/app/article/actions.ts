@@ -75,7 +75,7 @@ export type GetArticle_RetType = NonNullable<Awaited<ReturnType<typeof GetArticl
  * - articleId: article id.
  * - tagIds: updated repeated tag id values
  *
- * @throws if article id is invaild, or content and title is empty, or user did not logged in, user is not the writer of this article, or cannot detect client ip.
+ * @throws if article id is invalid, or content and title is empty, or user did not logged in, user is not the writer of this article, or cannot detect client ip.
  */
 export async function UpdateArticle({ formData }: { formData: FormData }) {
   const newContent = formData.get("content")?.toString() ?? "";
@@ -88,7 +88,7 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
   try {
     articleId = BigInt(articleIdRaw);
   } catch {
-    throw Error("Invaild article Id");
+    throw Error("Invalid article Id");
   }
   if (!newContent) {
     throw Error("content is required.");
@@ -106,14 +106,14 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
   }
 
   if (!session.user) {
-    throw Error("Invaild session.");
+    throw Error("Invalid session.");
   }
 
   let sessionId: bigint;
   try {
     sessionId = BigInt(session.user.id);
   } catch {
-    throw Error("Invaild user id.");
+    throw Error("Invalid user id.");
   }
 
   const article = await prisma.article.findUnique({
@@ -141,7 +141,7 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
     try {
       return BigInt(tagId);
     } catch {
-      throw Error("Invaild Tag id.");
+      throw Error("Invalid Tag id.");
     }
   });
   try {
@@ -193,7 +193,7 @@ export async function UpdateArticle({ formData }: { formData: FormData }) {
  * @param {number} page  The page number to retrieve. default is 1.
  * @param {number} pageSize  The number of articles in one page.
  *
- * @throws if article id is invaild, or user did not logged in, user is not the writer of this article, or cannot detect client ip.
+ * @throws if article id is invalid, or user did not logged in, user is not the writer of this article, or cannot detect client ip.
  */
 export async function DeleteArticle({ articleId }: { articleId: bigint }) {
   const session = await getServerSession(authOptions);
@@ -202,14 +202,14 @@ export async function DeleteArticle({ articleId }: { articleId: bigint }) {
   }
 
   if (!session.user) {
-    throw Error("Invaild session.");
+    throw Error("Invalid session.");
   }
 
   let sessionId: bigint;
   try {
     sessionId = BigInt(session.user.id);
   } catch {
-    throw Error("Invaild user id.");
+    throw Error("Invalid user id.");
   }
 
   const article = await prisma.article.findUnique({
@@ -382,13 +382,13 @@ export async function UpdateComment({
   }
 
   if (!session.user) {
-    throw Error("Invaild session.");
+    throw Error("Invalid session.");
   }
   let sessionId: bigint;
   try {
     sessionId = BigInt(session.user.id);
   } catch {
-    throw Error("Invaild user id.");
+    throw Error("Invalid user id.");
   }
   const clientIp = await getClientIp();
   if (!clientIp) {
@@ -445,13 +445,13 @@ export async function DeleteComment({ commentId }: { commentId: bigint }) {
   }
 
   if (!session.user) {
-    throw Error("Invaild session.");
+    throw Error("Invalid session.");
   }
   let sessionId: bigint;
   try {
     sessionId = BigInt(session.user.id);
   } catch {
-    throw Error("Invaild user id.");
+    throw Error("Invalid user id.");
   }
   const comment = await prisma.comment.findUnique({
     where: {
@@ -523,13 +523,13 @@ export async function PostEmote({
   }
 
   if (!session.user) {
-    throw Error("Invaild session.");
+    throw Error("Invalid session.");
   }
   let sessionId: bigint;
   try {
     sessionId = BigInt(session.user.id);
   } catch {
-    throw Error("Invaild user id.");
+    throw Error("Invalid user id.");
   }
 
   let articleId: bigint | null = null;

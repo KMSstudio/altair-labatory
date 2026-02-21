@@ -114,7 +114,7 @@ export type GetPinnedArticles_RetType = NonNullable<Awaited<ReturnType<typeof Ge
  * - tagIds: repeated tag id values
  *
  * @return Id of new article.
- * @throws If user did not logged in or cannot find client Ip, or either title, content, or tag is invaild
+ * @throws If user did not logged in or cannot find client Ip, or either title, content, or tag is invalid
  */
 export async function CreateArticle(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -128,7 +128,7 @@ export async function CreateArticle(formData: FormData) {
   try {
     authorId = BigInt(session.user.id);
   } catch {
-    throw Error("Invaild user id.");
+    throw Error("Invalid user id.");
   }
 
   const clientIp = await getClientIp();
@@ -140,7 +140,7 @@ export async function CreateArticle(formData: FormData) {
   try {
     boardId = BigInt(rawBoardId);
   } catch {
-    throw Error("Invaild board id.");
+    throw Error("Invalid board id.");
   }
 
   const title = formData.get("title")?.toString() ?? "";
@@ -153,7 +153,7 @@ export async function CreateArticle(formData: FormData) {
     try {
       return BigInt(tagId);
     } catch {
-      throw Error("Invaild Tag id.");
+      throw Error("Invalid Tag id.");
     }
   });
   try {

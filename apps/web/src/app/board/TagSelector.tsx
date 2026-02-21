@@ -78,7 +78,6 @@ function TagList({
   tags: GetTagResult[];
   onSelect: (tag: GetTagResult) => void;
 }) {
-  if (!tags) return <p>Please input Tag name</p>;
   if (tags.length === 0) return <p>No search result.</p>;
   return (
     <ul>

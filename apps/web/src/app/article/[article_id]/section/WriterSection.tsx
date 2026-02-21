@@ -1,5 +1,3 @@
-"use server";
-
 import Link from "next/link";
 import { DeleteArticle } from "../../actions";
 import { redirect } from "next/navigation";

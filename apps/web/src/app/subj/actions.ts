@@ -14,6 +14,8 @@ import {
   find_lab_subject_links_by_subject,
   find_subject_first_by_name,
 } from "@/util/subj.action";
+import { prisma } from "@labatory/db";
+import { CreateTag, UpdateTag } from "@/util/tag.action";
 
 /**
  * Normalizes a text field from FormData.
@@ -156,7 +158,11 @@ export async function createSubject(formData: FormData) {
   }
 
   try {
-    const created = await create_subject({ ...data, isActive: true });
+    const created = await prisma.$transaction(async (tx) => {
+      const created = await create_subject({ ...data, isActive: true }, tx);
+      await CreateTag({ kind: "SUBJECT", id: created.id, db: tx });
+      return created;
+    });
     revalidatePath("/subj/list");
     redirect(`/subj/${created.id.toString()}`);
   } catch (e) {
@@ -208,7 +214,19 @@ export async function updateSubject(formData: FormData) {
   }
 
   try {
-    await update_subject(id, data);
+    await prisma.$transaction(async (tx) => {
+      const updateSubj = await update_subject(id, data);
+      const tag = await tx.tag.findUnique({
+        where: {
+          subjId: updateSubj.id,
+        },
+      });
+      if (tag) {
+        await UpdateTag({ tagId: tag.id, db: tx });
+      } else {
+        await CreateTag({ kind: "SUBJECT", id: updateSubj.id, db: tx });
+      }
+    });
 
     revalidatePath("/subj/list");
     revalidatePath(target);

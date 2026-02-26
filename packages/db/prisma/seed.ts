@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   PIApplicationStatus,
   PrismaClient,
+  TagKind,
   UserRole,
   Visibility,
 } from "@prisma/client";
@@ -19,6 +20,7 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   await prisma.$transaction([
+    prisma.tag.deleteMany(),
     prisma.labReviewReport.deleteMany(),
     prisma.labReview.deleteMany(),
     prisma.labSubject.deleteMany(),
@@ -29,6 +31,10 @@ async function main() {
     prisma.subject.deleteMany(),
     prisma.university.deleteMany(),
     prisma.user.deleteMany(),
+    prisma.comment.deleteMany(),
+    prisma.article.deleteMany(),
+    prisma.boardAcl.deleteMany(),
+    prisma.board.deleteMany(),
   ]);
 
   const admin = await prisma.user.create({
@@ -164,6 +170,18 @@ async function main() {
     ],
   });
 
+  await prisma.tag.createMany({
+    data: [
+      { kind: TagKind.LAB, labId: labAi.id, text: `${labAi.nameKo}(${labAi.nameEn})` },
+      { kind: TagKind.LAB, labId: labBio.id, text: `${labBio.nameKo}(${labBio.nameEn})` },
+      { kind: TagKind.LAB, labId: labRobotics.id, text: `${labRobotics.nameKo}(${labRobotics.nameEn})` },
+      { kind: TagKind.SUBJECT, subjId: subjectAi.id, text: `${subjectAi.nameKo}(${subjectAi.nameEn})` },
+      { kind: TagKind.SUBJECT, subjId: subjectBio.id, text: `${subjectBio.nameKo}(${subjectBio.nameEn})` },
+      { kind: TagKind.SUBJECT, subjId: subjectRobotics.id, text: `${subjectRobotics.nameKo}(${subjectRobotics.nameEn})` },
+      { kind: TagKind.UNIV, univId: seoulUni.id, text: `${seoulUni.nameKo}(${seoulUni.nameEn})` },
+      { kind: TagKind.UNIV, univId: kaist.id, text: `${kaist.nameKo}(${kaist.nameEn})` },
+    ]
+  })
   await prisma.pI.create({
     data: {
       name: "Jihoon Park",
@@ -218,6 +236,42 @@ async function main() {
     },
   });
 
+  const freeBoard = await prisma.board.create({
+    data: {
+      nameKo: "자유게시판",
+      nameEn: "General discussion",
+      description: "A board for any theme and subject.",
+      sortOrder: 1,
+    }
+  })
+
+  const bestBoard = await prisma.board.create({
+    data: {
+      nameKo: "베스트게시판",
+      nameEn: "Top articles",
+      description: "A board featuring the most popular and highly rated posts.",
+      sortOrder: 2,
+    }
+  })
+
+  const freeArticle1 = await prisma.article.create({
+    data: {
+      boardId: freeBoard.id,
+      title: "First Example title",
+      content: "first Example content.",
+      authorId: student.id,
+      authorIp: "172.0.0.1",
+    }
+  })
+  const freeArticle2 = await prisma.article.create({
+    data: {
+      boardId: freeBoard.id,
+      title: "Second Example title",
+      content: "Second example content.",
+      authorId: piUser.id,
+      authorIp: "172.0.0.2",
+    }
+  })
   await prisma.labReviewReport.create({
     data: {
       reviewId: reviewAi.id,
@@ -234,6 +288,8 @@ async function main() {
     subjects: [subjectAi.id, subjectBio.id, subjectRobotics.id],
     piApplicationId: piApplication.id,
     reviewId: reviewAi.id,
+    boardId: [freeBoard.id, bestBoard.id],
+    articleId: [freeArticle1.id, freeArticle2.id],
   });
 }
 

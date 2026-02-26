@@ -50,13 +50,17 @@ model User {
 
   credentials UserCredential[]
   piApplications PIApplication[]
+  articles Article[]
+  comments Comment[]
+  articleEmote Emote[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
   reviews        LabReview[]
   reviewReports  LabReviewReport[]
-
+  
+  updatedBoard    Board[]
   @@map("users")
 }
 
@@ -93,6 +97,8 @@ model University {
   websiteUrl String? @db.VarChar(1024) @map("website_url")
 
   labs Lab[]
+
+  tag Tag?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -171,6 +177,8 @@ model Lab {
   subjects LabSubject[]
   reviews  LabReview[]
 
+  tag Tag?
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
@@ -191,6 +199,8 @@ model Subject {
   isActive    Boolean @default(true) @map("is_active")
 
   labs LabSubject[]
+
+  tag Tag?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -287,4 +297,220 @@ model VerificationToken {
 
   @@map("verification_token")
   @@index(tokenHash)
+}
+
+// =========================
+// BOARD / BOARD ACL / BOARD ARTICLE / COMMENT
+// =========================
+
+model Board {
+  id          BigInt @id @default(autoincrement())
+
+  nameKo        String  @db.VarChar(80) @map("name_ko")
+  nameEn        String  @db.VarChar(80) @map("name_en")
+  description   String? @db.VarChar(500)
+
+  isActive    Boolean @default(true) @map("is_active") // Switch to turn off board when maintenance is needed
+  sortOrder   Int     @default(0)    @map("sort_order")
+
+  articles    Article[]
+  aclRules    BoardAcl[]
+
+  updatedById BigInt? @map("updated_by")
+  updatedBy   User?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
+
+  @@index([sortOrder], map: "idx_boards_sort_order")
+  @@map("bulletin_board_systems")
+}
+
+model BoardAcl {
+  id      BigInt @id @default(autoincrement())
+
+  boardId BigInt @map("board_id")
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  action  String
+  role    UserRole?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  // Prevent duplicated (action, role) Acl in same board
+  @@unique([boardId, action, role], map: "uq_board_acls_board_id_action_role")
+  @@index([boardId, action], map: "idx_board_acls_board_id_action")
+  @@map("board_acls")
+}
+
+model Article {
+  id        BigInt @id @default(autoincrement())
+
+  boardId   BigInt @map("board_id")
+  board     Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  title     String @db.VarChar(200)
+  content   String
+  articleHistory ArticleHistory[]
+  viewCount Int    @default(0) @map("view_count")
+
+  tags      ArticleTag[]
+
+  authorId  BigInt? @map("author_id")
+  author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorIp  String  @db.VarChar(45) @map("author_ip") // To take account of IPv4/IPv6 (max 45)
+
+  emotes Emote[]
+
+  comments  Comment[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  deletedAt DateTime? @map("deleted_at")
+  isPinned  Boolean   @default(false) @map("is_pinned")
+  isHidden  Boolean   @default(false) @map("is_hidden")
+
+  @@index([createdAt], map: "idx_articles_created_at")
+  @@map("articles")
+}
+
+model ArticleHistory {
+  id BigInt @id @default(autoincrement())
+  articleId BigInt @map("article_id")
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  oldTitle    String @map("old_title")
+  oldContent  String @map("old_content")
+  oldAuthorIp String @db.VarChar(45) @map("old_author_ip")
+  editedAt DateTime @default(now())
+}
+
+model Comment {
+  id        BigInt @id @default(autoincrement())
+
+  articleId BigInt  @map("article_id")
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  authorId  BigInt? @map("author_id")
+  author    User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorIp  String  @db.VarChar(45) @map("author_ip")
+
+  content   String
+  commentHistory CommentHistory[]
+
+  emotes Emote[]
+
+  //If parent is null, Consider comment as comment on the article.
+  parentId  BigInt?   @map("parent_id") 
+  parent    Comment?  @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Comment[] @relation("CommentThread")
+
+  deletedAt DateTime? @map("deleted_at")
+  isHidden  Boolean   @default(false) @map("is_hidden")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@index([articleId, createdAt], map: "idx_comments_article_id_created_at")
+  @@index([authorId, createdAt], map: "idx_comments_author_id_created_at")
+  @@index([parentId, createdAt], map: "idx_comments_parent_id_created_at")
+  @@index([deletedAt], map: "idx_comments_deleted_at")
+  @@map("comments")
+}
+
+model CommentHistory {
+  id BigInt @id @default(autoincrement())
+  commentId BigInt @map("comment_id")
+  comment Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  oldContent String   @map("old_content")
+  oldAuthorIp String @db.VarChar(45) @map("old_author_ip")
+  editedAt   DateTime @default(now())
+}
+// =========================
+// ARTICLE TAG /  ARTICLE_TAGS
+// =========================
+
+enum TagKind {
+  LAB
+  SUBJECT
+  UNIV
+  TEXT
+}
+
+model Tag {
+  id   BigInt  @id @default(autoincrement())
+  kind TagKind
+
+  // nominate option (Choose only one of the four options.)
+  labId  BigInt? @unique @map("lab_id")
+  subjId BigInt? @unique @map("subj_id")
+  univId BigInt? @unique @map("univ_id")
+  text  String?
+
+  lab   Lab?        @relation(fields: [labId], references: [id], onDelete: Cascade)
+  subj  Subject?    @relation(fields: [subjId], references: [id], onDelete: Cascade)
+  univ  University? @relation(fields: [univId], references: [id], onDelete: Cascade)
+
+  articles ArticleTag[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([kind], map: "idx_tags_kind")
+  @@index([labId], map: "idx_tags_lab_id")
+  @@index([subjId], map: "idx_tags_subj_id")
+  @@index([univId], map: "idx_tags_univ_id")
+  @@map("tags")
+}
+
+model ArticleTag {
+  articleId BigInt    @map("article_id")
+  article   Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  tagId  BigInt @map("tag_id")
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+  @@map("article_tags")
+}
+
+
+// =========================
+// EMOTE
+// =========================
+
+enum EmoteKind {
+  CHEER
+  EMPATHY
+  LIKE
+  QUESTION
+  BAD
+}
+
+enum EmotePlace {
+  ARTICLE
+  COMMENT
+}
+
+model Emote {
+  id BigInt @id @default(autoincrement())
+  kind EmoteKind
+  place EmotePlace
+
+  articleId BigInt? @map("article_id")
+  article Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  commentId BigInt? @map("comment_id")
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  userId BigInt @map("user_id")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([articleId, commentId, kind, userId])
+  @@index([articleId, commentId, kind, userId])
+  @@map("emote")
 }

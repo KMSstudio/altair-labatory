@@ -1,5 +1,6 @@
 "use server";
 
+import { CreateTag, UpdateTag } from "@/util/tag.action";
 import { prisma } from "@labatory/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -57,7 +58,11 @@ const parseUnivInput = (formData: FormData): UnivInput => ({
  */
 export async function createUniversity(formData: FormData) {
   const data = parseUnivInput(formData);
-  const created = await prisma.university.create({ data });
+  const created = await prisma.$transaction(async (tx) => {
+    const created = await tx.university.create({ data });
+    await CreateTag({ kind: "UNIV", id: created.id, db: tx });
+    return created;
+  });
   revalidatePath("/univ");
   redirect(`/univ/${created.id.toString()}`);
 }
@@ -73,9 +78,24 @@ export async function updateUniversity(formData: FormData) {
   }
   const id = BigInt(idValue);
   const data = parseUnivInput(formData);
-  await prisma.university.update({
-    where: { id },
-    data,
+  await prisma.$transaction(async (tx) => {
+    const univ = await tx.university.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        tag: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (univ.tag) {
+      await UpdateTag({ tagId: univ.tag.id, db: tx });
+    } else {
+      await CreateTag({ kind: "UNIV", id: univ.id, db: tx });
+    }
   });
   const target = `/univ/${idValue}`;
   revalidatePath("/univ");

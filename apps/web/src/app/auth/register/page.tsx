@@ -61,7 +61,7 @@ export default function RegisterPage() {
       </form>
       {error ? <p role="alert">{error}</p> : null}
       <p>
-        Already have an account? <a href="/login">Log in</a>
+        Already have an account? <a href="/auth/login">Log in</a>
       </p>
     </main>
   );

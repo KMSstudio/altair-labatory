@@ -2,7 +2,11 @@
 
 import { NextResponse } from "next/server";
 import { prisma, Prisma } from "@labatory/db";
-import { CreateArticleCore } from "@/util/actions/article.action";
+
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+import { CreateArticleCore } from "@/repository/actions/article.action";
 import { buildCreateArticleCtx } from "@/app/api/_util/createArticleCtx";
 
 type Body = {
@@ -42,24 +46,32 @@ export async function POST(request: Request) {
   try { body = (await request.json()) as Body; }
   catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
 
+  const session = await getServerSession(authOptions);
+  if (!session?.user) throw Error("User must be logged in.");
+  if (!session.user.id) throw Error("Invalid session.");
+
   const rawBoardId = body.boardId?.toString().trim() ?? "";
   const title = body.title?.toString() ?? "";
   const content = body.content?.toString() ?? "";
   const tagIdsRaw = Array.isArray(body.tagIdsRaw) ? body.tagIdsRaw : [];
 
+  let boardId: bigint;
   if (!rawBoardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
   if (!title || !content) return NextResponse.json({ error: "Title and content are required." }, { status: 400 });
+  try { boardId = BigInt(rawBoardId.trim()); }
+  catch { throw Error("Invalid board id."); }
 
   let ctx;
-  try { ctx = await buildCreateArticleCtx(rawBoardId); }
+  try { ctx = await buildCreateArticleCtx(session); }
   catch (e) {
     const msg = e instanceof Error ? e.message : "Internal server error.";
     const status = msg === "User must be logged in." ? 401 : 400;
     return NextResponse.json({ error: msg }, { status });
   }
 
+  // Load minimal board info for existence check
   const board = await prisma.board.findUnique({
-    where: { id: ctx.boardId },
+    where: { id: boardId },
     select: { isActive: true },
   });
   if (!board) return NextResponse.json({ error: "Board does not exists." }, { status: 400 });
@@ -71,7 +83,7 @@ export async function POST(request: Request) {
 
   try {
     const articleId = await CreateArticleCore(
-      ctx,
+      ctx, boardId,
       { title, content, tagIds },
     );
 

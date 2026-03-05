@@ -2,7 +2,6 @@
 
 export type Article_Ctx = {
   authorId: bigint;
-  boardId: bigint;
   authorIp: string;
 };
 

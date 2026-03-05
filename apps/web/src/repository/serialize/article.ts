@@ -1,7 +1,7 @@
 // @/util/serialize/article.ts
 
-import type { ArticleDTO, ArticleDbShape } from "@/lib/dto/article";
-import type { ArticleTagDbShape, ArticleTagDTO } from "@/lib/dto/article-tag";
+import type { ArticleDTO, ArticleDbShape } from "@/repository/dto/article";
+import type { ArticleTagDbShape, ArticleTagDTO } from "@/repository/dto/article";
 
 export function serializeArticleTag(articleTag: ArticleTagDbShape): ArticleTagDTO {
   return {

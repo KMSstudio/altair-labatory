@@ -5,7 +5,7 @@ import { useState } from "react";
 import { TagSelector } from "../../TagSelector";
 
 type ApiBody = {
-  boardIdRaw: string;
+  boardId: string;
   title: string;
   content: string;
   tagIdsRaw?: string[];

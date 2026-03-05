@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { mergeSubjects, parseMergeInputFromJson } from "@/util/actions/subj.action";
+import { mergeSubjects, parseMergeInputFromJson } from "@/repository/actions/subj.action";
 
 /**
  * POST /api/subj/merge

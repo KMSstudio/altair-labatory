@@ -1,10 +1,9 @@
 // @/src/app/api/_util/createArticleCtx.ts
 
 import "server-only";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/util/util";
 import type { Article_Ctx } from "@/types/article";
+import type { Session } from "next-auth";
 
 /**
  * Build author context for article creation.
@@ -24,11 +23,7 @@ import type { Article_Ctx } from "@/types/article";
  * - session user id is missing or invalid
  * - client IP cannot be extracted
  */
-export async function buildCreateArticleCtx(boardIdRaw: string): Promise<Article_Ctx> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) throw Error("User must be logged in.");
-  if (!session.user.id) throw Error("Invalid session.");
-
+export async function buildCreateArticleCtx(session: Session): Promise<Article_Ctx> {
   let authorId: bigint;
   try { authorId = BigInt(session.user.id); }
   catch { throw Error("Invalid user id."); }
@@ -36,9 +31,5 @@ export async function buildCreateArticleCtx(boardIdRaw: string): Promise<Article
   const clientIp = await getClientIp();
   if (!clientIp) throw Error("Invalid client ip.");
 
-  let boardId: bigint;
-  try { boardId = BigInt(boardIdRaw.trim()); }
-  catch { throw Error("Invalid board id."); }
-
-  return { authorId, boardId, authorIp: clientIp };
+  return { authorId, authorIp: clientIp };
 }

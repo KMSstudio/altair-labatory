@@ -1,46 +1,78 @@
-import { redirect } from "next/navigation";
-import { UpdateArticle, type GetArticle_RetType } from "../../actions";
-import { TagSelector } from "@/app/board/TagSelector";
-import Script from "next/script";
+// @/src/app/article/[article_id]/update/ArticleUpdateForm.tsx
 
-async function OnSubmit(formData: FormData) {
-  "use server";
-  let id: string;
-  try {
-    await UpdateArticle({ formData });
-    id = formData.get("articleId") as string;
-  } catch (e) {
-    redirect(
-      `?error=${encodeURIComponent(`Updating article error: ${e instanceof Error ? e.message : "Unknown error."}`)}`,
-    );
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { TagSelector } from "@/app/board/TagSelector";
+import type { ArticleDTO, ArticleTagDTO } from "@/repository/dto/article";
+
+type ApiOk = { ok: true; articleId: string };
+type ApiErr = { error: string };
+
+export function ArticleUpdateForm({ article }: { article: ArticleDTO }) {
+  const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
+
+  const selectedTags: ArticleTagDTO[] = article.tags ?? [];
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+
+    const fd = new FormData(e.currentTarget);
+
+    const articleId = (fd.get("articleId")?.toString() ?? "").trim();
+    const title = (fd.get("title")?.toString() ?? "").trim();
+    const content = (fd.get("content")?.toString() ?? "").trim();
+    const tagIdsRaw = fd.getAll("tagIds").map((v) => v.toString());
+
+    const body = { articleId, title, content, tagIdsRaw };
+
+    let res: Response;
+    try {
+      res = await fetch("/api/article/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch {
+      setSubmitting(false);
+      router.replace(`?error=${encodeURIComponent("Network error.")}`);
+      return;
+    }
+
+    const data = (await res.json().catch(() => ({}))) as Partial<ApiOk & ApiErr>;
+
+    if (!res.ok || !data.ok || !data.articleId) {
+      setSubmitting(false);
+      router.replace(`?error=${encodeURIComponent(data.error ?? "Unknown error.")}`);
+      return;
+    }
+
+    router.push(`/article/${data.articleId}`);
   }
 
-  redirect(`/article/${id}`);
-}
-
-export function ArticleUpdateForm({ article }: { article: GetArticle_RetType }) {
-  const selectedTags = article.tags.map((articleTag) => {
-    return articleTag.tag;
-  });
-
   return (
-    <form action={OnSubmit} id="target-form">
+    <form onSubmit={onSubmit} id="target-form">
       <input type="hidden" name="articleId" value={article.id.toString()} />
+
       <div>
         <label htmlFor="title">title</label>
         <input id="title" name="title" type="text" required defaultValue={article.title} />
       </div>
+
       <div>
         <label htmlFor="content">content</label>
         <textarea id="content" name="content" required defaultValue={article.content} />
       </div>
-      <TagSelector SelectedTags={selectedTags} />
-      <button id="submit-btn" type="submit">
-        submit
-      </button>
 
-      {/*Make button freeze during form submission */}
-      <Script src="/js/disable-on-submit.js" strategy="afterInteractive" />
+      <TagSelector SelectedTags={selectedTags} />
+
+      <button id="submit-btn" type="submit" disabled={submitting}>
+        {submitting ? "submitting..." : "submit"}
+      </button>
     </form>
   );
 }

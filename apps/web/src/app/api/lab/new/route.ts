@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
-import { SerializeLab } from "@/util/serialize/SerializeLab";
+import { SerializeLab } from "@/repository/serialize/SerializeLab";
 
 import {
   isKnownRequestError,
@@ -11,7 +11,7 @@ import {
   with_transaction,
   create_lab,
   create_subject_for_lab,
-} from "@/util/actions/lab.action";
+} from "@/repository/actions/lab.action";
 
 /**
  * POST /api/lab/new

@@ -2,7 +2,7 @@
 
 import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/util/util";
-import { SerializeComment } from "@/util/serialize/SerializeComment";
+import { SerializeComment } from "@/repository/serialize/SerializeComment";
 import { type EmoteKind, type EmotePlace, Prisma, prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 

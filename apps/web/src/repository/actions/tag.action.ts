@@ -3,7 +3,7 @@
 "use server";
 
 import { prisma, Prisma, type TagKind } from "@labatory/db";
-import type { ArticleTagDbShape } from "@/lib/dto/article";
+import type { ArticleTagDbShape } from "@/repository/dto/article";
 import { name2Text } from "@/util/util";
 
 type DbClient = Prisma.TransactionClient | typeof prisma;

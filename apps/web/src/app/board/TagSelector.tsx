@@ -3,9 +3,9 @@
 "use client";
 
 import type { TagKind } from "@labatory/db";
-import type { ArticleTagDTO } from "@/lib/dto/article";
-import { SearchArticleTags } from "@/util/actions/tag.action";
-import { serializeArticleTag } from "@/util/serialize/article";
+import type { ArticleTagDTO } from "@/repository/dto/article";
+import { SearchArticleTags } from "@/repository/actions/tag.action";
+import { serializeArticleTag } from "@/repository/serialize/article";
 import { useState } from "react";
 
 export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDTO[] }) {

@@ -3,12 +3,12 @@
 
 import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/util/util";
-import { SerializeComment } from "@/util/serialize/SerializeComment";
+import { SerializeComment } from "@/repository/serialize/SerializeComment";
 import { Prisma, prisma, type EmoteKind, type EmotePlace } from "@labatory/db";
 import { getServerSession } from "next-auth";
 
 import type { Article_Ctx, Article_Input } from "@/types/article";
-import type { ArticleDbShape } from "@/lib/dto/article";
+import type { ArticleDbShape } from "@/repository/dto/article";
 
 const getArticleSelect = {
   id: true,
@@ -38,9 +38,14 @@ const getArticleSelect = {
 } as const;
 
 /**
- * Retrieve a specific article by id (filters hidden).
+ * Retrieve a specific visible (non-hidden) article by id.
+ *
+ * This is a DB-only function. No authentication/authorization is performed here.
+ *
+ * @param articleId - Target article id.
+ * @returns Article DB shape if found and not hidden, otherwise null.
  */
-export async function GetArticle({ articleId }: { articleId: bigint }): Promise<ArticleDbShape | null> {
+export async function GetArticleCore(articleId: bigint): Promise<ArticleDbShape | null> {
   return prisma.article.findUnique({
     where: { id: articleId, isHidden: false },
     select: getArticleSelect,
@@ -48,67 +53,64 @@ export async function GetArticle({ articleId }: { articleId: bigint }): Promise<
 }
 
 /**
- * Update article title/content/tags, and store previous version in articleHistory.
+ * Update an existing article's title/content/tags, and store the previous version in `articleHistory`.
+ *
+ * This is a **DB-only function**. Caller must ensure:
+ * - Authentication/authorization (e.g., requester is allowed to update this article)
+ * - Input validation (non-empty title/content, valid tag ids, etc.)
+ *
+ * The update runs in a single transaction:
+ * 1) Load current article state
+ * 2) Insert previous state into `articleHistory`
+ * 3) Update article fields (including `authorIp`)
+ * 4) Replace `articleTag` relations
+ *
+ * @param articleId - Target article id to update.
+ * @param ctx - Context information (authorId/boardId/authorIp).
+ * @param input - Update payload (title/content/tagIds).
+ *
+ * @throws Error
+ * If the target article does not exist.
+ *
+ * @throws Prisma.PrismaClientKnownRequestError
+ * If a database constraint violation occurs.
  */
-export async function UpdateArticle({ formData }: { formData: FormData }): Promise<void> {
-  const newContent = formData.get("content")?.toString() ?? "";
-  const newTitle = formData.get("title")?.toString() ?? "";
-  const articleIdRaw = formData.get("articleId")?.toString() ?? "";
-  if (!articleIdRaw) throw Error("Article id is required");
-
-  let articleId: bigint;
-  try { articleId = BigInt(articleIdRaw); } catch { throw Error("Invalid article Id"); }
-
-  if (!newContent) throw Error("content is required.");
-  if (!newTitle) throw Error("Title is required.");
-
-  const clientIp = await getClientIp();
-  if (!clientIp) throw Error("Cannot read client id properly.");
-
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw Error("Unauthorized.");
-
-  let sessionId: bigint;
-  try { sessionId = BigInt(session.user.id); } catch { throw Error("Invalid user id."); }
-
-  const article = await prisma.article.findUnique({
-    where: { id: articleId },
-    select: { authorId: true, title: true, content: true, authorIp: true },
-  });
-  if (!article) throw Error("Article does not Exist.");
-  if (sessionId !== article.authorId) throw Error("Unauthorized");
-
-  const tagIdsRaw = formData.getAll("tagIds") as string[];
-  const tagIds = tagIdsRaw.map((tagId) => {
-    try { return BigInt(tagId); } catch { throw Error("Invalid Tag id."); }
-  });
-
-  try {
-    await prisma.$transaction(async (tx) => {
-      await tx.articleHistory.create({
-        data: {
-          articleId,
-          oldTitle: article.title,
-          oldContent: article.content,
-          oldAuthorIp: article.authorIp,
-        },
-      });
-
-      await tx.article.update({
-        where: { id: articleId },
-        data: { title: newTitle, content: newContent, authorIp: clientIp },
-      });
-
-      await tx.articleTag.deleteMany({ where: { articleId } });
-
-      if (tagIds.length) {
-        const data: Prisma.ArticleTagCreateManyInput[] = tagIds.map((tagId) => ({ articleId, tagId }));
-        await tx.articleTag.createMany({ data });
-      }
+export async function UpdateArticleCore(articleId: bigint, ctx: Article_Ctx, input: Article_Input): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const article = await tx.article.findUnique({
+      where: { id: articleId },
+      select: { title: true, content: true, authorIp: true },
     });
-  } catch (e) {
-    throw Error(e instanceof Error ? e.message : "Internal server error.");
-  }
+    if (!article) throw Error("Article does not Exist.");
+
+    await tx.articleHistory.create({
+      data: {
+        articleId,
+        oldTitle: article.title,
+        oldContent: article.content,
+        oldAuthorIp: article.authorIp,
+      },
+    });
+
+    await tx.article.update({
+      where: { id: articleId },
+      data: {
+        title: input.title,
+        content: input.content,
+        authorIp: ctx.authorIp,
+      },
+    });
+
+    await tx.articleTag.deleteMany({ where: { articleId } });
+
+    if (input.tagIds.length) {
+      const data: Prisma.ArticleTagCreateManyInput[] = input.tagIds.map((tagId) => ({
+        articleId,
+        tagId,
+      }));
+      await tx.articleTag.createMany({ data });
+    }
+  });
 }
 
 /**
@@ -153,12 +155,12 @@ export async function DeleteArticle({ articleId }: { articleId: bigint }): Promi
  * If a database constraint violation occurs (e.g., invalid foreign key,
  * duplicate entries, etc.).
  */
-export async function CreateArticleCore(ctx: Article_Ctx, input: Article_Input) {
+export async function CreateArticleCore(ctx: Article_Ctx, boardId: bigint, input: Article_Input) {
   return prisma.$transaction(async (tx) => {
     const newArticle = await tx.article.create({
       data: {
         title: input.title,
-        boardId: ctx.boardId,
+        boardId: boardId,
         authorId: ctx.authorId,
         authorIp: ctx.authorIp,
         content: input.content,

@@ -1,7 +1,11 @@
+// @/src/app/article/[article_id]/update/page.tsx
+
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
-import { GetArticle } from "../../actions";
+
+import { GetArticleCore } from "@/repository/actions/article.action";
+import { serializeArticle } from "@/repository/serialize/article";
 import { ArticleUpdateForm } from "./ArticleUpdateForm";
 
 export default async function Page({
@@ -19,23 +23,27 @@ export default async function Page({
   } catch {
     notFound();
   }
+
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     redirect("/");
   }
-  let sessionId: bigint;
+  let userId: bigint;
   try {
-    sessionId = BigInt(session.user.id);
+    userId = BigInt(session.user.id);
   } catch {
     redirect("/");
   }
-  const article = await GetArticle({ articleId });
-  if (!article) {
+  
+  const articleRaw = await GetArticleCore( articleId );
+  if (!articleRaw) {
     notFound();
   }
-  if (!article.author || sessionId !== article.author?.id) {
+  const article = serializeArticle(articleRaw);
+  if(!article.author || userId !== BigInt(article.author?.id)){
     redirect("/");
   }
+
   return (
     <div>
       {searchParams?.error && <p>{decodeURIComponent(searchParams.error)}</p>}

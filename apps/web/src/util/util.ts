@@ -1,5 +1,7 @@
 // @/src/util/util.ts
 
+import { headers } from "next/headers";
+
 export const name2Text = (nameKo: string, nameEn: string | null) => `${nameKo}(${nameEn ?? ""})`;
 
 /**
@@ -35,3 +37,14 @@ export const normalizeText2String = (value: unknown): string => {
   const trimmed = value.trim();
   return trimmed.length ? trimmed : "";
 };
+
+
+/**
+ * Extract client IP from request headers.
+ */
+export async function getClientIp(): Promise<string | null> {
+  const h = await headers();
+  const forwardedFor = h.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0]!.trim();
+  return h.get("x-real-ip");
+}

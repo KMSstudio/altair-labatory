@@ -1,6 +1,6 @@
 import { PostComment } from "@/app/article/actions";
 import { authOptions } from "@/lib/auth";
-import { getClientIp } from "@/util/actions/tag.action";
+import { getClientIp } from "@/util/util";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 

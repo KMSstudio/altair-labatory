@@ -1,14 +1,14 @@
 // @/src/util/actions/tag.action.ts
+
 "use server";
 
 import { prisma, Prisma, type TagKind } from "@labatory/db";
-import { headers } from "next/headers";
-import type { ArticleTagDbShape } from "@/lib/dto/article-tag";
-import { name2Text } from "../util";
+import type { ArticleTagDbShape } from "@/lib/dto/article";
+import { name2Text } from "@/util/util";
 
 type DbClient = Prisma.TransactionClient | typeof prisma;
 
-const getTagSelect = {
+const TagSelect = {
   id: true,
   kind: true,
   labId: true,
@@ -16,16 +16,6 @@ const getTagSelect = {
   univId: true,
   text: true,
 } as const;
-
-/**
- * Extract client IP from request headers.
- */
-export async function getClientIp(): Promise<string | null> {
-  const h = await headers();
-  const forwardedFor = h.get("x-forwarded-for");
-  if (forwardedFor) return forwardedFor.split(",")[0]!.trim();
-  return h.get("x-real-ip");
-}
 
 /**
  * Resolve tag display text by referenced entity name.
@@ -91,7 +81,7 @@ export async function CreateTag({
     data.text = await fetchNameText(kind, db, id);
   }
 
-  return db.tag.create({ data, select: getTagSelect });
+  return db.tag.create({ data, select: TagSelect });
 }
 
 /**
@@ -110,7 +100,7 @@ export async function UpdateTag({
   text?: string;
   db?: DbClient;
 }): Promise<ArticleTagDbShape> {
-  const tag = await db.tag.findUnique({ where: { id: tagId }, select: getTagSelect });
+  const tag = await db.tag.findUnique({ where: { id: tagId }, select: TagSelect });
   if (!tag) throw Error("Invalid tag id");
 
   let nextText = "";
@@ -132,7 +122,7 @@ export async function UpdateTag({
   return db.tag.update({
     where: { id: tag.id },
     data: { text: nextText },
-    select: getTagSelect,
+    select: TagSelect,
   });
 }
 
@@ -146,13 +136,13 @@ export async function GetTag({
   tagId: bigint;
   db?: DbClient;
 }): Promise<ArticleTagDbShape | null> {
-  return db.tag.findUnique({ where: { id: tagId }, select: getTagSelect });
+  return db.tag.findUnique({ where: { id: tagId }, select: TagSelect });
 }
 
 /**
  * Search tags by kind and partial text match.
  */
-export async function SearchTags({
+export async function SearchArticleTags({
   kind,
   queryRaw,
   db = prisma,
@@ -166,11 +156,6 @@ export async function SearchTags({
 
   return db.tag.findMany({
     where: { AND: [{ text: whereQuery(query), kind }] },
-    select: getTagSelect,
+    select: TagSelect,
   });
 }
-
-export type GetTagResult = NonNullable<Awaited<ReturnType<typeof GetTag>>>;
-export type SearchTagsResult = Awaited<ReturnType<typeof SearchTags>>;
-export type CreateTagResult = Awaited<ReturnType<typeof CreateTag>>;
-export type UpdateTagResult = Awaited<ReturnType<typeof UpdateTag>>;

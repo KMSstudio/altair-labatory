@@ -1,6 +1,8 @@
-import { GetTagResult } from "../tag.action";
+// @/src/util/serialize/SerializeTag.ts
 
-export function SerializeTag(tag: GetTagResult) {
+import type { ArticleTagDbShape, ArticleTagDTO } from "@/lib/dto/article-tag";
+
+export function serializeTag(tag: ArticleTagDbShape): ArticleTagDTO {
   return {
     id: tag.id.toString(),
     kind: tag.kind,
@@ -10,5 +12,3 @@ export function SerializeTag(tag: GetTagResult) {
     text: tag.text,
   };
 }
-
-export type SerializeTagResult = NonNullable<Awaited<ReturnType<typeof SerializeTag>>>;

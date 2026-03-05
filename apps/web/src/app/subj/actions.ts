@@ -13,9 +13,9 @@ import {
   find_subject_unique,
   find_lab_subject_links_by_subject,
   find_subject_first_by_name,
-} from "@/util/subj.action";
+} from "@/util/actions/subj.action";
 import { prisma } from "@labatory/db";
-import { CreateTag, UpdateTag } from "@/util/tag.action";
+import { CreateTag, UpdateTag } from "@/util/actions/tag.action";
 
 /**
  * Normalizes a text field from FormData.

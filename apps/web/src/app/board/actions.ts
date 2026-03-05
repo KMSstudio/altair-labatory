@@ -3,7 +3,7 @@
 "use server";
 
 import { authOptions } from "@/lib/auth";
-import { getClientIp } from "@/util/tag.action";
+import { getClientIp } from "@/util/actions/tag.action";
 import { Prisma, prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 

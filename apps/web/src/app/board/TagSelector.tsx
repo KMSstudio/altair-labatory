@@ -1,6 +1,6 @@
 "use client";
 
-import { GetTagResult, SearchTags } from "@/util/tag.action";
+import { GetTagResult, SearchTags } from "@/util/actions/tag.action";
 import { type TagKind } from "@labatory/db";
 import { useState } from "react";
 

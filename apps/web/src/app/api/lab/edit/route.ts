@@ -12,7 +12,7 @@ import {
   update_lab,
   create_subject_for_lab,
   replace_lab_subject_links,
-} from "@/util/lab.action";
+} from "@/util/actions/lab.action";
 
 const requireLabEditor = async (labId: bigint, user: { id: string; role: string }) => {
   if (user.role === "ADMIN") return;

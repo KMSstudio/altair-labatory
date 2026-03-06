@@ -4,7 +4,7 @@ import {
   createSubject,
   isUniqueViolation,
   parseCreateInputFromJson,
-} from "@/repository/actions/subj.action";
+} from "@/util/subj.action";
 
 /**
  * Serializes a Subject record for JSON responses.

@@ -20,7 +20,7 @@ import {
   update_lab,
   create_subject_for_lab,
   replace_lab_subject_links,
-} from "@/repository/actions/lab.action";
+} from "@/util/lab.action";
 import { CreateTag, UpdateTag } from "@/repository/actions/tag.action";
 
 export async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "subj" }) {

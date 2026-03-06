@@ -13,24 +13,10 @@ import {
   find_subject_unique,
   find_lab_subject_links_by_subject,
   find_subject_first_by_name,
-} from "@/repository/actions/subj.action";
+} from "@/util/subj.action";
 import { prisma } from "@labatory/db";
 import { CreateTag, UpdateTag } from "@/repository/actions/tag.action";
-
-/**
- * Normalizes a text field from FormData.
- *
- * - If the value is not a string, returns `null`.
- * - If the trimmed string is empty, returns `null`.
- *
- * @param value - Raw FormData entry.
- * @returns A trimmed string or `null`.
- */
-const normalizeText = (value: FormDataEntryValue | null): string | null => {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed.length ? trimmed : null;
-};
+import { normalizeText } from "@/util/util";
 
 /**
  * Reads a required text field from FormData.

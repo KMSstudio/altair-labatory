@@ -25,11 +25,11 @@ export type ArticleTagDTO = {
 export type ArticleEmoteDbShape = { userId: bigint; kind: EmoteKind };
 export type ArticleEmoteDTO = { userId: string; kind: EmoteKind };
 
-// AUTHOR=
+// AUTHOR
 export type ArticleAuthorDbShape = { id: bigint; displayName: string } & Record<string, any>;
 export type ArticleAuthorDTO = { id: string; displayName: string } & Record<string, any>;
 
-// ARTICLE (detail)
+// ARTICLE
 export type ArticleDbShape = {
   id: bigint;
   boardId: bigint;

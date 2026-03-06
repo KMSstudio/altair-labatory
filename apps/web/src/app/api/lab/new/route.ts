@@ -11,7 +11,7 @@ import {
   with_transaction,
   create_lab,
   create_subject_for_lab,
-} from "@/repository/actions/lab.action";
+} from "@/util/lab.action";
 
 /**
  * POST /api/lab/new

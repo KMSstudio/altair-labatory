@@ -1,4 +1,4 @@
-// @/src/util/actions/tag.action.ts
+// @/util/actions/tag.action.ts
 
 "use server";
 
@@ -144,18 +144,18 @@ export async function GetTag({
  */
 export async function SearchArticleTags({
   kind,
-  queryRaw,
+  query,
   db = prisma,
 }: {
   kind: TagKind;
-  queryRaw: string;
+  query: string;
   db?: DbClient;
 }): Promise<ArticleTagDbShape[]> {
-  const query = queryRaw.trim();
+  const query_trim = query.trim();
   const whereQuery = (q: string) => ({ contains: q, mode: Prisma.QueryMode.insensitive }) as const;
 
   return db.tag.findMany({
-    where: { AND: [{ text: whereQuery(query), kind }] },
+    where: { AND: [{ text: whereQuery(query_trim), kind }] },
     select: TagSelect,
   });
 }

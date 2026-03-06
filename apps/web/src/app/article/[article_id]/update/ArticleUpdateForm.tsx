@@ -1,4 +1,4 @@
-// @/src/app/article/[article_id]/update/ArticleUpdateForm.tsx
+// @/app/article/[article_id]/update/ArticleUpdateForm.tsx
 
 "use client";
 

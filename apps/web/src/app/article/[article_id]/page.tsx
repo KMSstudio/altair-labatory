@@ -1,11 +1,14 @@
+// @/app/article/[artcle_id]/page.tsx
+
 import { notFound } from "next/navigation";
-import { GetArticle, GetComments, LinkComments, GetEmoteCount } from "../actions";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+import { GetArticle, GetComments, LinkComments, GetEmoteCount } from "../actions";
 import { CommentSection } from "./section/CommentSection";
 import { EmoteSection } from "./section/EmoteSection";
 import { CommentForm } from "./section/CommentForm";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { WriterSection } from "./section/WriterSection";
 
 export default async function Page({

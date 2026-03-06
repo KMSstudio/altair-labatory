@@ -1,4 +1,4 @@
-// @/src/util/util.ts
+// @/util/util.ts
 
 import { headers } from "next/headers";
 

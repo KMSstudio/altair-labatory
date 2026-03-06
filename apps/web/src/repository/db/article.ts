@@ -1,41 +1,13 @@
 // @/util/actions/article.action.ts
+
 "use server";
 
 import { authOptions } from "@/lib/auth";
-import { getClientIp } from "@/util/util";
-import { SerializeComment } from "@/repository/serialize/SerializeComment";
-import { Prisma, prisma, type EmoteKind, type EmotePlace } from "@labatory/db";
 import { getServerSession } from "next-auth";
+import { Prisma, prisma, type EmoteKind, type EmotePlace } from "@labatory/db";
 
 import type { Article_Ctx, Article_Input } from "@/types/article";
-import type { ArticleDbShape } from "@/repository/dto/article";
-
-const getArticleSelect = {
-  id: true,
-  boardId: true,
-  title: true,
-  content: true,
-  viewCount: true,
-  tags: {
-    include: {
-      tag: {
-        select: {
-          id: true,
-          kind: true,
-          labId: true,
-          univId: true,
-          subjId: true,
-          text: true,
-        },
-      },
-    },
-  },
-  author: true,
-  createdAt: true,
-  updatedAt: true,
-  emotes: { select: { userId: true, kind: true } },
-  _count: { select: { comments: true } },
-} as const;
+import { type ArticleDbShape, getArticleSelect } from "@/repository/dto/article";
 
 /**
  * Retrieve a specific visible (non-hidden) article by id.
@@ -180,149 +152,25 @@ export async function CreateArticleCore(ctx: Article_Ctx, boardId: bigint, input
   });
 }
 
+// export async function LinkComments(comments: GetComments_RetType | null): Promise<CommentDisplayType[]> {
+//   const roots: CommentDisplayType[] = [];
+//   const map = new Map<CommentDisplayType["id"], CommentDisplayType>();
+//   if (!comments) return roots;
 
-/**
- * Get comments for an article (ordered asc).
- */
-export async function GetComments({ articleId }: { articleId: bigint }) {
-  return prisma.comment.findMany({
-    where: { articleId },
-    select: {
-      id: true,
-      author: { select: { id: true, displayName: true } },
-      articleId: true,
-      isHidden: true,
-      parentId: true,
-      content: true,
-      emotes: { select: { userId: true, kind: true } },
-      createdAt: true,
-      updatedAt: true,
-    },
-    orderBy: { createdAt: "asc" },
-  });
-}
+//   for (const c of comments) map.set(c.id, { ...c, children: [] });
+//   for (const c of comments) {
+//     const cur = map.get(c.id);
+//     if (!cur) continue;
 
-export type GetComments_RetType = NonNullable<Awaited<ReturnType<typeof GetComments>>>;
-export type CommentDisplayType = GetComments_RetType[number] & { children: CommentDisplayType[] };
-
-/**
- * Post comment and return serialized comment DTO (existing behavior).
- */
-export async function PostComment({
-  content,
-  articleId,
-  parentCommentId,
-}: {
-  content: string;
-  articleId: bigint;
-  parentCommentId: bigint | null;
-}) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
-  if (!content) throw new Error("Content is required.");
-
-  const authorIp = await getClientIp();
-  if (!authorIp) throw new Error("Invalid client ip.");
-
-  const authorId = BigInt(session.user.id);
-
-  try {
-    const comment = await prisma.comment.create({
-      data: { articleId, parentId: parentCommentId, content, authorIp, authorId },
-      select: {
-        id: true,
-        author: { select: { id: true, displayName: true } },
-        articleId: true,
-        isHidden: true,
-        parentId: true,
-        content: true,
-        emotes: { select: { userId: true, kind: true } },
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-
-    return SerializeComment(comment);
-  } catch (e) {
-    throw new Error(e instanceof Error ? e.message : "Internal server error.");
-  }
-}
-
-export async function UpdateComment({ commentId, newContent }: { commentId: bigint; newContent: string }) {
-  if (!newContent) throw Error("content is required.");
-
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw Error("Unauthorized.");
-
-  let sessionId: bigint;
-  try { sessionId = BigInt(session.user.id); } catch { throw Error("Invalid user id."); }
-
-  const clientIp = await getClientIp();
-  if (!clientIp) throw Error("Cannot read client id properly.");
-
-  const comment = await prisma.comment.findUnique({
-    where: { id: commentId },
-    select: { authorId: true, content: true, authorIp: true },
-  });
-  if (!comment) throw Error("Comment does not Exist.");
-  if (comment.content === newContent) return false;
-  if (sessionId !== comment.authorId) throw Error("Unauthorized");
-
-  try {
-    await prisma.$transaction(async (tx) => {
-      await tx.commentHistory.create({
-        data: { commentId, oldContent: comment.content, oldAuthorIp: comment.authorIp },
-      });
-      await tx.comment.update({
-        where: { id: commentId },
-        data: { content: newContent, authorIp: clientIp },
-      });
-    });
-    return true;
-  } catch (e) {
-    throw Error(e instanceof Error ? e.message : "Internal server error.");
-  }
-}
-
-export async function DeleteComment({ commentId }: { commentId: bigint }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw Error("Unauthorized.");
-
-  let sessionId: bigint;
-  try { sessionId = BigInt(session.user.id); } catch { throw Error("Invalid user id."); }
-
-  const comment = await prisma.comment.findUnique({
-    where: { id: commentId },
-    select: { authorId: true },
-  });
-  if (!comment) throw Error("Comment does not Exist.");
-  if (sessionId !== comment.authorId) throw Error("Unauthorized");
-
-  await prisma.comment.update({
-    where: { id: commentId },
-    data: { isHidden: true, deletedAt: new Date() },
-  });
-}
-
-export async function LinkComments(comments: GetComments_RetType | null): Promise<CommentDisplayType[]> {
-  const roots: CommentDisplayType[] = [];
-  const map = new Map<CommentDisplayType["id"], CommentDisplayType>();
-  if (!comments) return roots;
-
-  for (const c of comments) map.set(c.id, { ...c, children: [] });
-  for (const c of comments) {
-    const cur = map.get(c.id);
-    if (!cur) continue;
-
-    if (!cur.parentId) roots.push(cur);
-    else {
-      const parent = map.get(cur.parentId);
-      if (parent) parent.children.push(cur);
-      else roots.push(cur);
-    }
-  }
-  return roots;
-}
+//     if (!cur.parentId) roots.push(cur);
+//     else {
+//       const parent = map.get(cur.parentId);
+//       if (parent) parent.children.push(cur);
+//       else roots.push(cur);
+//     }
+//   }
+//   return roots;
+// }
 
 export async function PostEmote({
   id,

@@ -1,4 +1,4 @@
-// @/src/app/api/article/update/route.ts
+// @/app/api/article/update/route.ts
 
 import { NextResponse } from "next/server";
 import { Prisma, prisma } from "@labatory/db";
@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 import { buildCreateArticleCtx } from "@/app/api/_util/createArticleCtx";
-import { UpdateArticleCore } from "@/repository/actions/article.action";
+import { UpdateArticleCore } from "@/repository/db/article";
 
 type Body = {
   articleId: string;

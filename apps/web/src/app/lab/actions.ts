@@ -21,7 +21,7 @@ import {
   create_subject_for_lab,
   replace_lab_subject_links,
 } from "@/util/lab.action";
-import { CreateTag, UpdateTag } from "@/repository/actions/tag.action";
+import { CreateTag, UpdateTag } from "@/repository/db/tag";
 
 export async function getLabs(params: { q: string; scope: "all" | "lab" | "univ" | "subj" }) {
   const where: Prisma.LabWhereInput = {};

@@ -1,10 +1,10 @@
-// @/src/app/article/[article_id]/update/page.tsx
+// @/app/article/[article_id]/update/page.tsx
 
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 
-import { GetArticleCore } from "@/repository/actions/article.action";
+import { GetArticleCore } from "@/repository/db/article";
 import { serializeArticle } from "@/repository/serialize/article";
 import { ArticleUpdateForm } from "./ArticleUpdateForm";
 

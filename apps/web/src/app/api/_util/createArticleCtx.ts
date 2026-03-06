@@ -1,4 +1,4 @@
-// @/src/app/api/_util/createArticleCtx.ts
+// @/app/api/_util/createArticleCtx.ts
 
 import "server-only";
 import { getClientIp } from "@/util/util";

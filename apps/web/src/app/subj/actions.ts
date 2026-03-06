@@ -15,7 +15,7 @@ import {
   find_subject_first_by_name,
 } from "@/util/subj.action";
 import { prisma } from "@labatory/db";
-import { CreateTag, UpdateTag } from "@/repository/actions/tag.action";
+import { CreateTag, UpdateTag } from "@/repository/db/tag";
 import { normalizeText } from "@/util/util";
 
 /**

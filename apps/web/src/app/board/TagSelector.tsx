@@ -1,10 +1,10 @@
-// @/src/app/board/TagSelector.tsx
+// @/app/board/TagSelector.tsx
 
 "use client";
 
 import type { TagKind } from "@labatory/db";
 import type { ArticleTagDTO } from "@/repository/dto/article";
-import { SearchArticleTags } from "@/repository/actions/tag.action";
+import { SearchArticleTags } from "@/repository/db/tag";
 import { serializeArticleTag } from "@/repository/serialize/article";
 import { useState } from "react";
 
@@ -32,7 +32,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDT
     setErrorMessage(null);
 
     try {
-      setTags((await SearchArticleTags({ kind: tagKind, queryRaw: trimmedQuery })).map(serializeArticleTag));
+      setTags((await SearchArticleTags({ kind: tagKind, query: trimmedQuery })).map(serializeArticleTag));
     } catch (e) {
       setErrorMessage(`Selecting tag error: ${e instanceof Error ? e.message : "Unknown Error"}`);
     } finally {

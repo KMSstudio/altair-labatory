@@ -67,6 +67,11 @@ async function main() {
         role: UserRole.PI,
         primaryEmail: "seojun.park@labatory.test",
       },
+      {
+        displayName: "Dr. Jane Doe",
+        role: UserRole.PI,
+        primaryEmail: "jane.doe@labatory.test",
+      },
     ],
   });
 
@@ -311,7 +316,6 @@ async function main() {
       nameEn: "Distributed Systems Lab",
       websiteUrl: "https://example.com/ds-lab",
       description: "Scalable systems, distributed computing, and cloud infrastructure.",
-      university: { connect: { id: berkeleyUni.id } },
     },
   });
 
@@ -444,6 +448,13 @@ async function main() {
         scholarUrl: "https://scholar.google.com/citations?user=sample",
         userId: piUsers[2].id,
         labId: labSystems.id,
+      },
+      {
+        name: "John Doe",
+        email: "john.doe@labatory.test",
+        scholarUrl: "https://scholar.google.com/citations?user=sample",
+        userId: null,
+        labId: null,
       }
     ],
   });
@@ -784,6 +795,17 @@ async function main() {
     }
   })
 
+  const deletedUserArticle = await prisma.article.create({
+    data: {
+      boardId: Board1.id,
+      title: "Author is gone.",
+      content: "Author is not a user anymore.",
+      authorId: null,
+      authorIp: "2001:2d8:abcd:44::19",
+      isHidden: false,
+    }
+  })
+
   const Articles = [];
 
   for (let i = 0; i < 100; i++) {
@@ -991,14 +1013,14 @@ async function main() {
   })
 
   console.log("Seed completed", {
-    users: [admins[0].id, piUsers[0].id, piUsers[1].id, students[0].id, students[1].id, students[2].id, students[3].id, students[4].id, students[5].id],
+    users: [admins[0].id, piUsers[0].id, piUsers[1].id, piUsers[2].id, students[0].id, students[1].id, students[2].id, students[3].id, students[4].id, students[5].id],
     universities: [seoulUni.id, yonseiUni.id, koreaUni.id, kaist.id, berkeleyUni.id, oxfordUni.id],
     labs: [labAi.id, labBio.id, labRobotics.id, labVision.id, labNlp.id, labSystems.id],
     subjects: [subjectAi.id, subjectBio.id, subjectRobotics.id, subjectMl.id, subjectVision.id, subjectNlp.id],
     piApplicationId: [pendingPiApplication.id, ApprovedPiApplication.id, rejectedPiApplication.id],
     reviewId: [reviewAi.id, reviewRobotics1.id, reviewRobotics2.id, reviewVision1.id, reviewVision2.id, reviewNlp1.id, reviewSystems1.id],
     boardId: [Board1.id, updatedBoard.id, EmptyBoard.id, CrowdedBoard.id, inactiveBoard.id],
-    articleId: [PinnedArticle1.id, PinnedArticle2.id, Article1.id, UpdatedArticle.id, DeletedArticle.id],
+    articleId: [PinnedArticle1.id, PinnedArticle2.id, Article1.id, UpdatedArticle.id, DeletedArticle.id, deletedUserArticle.id],
     commentId: [comment1.id, selfComment.id, updatedComment.id, deletedComment.id, reply.id, updatedReply.id, deletedReply.id, replyOfReply.id, replyOfReplyOfReply.id],
   });
 }

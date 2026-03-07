@@ -752,7 +752,7 @@ async function main() {
       nameEn: "temp",
       description: "A board under construction.",
       sortOrder: 5,
-      isActive: true,
+      isActive: false,
     }
   })
 

@@ -164,6 +164,15 @@ async function main() {
         passwordHash,
       },
       {
+        userId: piUsers[3].id,
+        provider: "credentials",
+        providerUserId: "jane.doe@labatory.test",
+        email: "jane.doe@labatory.test",
+        emailVerified: true,
+        isPrimary: true,
+        passwordHash,
+      },
+      {
         userId: students[0].id,
         provider: "credentials",
         providerUserId: "minseo.kim@labatory.test",
@@ -939,6 +948,15 @@ async function main() {
     }
   })
 
+  const deletedUserComment = await prisma.comment.create({
+    data: {
+      articleId: deletedUserArticle.id,
+      authorId: null,
+      authorIp: "175.223.44.18",
+      content: "Author of this comment is gone too."
+    }
+  })
+
   const replyOfReply = await prisma.comment.create({
     data: {
       articleId: Article1.id,
@@ -1037,9 +1055,9 @@ async function main() {
     piApplicationId: [pendingPiApplication.id, approvedPiApplication.id, rejectedPiApplication.id],
     piId: [pis[0].id, pis[1].id, pis[2].id, pis[3].id,],
     reviewId: [reviewAi.id, reviewRobotics1.id, reviewRobotics2.id, reviewVision1.id, reviewVision2.id, reviewNlp1.id, reviewSystems1.id],
-    boardId: [Board1.id, updatedBoard.id, EmptyBoard.id, CrowdedBoard.id, inactiveBoard.id],
+    boardId: [Board1.id, EmptyBoard.id, CrowdedBoard.id, updatedBoard.id, inactiveBoard.id],
     articleId: [PinnedArticle1.id, PinnedArticle2.id, Article1.id, UpdatedArticle.id, DeletedArticle.id, deletedUserArticle.id],
-    commentId: [comment1.id, selfComment.id, updatedComment.id, deletedComment.id, reply.id, updatedReply.id, deletedReply.id, replyOfReply.id, replyOfReplyOfReply.id],
+    commentId: [comment1.id, selfComment.id, updatedComment.id, deletedComment.id, reply.id, updatedReply.id, deletedReply.id, deletedUserComment.id, replyOfReply.id, replyOfReplyOfReply.id],
   });
 }
 

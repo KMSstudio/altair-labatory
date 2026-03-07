@@ -43,9 +43,14 @@ async function main() {
   const admins = await prisma.user.createManyAndReturn({
     data: [
       {
-        displayName: "Admin User",
+        displayName: "Admin User1",
         role: UserRole.ADMIN,
-        primaryEmail: "admin@labatory.test",
+        primaryEmail: "admin1@labatory.test",
+      },
+      {
+        displayName: "Admin User2",
+        role: UserRole.ADMIN,
+        primaryEmail: "admin2@labatory.test",
       },
     ]
   });
@@ -116,8 +121,17 @@ async function main() {
       {
         userId: admins[0].id,
         provider: "credentials",
-        providerUserId: "admin@labatory.test",
-        email: "admin@labatory.test",
+        providerUserId: "admin1@labatory.test",
+        email: "admin1@labatory.test",
+        emailVerified: true,
+        isPrimary: true,
+        passwordHash,
+      },
+      {
+        userId: admins[1].id,
+        provider: "credentials",
+        providerUserId: "admin2@labatory.test",
+        email: "admin2@labatory.test",
         emailVerified: true,
         isPrimary: true,
         passwordHash,
@@ -426,7 +440,7 @@ async function main() {
     }
   });
 
-  await prisma.pI.createMany({
+  const pis = await prisma.pI.createManyAndReturn({
     data: [
       {
         name: "Jihoon Park",
@@ -457,6 +471,9 @@ async function main() {
         labId: null,
       }
     ],
+    select: {
+      id: true,
+    }
   });
 
   const pendingPiApplication = await prisma.pIApplication.create({
@@ -471,7 +488,7 @@ async function main() {
     },
   });
 
-  const ApprovedPiApplication = await prisma.pIApplication.create({
+  const approvedPiApplication = await prisma.pIApplication.create({
     data: {
       userId: students[1].id,
       requestedName: "Cheolsu Kim",
@@ -676,7 +693,7 @@ async function main() {
   await prisma.labReviewReport.create({
     data: {
       reviewId: reviewAi.id,
-      reporterId: admins[0].id,
+      reporterId: admins[1].id,
       reason: "PI requested clarification again.",
       detail: "Check for still remaining sensitive information in the review.",
     },
@@ -1013,11 +1030,12 @@ async function main() {
   })
 
   console.log("Seed completed", {
-    users: [admins[0].id, piUsers[0].id, piUsers[1].id, piUsers[2].id, students[0].id, students[1].id, students[2].id, students[3].id, students[4].id, students[5].id],
+    users: [admins[0].id, admins[1].id, piUsers[0].id, piUsers[1].id, piUsers[2].id, students[0].id, students[1].id, students[2].id, students[3].id, students[4].id, students[5].id],
     universities: [seoulUni.id, yonseiUni.id, koreaUni.id, kaist.id, berkeleyUni.id, oxfordUni.id],
     labs: [labAi.id, labBio.id, labRobotics.id, labVision.id, labNlp.id, labSystems.id],
     subjects: [subjectAi.id, subjectBio.id, subjectRobotics.id, subjectMl.id, subjectVision.id, subjectNlp.id],
-    piApplicationId: [pendingPiApplication.id, ApprovedPiApplication.id, rejectedPiApplication.id],
+    piApplicationId: [pendingPiApplication.id, approvedPiApplication.id, rejectedPiApplication.id],
+    piId: [pis[0].id, pis[1].id, pis[2].id, pis[3].id,],
     reviewId: [reviewAi.id, reviewRobotics1.id, reviewRobotics2.id, reviewVision1.id, reviewVision2.id, reviewNlp1.id, reviewSystems1.id],
     boardId: [Board1.id, updatedBoard.id, EmptyBoard.id, CrowdedBoard.id, inactiveBoard.id],
     articleId: [PinnedArticle1.id, PinnedArticle2.id, Article1.id, UpdatedArticle.id, DeletedArticle.id, deletedUserArticle.id],

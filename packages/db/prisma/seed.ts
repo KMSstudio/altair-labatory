@@ -2,6 +2,8 @@ import { config as loadEnv } from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  EmoteKind,
+  EmotePlace,
   PIApplicationStatus,
   PrismaClient,
   TagKind,
@@ -38,91 +40,76 @@ async function main() {
     prisma.board.deleteMany(),
   ]);
 
-  const admin = await prisma.user.create({
-    data: {
-      displayName: "Admin User",
-      role: UserRole.ADMIN,
-      primaryEmail: "admin@labatory.test",
-    },
+  const admins = await prisma.user.createManyAndReturn({
+    data: [
+      {
+        displayName: "Admin User",
+        role: UserRole.ADMIN,
+        primaryEmail: "admin@labatory.test",
+      },
+    ]
   });
 
-  const piUser1 = await prisma.user.create({
-    data: {
-      displayName: "Dr. Jihoon Park",
-      role: UserRole.PI,
-      primaryEmail: "jihoon.park@labatory.test",
-    },
+  const piUsers = await prisma.user.createManyAndReturn({
+    data: [
+      {
+        displayName: "Dr. Jihoon Park",
+        role: UserRole.PI,
+        primaryEmail: "jihoon.park@labatory.test",
+      },
+      {
+        displayName: "Dr. Jihong Kim",
+        role: UserRole.PI,
+        primaryEmail: "jihong.kim@labatory.test",
+      },
+      {
+        displayName: "Dr. Seojun Park",
+        role: UserRole.PI,
+        primaryEmail: "seojun.park@labatory.test",
+      },
+    ],
   });
 
-  const piUser2 = await prisma.user.create({
-    data: {
-      displayName: "Dr. Jihong Kim",
-      role: UserRole.PI,
-      primaryEmail: "jihong.kim@labatory.test",
-    },
-  });
-
-  const piUser3 = await prisma.user.create({
-    data: {
-      displayName: "Dr. Seojun Park",
-      role: UserRole.PI,
-      primaryEmail: "seojun.park@labatory.test",
-    },
-  });
-
-  const student1 = await prisma.user.create({
-    data: {
-      displayName: "Minseo Kim",
-      role: UserRole.USER,
-      primaryEmail: "minseo.kim@labatory.test",
-    },
-  });
-
-  const student2 = await prisma.user.create({
-    data: {
-      displayName: "Cheolsu Kim",
-      role: UserRole.USER,
-      primaryEmail: "cheolsu.kim@labatory.test",
-    },
-  });
-
-  const student3 = await prisma.user.create({
-    data: {
-      displayName: "Younghee Lee",
-      role: UserRole.USER,
-      primaryEmail: "younghee.lee@labatory.test",
-    },
-  });
-
-  const student4 = await prisma.user.create({
-    data: {
-      displayName: "Seungwoo Choi",
-      role: UserRole.USER,
-      primaryEmail: "seungwoo.choi@labatory.test",
-    },
-  });
-
-  const student5 = await prisma.user.create({
-    data: {
-      displayName: "Hana Jung",
-      role: UserRole.USER,
-      primaryEmail: "hana.jung@labatory.test",
-    },
-  });
-
-  const student6 = await prisma.user.create({
-    data: {
-      displayName: "Donghyun Kang",
-      role: UserRole.USER,
-      primaryEmail: "donghyun.kang@labatory.test",
-    },
+  const students = await prisma.user.createManyAndReturn({
+    data: [
+      {
+        displayName: "Minseo Kim",
+        role: UserRole.USER,
+        primaryEmail: "minseo.kim@labatory.test",
+      },
+      {
+        displayName: "Cheolsu Kim",
+        role: UserRole.USER,
+        primaryEmail: "cheolsu.kim@labatory.test",
+      },
+      {
+        displayName: "Younghee Lee",
+        role: UserRole.USER,
+        primaryEmail: "younghee.lee@labatory.test",
+      },
+      {
+        displayName: "Seungwoo Choi",
+        role: UserRole.USER,
+        primaryEmail: "seungwoo.choi@labatory.test",
+      },
+      {
+        displayName: "Hana Jung",
+        role: UserRole.USER,
+        primaryEmail: "hana.jung@labatory.test",
+      },
+      {
+        displayName: "Donghyun Kang",
+        role: UserRole.USER,
+        primaryEmail: "donghyun.kang@labatory.test",
+      },
+    ],
   });
 
   const passwordHash = await bcryptjs.hash("password", 10)
   await prisma.userCredential.createMany({
     data: [
       {
-        userId: admin.id,
+        userId: admins[0].id,
         provider: "credentials",
         providerUserId: "admin@labatory.test",
         email: "admin@labatory.test",
@@ -131,7 +118,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: piUser1.id,
+        userId: piUsers[0].id,
         provider: "credentials",
         providerUserId: "jihoon.park@labatory.test",
         email: "jihoon.park@labatory.test",
@@ -140,7 +127,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: piUser2.id,
+        userId: piUsers[1].id,
         provider: "credentials",
         providerUserId: "jihong.kim@labatory.test",
         email: "jihong.kim@labatory.test",
@@ -149,7 +136,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: piUser3.id,
+        userId: piUsers[2].id,
         provider: "credentials",
         providerUserId: "seojun.park@labatory.test",
         email: "seojun.park@labatory.test",
@@ -158,7 +145,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: student1.id,
+        userId: students[0].id,
         provider: "credentials",
         providerUserId: "minseo.kim@labatory.test",
         email: "minseo.kim@labatory.test",
@@ -167,7 +154,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: student2.id,
+        userId: students[1].id,
         provider: "credentials",
         providerUserId: "cheolsu.kim@labatory.test",
         email: "cheolsu.kim@labatory.test",
@@ -176,7 +163,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: student3.id,
+        userId: students[2].id,
         provider: "credentials",
         providerUserId: "younghee.lee@labatory.test",
         email: "younghee.lee@labatory.test",
@@ -185,7 +172,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: student4.id,
+        userId: students[3].id,
         provider: "credentials",
         providerUserId: "seungwoo.choi@labatory.test",
         email: "seungwoo.choi@labatory.test",
@@ -194,7 +181,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: student5.id,
+        userId: students[4].id,
         provider: "credentials",
         providerUserId: "hana.jung@labatory.test",
         email: "hana.jung@labatory.test",
@@ -203,7 +190,7 @@ async function main() {
         passwordHash,
       },
       {
-        userId: student6.id,
+        userId: students[5].id,
         provider: "credentials",
         providerUserId: "donghyun.kang@labatory.test",
         email: "donghyun.kang@labatory.test",
@@ -406,7 +393,7 @@ async function main() {
     ],
   });
 
-  await prisma.tag.createMany({
+  const tags = await prisma.tag.createManyAndReturn({
     data: [
       { kind: TagKind.LAB, labId: labAi.id, text: `${labAi.nameKo}(${labAi.nameEn})` },
       { kind: TagKind.LAB, labId: labBio.id, text: `${labBio.nameKo}(${labBio.nameEn})` },
@@ -429,7 +416,10 @@ async function main() {
       { kind: TagKind.TEXT, text: "Maintenance" },
       { kind: TagKind.TEXT, text: "Infomation" },
       { kind: TagKind.TEXT, text: "Update" },
-    ]
+    ],
+    select: {
+      id: true,
+    }
   });
 
   await prisma.pI.createMany({
@@ -438,21 +428,21 @@ async function main() {
         name: "Jihoon Park",
         email: "jihoon.park@labatory.test",
         scholarUrl: "https://scholar.google.com/citations?user=sample",
-        userId: piUser1.id,
+        userId: piUsers[0].id,
         labId: labAi.id,
       },
       {
         name: "Jihong Kim",
         email: "jihong.kim@labatory.test",
         scholarUrl: "https://scholar.google.com/citations?user=sample",
-        userId: piUser2.id,
+        userId: piUsers[1].id,
         labId: labRobotics.id,
       },
       {
         name: "Seojun Park",
         email: "seojun.park@labatory.test",
         scholarUrl: "https://scholar.google.com/citations?user=sample",
-        userId: piUser3.id,
+        userId: piUsers[2].id,
         labId: labSystems.id,
       }
     ],
@@ -460,7 +450,7 @@ async function main() {
 
   const pendingPiApplication = await prisma.pIApplication.create({
     data: {
-      userId: student1.id,
+      userId: students[0].id,
       requestedName: "Minseo Kim",
       labId: labBio.id,
       schoolEmail: "minseo.kim@school.test",
@@ -472,28 +462,28 @@ async function main() {
 
   const ApprovedPiApplication = await prisma.pIApplication.create({
     data: {
-      userId: student2.id,
+      userId: students[1].id,
       requestedName: "Cheolsu Kim",
       labId: labVision.id,
       schoolEmail: "cheolsu.kim@school.test",
       ScholarUrl: "https://scholar.google.com/citations?user=cheolsu",
       note: "Looking to register the lab for recruitment.",
       status: PIApplicationStatus.APPROVED,
-      decidedBy: admin.id,
+      decidedBy: admins[0].id,
       decidedAt: new Date(),
     },
   });
 
   const rejectedPiApplication = await prisma.pIApplication.create({
     data: {
-      userId: student3.id,
+      userId: students[2].id,
       requestedName: "Younghee Lee",
       labId: labNlp.id,
       schoolEmail: "younghee.lee@school.test",
       ScholarUrl: "https://scholar.google.com/citations?user=younghee",
       note: "Looking to register the lab for recruitment.",
       status: PIApplicationStatus.REJECTED,
-      decidedBy: admin.id,
+      decidedBy: admins[0].id,
       decidedAt: new Date(),
     },
   });
@@ -501,7 +491,7 @@ async function main() {
   const reviewAi = await prisma.labReview.create({
     data: {
       labId: labAi.id,
-      authorId: student1.id,
+      authorId: students[0].id,
       content: "Collaborative environment with strong mentorship.",
       recommend: true,
       atmos: 5,
@@ -516,7 +506,7 @@ async function main() {
   const reviewRobotics1 = await prisma.labReview.create({
     data: {
       labId: labRobotics.id,
-      authorId: student1.id,
+      authorId: students[0].id,
       content: "Hands-on robotics projects and supportive senior students.",
       recommend: true,
       atmos: 5,
@@ -531,7 +521,7 @@ async function main() {
   const reviewRobotics2 = await prisma.labReview.create({
     data: {
       labId: labRobotics.id,
-      authorId: student2.id,
+      authorId: students[1].id,
       content: "Good research topics but workload can be heavy near deadlines.",
       recommend: true,
       atmos: 4,
@@ -546,7 +536,7 @@ async function main() {
   const reviewVision1 = await prisma.labReview.create({
     data: {
       labId: labVision.id,
-      authorId: student3.id,
+      authorId: students[0].id,
       content: "Strong focus on deep learning and computer vision benchmarks.",
       recommend: true,
       atmos: 4,
@@ -561,7 +551,7 @@ async function main() {
   const reviewVision2 = await prisma.labReview.create({
     data: {
       labId: labVision.id,
-      authorId: student4.id,
+      authorId: students[1].id,
       content: "Lots of opportunities to publish if you are proactive.",
       recommend: true,
       atmos: 4,
@@ -576,7 +566,7 @@ async function main() {
   const reviewNlp1 = await prisma.labReview.create({
     data: {
       labId: labNlp.id,
-      authorId: student5.id,
+      authorId: students[0].id,
       content: "Interesting NLP projects and good access to GPU resources.",
       recommend: true,
       atmos: 4,
@@ -591,7 +581,7 @@ async function main() {
   const reviewSystems1 = await prisma.labReview.create({
     data: {
       labId: labSystems.id,
-      authorId: student6.id,
+      authorId: students[0].id,
       content: "Research topics are challenging but rewarding.",
       recommend: true,
       atmos: 3,
@@ -606,7 +596,7 @@ async function main() {
   const reviewBio1 = await prisma.labReview.create({
     data: {
       labId: labBio.id,
-      authorId: student1.id,
+      authorId: students[0].id,
       content: "Interesting projects, but workload can be heavy.",
       recommend: false,
       atmos: 3,
@@ -621,7 +611,7 @@ async function main() {
   const privateReview1 = prisma.labReview.create({
     data: {
       labId: labAi.id,
-      authorId: student2.id,
+      authorId: students[1].id,
       content: "Worst lab ever; Don't recommend joining it.",
       recommend: false,
       atmos: 2,
@@ -636,7 +626,7 @@ async function main() {
   const privateReview2 = prisma.labReview.create({
     data: {
       labId: labAi.id,
-      authorId: student3.id,
+      authorId: students[2].id,
       content: "Interesting subject, but professor doesn't have work ethics at all.",
       recommend: false,
       atmos: 1,
@@ -651,9 +641,9 @@ async function main() {
   const protectedReview = prisma.labReview.create({
     data: {
       labId: labAi.id,
-      authorId: student2.id,
+      authorId: students[1].id,
       content: "Enthusiastic professor and Great equipments.",
-      recommend: false,
+      recommend: true,
       atmos: 5,
       lectr: 4,
       paper: 4,
@@ -662,6 +652,24 @@ async function main() {
       visib: Visibility.PROTECT,
     }
   })
+
+  await prisma.labReviewReport.create({
+    data: {
+      reviewId: reviewAi.id,
+      reporterId: admins[0].id,
+      reason: "PI requested clarification.",
+      detail: "Check for sensitive information in the review.",
+    },
+  });
+
+  await prisma.labReviewReport.create({
+    data: {
+      reviewId: reviewAi.id,
+      reporterId: admins[0].id,
+      reason: "PI requested clarification again.",
+      detail: "Check for still remaining sensitive information in the review.",
+    },
+  });
 
   const Board1 = await prisma.board.create({
     data: {
@@ -696,7 +704,7 @@ async function main() {
       nameEn: "Top articles",
       description: "A board featuring the most popular and highly rated posts.",
       sortOrder: 4,
-      updatedBy: { connect: { id: admin.id } },
+      updatedBy: { connect: { id: admins[0].id } },
       updatedAt: new Date(Date.now() + 1000),
     }
   });
@@ -716,7 +724,7 @@ async function main() {
       boardId: Board1.id,
       title: "Rules and guide",
       content: "1. Be Nice - Treat community members with respect.\n 2. Illegal Activities - Do not engage in illegal activities",
-      authorId: admin.id,
+      authorId: admins[0].id,
       authorIp: "211.36.128.45",
       isPinned: true,
     }
@@ -727,7 +735,7 @@ async function main() {
       boardId: Board1.id,
       title: "Announcement",
       content: "Board will be closed in 2027-03-31 3:00 ~ 6:00 UTC+9 for maintenance.",
-      authorId: admin.id,
+      authorId: admins[0].id,
       authorIp: "2406:5900:abcd:1234::21",
       isPinned: true,
     }
@@ -738,7 +746,7 @@ async function main() {
       boardId: Board1.id,
       title: "Example title",
       content: "Example content.",
-      authorId: student1.id,
+      authorId: students[3].id,
       authorIp: "106.102.91.203",
     }
   });
@@ -748,7 +756,7 @@ async function main() {
       boardId: Board1.id,
       title: "Changed title",
       content: "Changed content.",
-      authorId: piUser1.id,
+      authorId: students[4].id,
       authorIp: "121.165.73.52",
       updatedAt: new Date(Date.now() + 1000),
     }
@@ -769,7 +777,7 @@ async function main() {
       boardId: Board1.id,
       title: "Deleted title",
       content: "Deleted content.",
-      authorId: piUser2.id,
+      authorId: students[3].id,
       authorIp: "2001:2d8:abcd:44::19",
       isHidden: true,
       deletedAt: new Date(Date.now() + 1000),
@@ -783,7 +791,7 @@ async function main() {
       boardId: CrowdedBoard.id,
       title: `Title number ${i}`,
       content: `Comtent number ${i}`,
-      authorId: admin.id,
+      authorId: admins[0].id,
       authorIp: "1.1.1.1",
     })
   }
@@ -795,7 +803,7 @@ async function main() {
   const comment1 = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student2.id,
+      authorId: students[5].id,
       authorIp: "175.223.44.18",
       content: "Example comment."
     }
@@ -804,7 +812,7 @@ async function main() {
   const selfComment = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student1.id,
+      authorId: students[3].id,
       authorIp: "106.102.91.203",
       content: "Comment left by author of article."
     }
@@ -813,7 +821,7 @@ async function main() {
   const updatedComment = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student3.id,
+      authorId: students[5].id,
       authorIp: "2001:2d8:abcd:44::19",
       content: "Updated Comment.",
       updatedAt: new Date(Date.now() + 1000),
@@ -832,7 +840,7 @@ async function main() {
   const deletedComment = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student4.id,
+      authorId: students[5].id,
       authorIp: "118.235.12.97",
       content: "Deleted Comment.",
       isHidden: true,
@@ -843,7 +851,7 @@ async function main() {
   const reply = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student5.id,
+      authorId: students[5].id,
       authorIp: "2406:da14:8899:1::7",
       content: "Example reply.",
       parentId: comment1.id,
@@ -853,14 +861,14 @@ async function main() {
   const updatedReply = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student5.id,
+      authorId: students[5].id,
       authorIp: "118.165.12.76",
       content: "Updated reply.",
       parentId: comment1.id,
       updatedAt: new Date(Date.now() + 1000),
     }
   })
-  console.log(updatedReply.createdAt, updatedReply.updatedAt)
+
   const updatedReplyHistory = await prisma.commentHistory.create({
     data: {
       commentId: updatedReply.id,
@@ -873,7 +881,7 @@ async function main() {
   const selfReply = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student1.id,
+      authorId: students[3].id,
       authorIp: "255.255.255.255",
       content: "Reply left by author of article.",
       parentId: selfComment.id,
@@ -883,7 +891,7 @@ async function main() {
   const deletedReply = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student1.id,
+      authorId: students[5].id,
       authorIp: "172.0.0.1",
       content: "Deleted Comment.",
       parentId: deletedComment.id,
@@ -895,7 +903,7 @@ async function main() {
   const replyOfReply = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student5.id,
+      authorId: students[4].id,
       authorIp: "172.0.0.8",
       content: "Example reply of reply.",
       parentId: reply.id,
@@ -905,25 +913,85 @@ async function main() {
   const replyOfReplyOfReply = await prisma.comment.create({
     data: {
       articleId: Article1.id,
-      authorId: student5.id,
+      authorId: students[5].id,
       authorIp: "45.67.89.101",
       content: "Example reply of reply of reply.",
       parentId: replyOfReply.id,
     }
   })
 
+  await prisma.emote.createMany({
+    data: [
+      {
+        articleId: Article1.id,
+        userId: students[3].id,
+        kind: EmoteKind.EMPATHY,
+        place: EmotePlace.ARTICLE,
+      },
+      {
+        articleId: Article1.id,
+        userId: students[4].id,
+        kind: EmoteKind.EMPATHY,
+        place: EmotePlace.ARTICLE,
+      },
+      {
+        articleId: Article1.id,
+        userId: students[5].id,
+        kind: EmoteKind.EMPATHY,
+        place: EmotePlace.ARTICLE,
+      },
+      {
+        articleId: Article1.id,
+        userId: students[3].id,
+        kind: EmoteKind.LIKE,
+        place: EmotePlace.ARTICLE,
+      },
+      {
+        articleId: Article1.id,
+        userId: students[4].id,
+        kind: EmoteKind.CHEER,
+        place: EmotePlace.ARTICLE,
+      },
+      {
+        articleId: Article1.id,
+        userId: students[5].id,
+        kind: EmoteKind.QUESTION,
+        place: EmotePlace.ARTICLE,
+      },
+    ]
+  })
 
-  await prisma.labReviewReport.create({
-    data: {
-      reviewId: reviewAi.id,
-      reporterId: admin.id,
-      reason: "PI requested clarification",
-      detail: "Check for sensitive information in the review.",
-    },
-  });
+  await prisma.articleTag.createMany({
+    data: [
+      {
+        articleId: Article1.id,
+        tagId: tags[0].id,
+      },
+      {
+        articleId: Article1.id,
+        tagId: tags[3].id,
+      },
+      {
+        articleId: Article1.id,
+        tagId: tags[5].id,
+      },
+      {
+        articleId: PinnedArticle2.id,
+        tagId: tags[19].id,
+      },
+      {
+        articleId: PinnedArticle2.id,
+        tagId: tags[20].id,
+      },
+      {
+        articleId: PinnedArticle1.id,
+        tagId: tags[18].id,
+      },
+    ]
+  })
 
   console.log("Seed completed", {
-    users: [admin.id, piUser1.id, piUser2.id, student1.id, student2.id, student3.id, student4.id, student5.id, student6.id],
+    users: [admins[0].id, piUsers[0].id, piUsers[1].id, students[0].id, students[1].id, students[2].id, students[3].id, students[4].id, students[5].id],
     universities: [seoulUni.id, yonseiUni.id, koreaUni.id, kaist.id, berkeleyUni.id, oxfordUni.id],
     labs: [labAi.id, labBio.id, labRobotics.id, labVision.id, labNlp.id, labSystems.id],
     subjects: [subjectAi.id, subjectBio.id, subjectRobotics.id, subjectMl.id, subjectVision.id, subjectNlp.id],

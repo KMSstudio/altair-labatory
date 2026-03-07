@@ -63,15 +63,21 @@ export async function GetArticle({ articleId }: { articleId: bigint }) {
   });
 }
 
-export async function UpdateViewCount({ articleId, updatedValue }: { articleId: bigint, updatedValue: number }) {
+export async function UpdateViewCount({
+  articleId,
+  updatedValue,
+}: {
+  articleId: bigint;
+  updatedValue: number;
+}) {
   await prisma.article.update({
     where: {
       id: articleId,
     },
     data: {
-      viewCount: updatedValue
-    }
-  })
+      viewCount: updatedValue,
+    },
+  });
 }
 
 export type GetArticle_RetType = NonNullable<Awaited<ReturnType<typeof GetArticle>>>;

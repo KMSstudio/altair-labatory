@@ -441,7 +441,7 @@ async function main() {
       { kind: TagKind.UNIV, univId: berkeleyUni.id, text: `${berkeleyUni.nameKo}(${berkeleyUni.nameEn})` },
       { kind: TagKind.UNIV, univId: oxfordUni.id, text: `${oxfordUni.nameKo}(${oxfordUni.nameEn})` },
       { kind: TagKind.TEXT, text: "Maintenance" },
-      { kind: TagKind.TEXT, text: "Infomation" },
+      { kind: TagKind.TEXT, text: "Information" },
       { kind: TagKind.TEXT, text: "Update" },
     ],
     select: {
@@ -1054,10 +1054,10 @@ async function main() {
     subjects: [subjectAi.id, subjectBio.id, subjectRobotics.id, subjectMl.id, subjectVision.id, subjectNlp.id],
     piApplicationId: [pendingPiApplication.id, approvedPiApplication.id, rejectedPiApplication.id],
     piId: [pis[0].id, pis[1].id, pis[2].id, pis[3].id,],
-    reviewId: [reviewAi.id, reviewRobotics1.id, reviewRobotics2.id, reviewVision1.id, reviewVision2.id, reviewNlp1.id, reviewSystems1.id],
+    reviewId: [reviewAi.id, reviewRobotics1.id, reviewRobotics2.id, reviewVision1.id, reviewVision2.id, reviewNlp1.id, reviewSystems1.id, reviewBio1.id, privateReview1.id, privateReview2.id, protectedReview.id],
     boardId: [Board1.id, EmptyBoard.id, CrowdedBoard.id, updatedBoard.id, inactiveBoard.id],
     articleId: [PinnedArticle1.id, PinnedArticle2.id, Article1.id, UpdatedArticle.id, DeletedArticle.id, deletedUserArticle.id],
-    commentId: [comment1.id, selfComment.id, updatedComment.id, deletedComment.id, reply.id, updatedReply.id, deletedReply.id, deletedUserComment.id, replyOfReply.id, replyOfReplyOfReply.id],
+    commentId: [comment1.id, selfComment.id, updatedComment.id, deletedComment.id, reply.id, updatedReply.id, selfReply.id, deletedReply.id, deletedUserComment.id, replyOfReply.id, replyOfReplyOfReply.id],
   });
 }
 

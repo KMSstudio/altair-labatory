@@ -28,8 +28,7 @@ export default async function Page({
   if (!article) {
     notFound();
   }
-  await UpdateViewCount({ articleId, updatedValue: article.viewCount + 1 });
-  console.log(article.viewCount + 1);
+  await UpdateViewCount({ articleId });
   const emoteCount = await GetEmoteCount({ id: articleId, targetPlace: "ARTICLE" });
   const commentsRaw = await GetComments({ articleId });
   const comments = await LinkComments(commentsRaw);

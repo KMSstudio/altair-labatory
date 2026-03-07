@@ -645,7 +645,7 @@ async function main() {
     },
   });
 
-  const privateReview1 = prisma.labReview.create({
+  const privateReview1 = await prisma.labReview.create({
     data: {
       labId: labAi.id,
       authorId: students[1].id,
@@ -660,7 +660,7 @@ async function main() {
     }
   })
 
-  const privateReview2 = prisma.labReview.create({
+  const privateReview2 = await prisma.labReview.create({
     data: {
       labId: labAi.id,
       authorId: students[2].id,
@@ -675,7 +675,7 @@ async function main() {
     }
   })
 
-  const protectedReview = prisma.labReview.create({
+  const protectedReview = await prisma.labReview.create({
     data: {
       labId: labAi.id,
       authorId: students[1].id,
@@ -838,7 +838,7 @@ async function main() {
     Articles.push({
       boardId: CrowdedBoard.id,
       title: `Title number ${i}`,
-      content: `Comtent number ${i}`,
+      content: `Content number ${i}`,
       authorId: admins[0].id,
       authorIp: "1.1.1.1",
     })

@@ -63,19 +63,13 @@ export async function GetArticle({ articleId }: { articleId: bigint }) {
   });
 }
 
-export async function UpdateViewCount({
-  articleId,
-  updatedValue,
-}: {
-  articleId: bigint;
-  updatedValue: number;
-}) {
+export async function UpdateViewCount({ articleId }: { articleId: bigint }) {
   await prisma.article.update({
     where: {
       id: articleId,
     },
     data: {
-      viewCount: updatedValue,
+      viewCount: { increment: 1 },
     },
   });
 }

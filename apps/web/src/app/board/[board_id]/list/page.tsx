@@ -40,7 +40,8 @@ export default async function Page({
   if (searchParams?.page) {
     try {
       page = Number.parseInt(searchParams?.page, 10);
-      if (Number.isFinite(page) || page < 1) throw new Error();
+      console.log(page);
+      if (!Number.isFinite(page) || page < 1) throw new Error();
     } catch {
       notFound();
     }

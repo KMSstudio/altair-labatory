@@ -26,7 +26,7 @@ export async function CommentSection({
             )}
             <div>
               {comment.createdAt.toDateString()}
-              {comment.createdAt.getDate() !== comment.updatedAt.getDate() && (
+              {comment.createdAt.getTime() !== comment.updatedAt.getTime() && (
                 <>
                   <span> · Edited </span>
                   <time dateTime={comment.updatedAt.toISOString()}>

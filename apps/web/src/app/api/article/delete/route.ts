@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
-import { DeleteArticle } from "@/repository/db/article";
+import { DeleteArticle } from "@/repository/db/article/article";
 import { parseBigInt } from "@/app/api/_util/parse";
 import { assertArticleAuthorOrAdmin, mapPermissionError } from "@/app/api/_util/assertPermission";
 

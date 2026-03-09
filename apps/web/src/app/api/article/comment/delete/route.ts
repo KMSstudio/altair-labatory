@@ -5,7 +5,7 @@ import { Prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
-import { DeleteComment } from "@/repository/db/comment";
+import { DeleteComment } from "@/repository/db/article/comment";
 import { parseBigInt } from "@/app/api/_util/parse";
 import { assertCommentAuthorOrAdmin, mapPermissionError } from "@/app/api/_util/assertPermission";
 

@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 
-import { GetArticleCore } from "@/repository/db/article";
+import { GetArticleCore } from "@/repository/db/article/article";
 import { ArticleUpdateForm } from "./ArticleUpdateForm";
 
 export default async function Page({

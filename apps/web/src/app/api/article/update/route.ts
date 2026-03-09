@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 import { buildCreateArticleCtx } from "@/app/api/_util/createArticleCtx";
-import { UpdateArticleCore } from "@/repository/db/article";
+import { UpdateArticleCore } from "@/repository/db/article/article";
 
 type Body = {
   articleId: string;

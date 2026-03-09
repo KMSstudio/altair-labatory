@@ -4,7 +4,7 @@
 
 import type { TagKind } from "@labatory/db";
 import type { ArticleTagDTO } from "@/repository/dto/article";
-import { SearchArticleTags } from "@/repository/db/tag";
+import { SearchArticleTags } from "@/repository/db/article/tag";
 import { serializeArticleTag } from "@/repository/serialize/article";
 import { useState } from "react";
 

@@ -13,7 +13,7 @@ import {
   mapPermissionError,
 } from "@/app/api/_util/assertPermission";
 
-import { PostComment } from "@/repository/db/comment";
+import { PostComment } from "@/repository/db/article/comment";
 import type { Comment_Ctx, Comment_PostInput } from "@/types/article";
 
 type Body = {

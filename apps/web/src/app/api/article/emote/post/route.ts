@@ -7,7 +7,7 @@ import { EmoteKind, EmotePlace } from "@labatory/db";
 
 import { authOptions } from "@/lib/auth";
 import type { Emote_Ctx } from "@/types/article";
-import { ToggleEmote } from "@/repository/db/emote";
+import { ToggleEmote } from "@/repository/db/article/emote";
 import { BuildEmoteDisplayState } from "@/app/article/[article_id]/article.transform";
 import { parseBigInt, parseEnumValue } from "@/app/api/_util/parse";
 

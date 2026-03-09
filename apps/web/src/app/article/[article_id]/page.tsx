@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
-import { GetArticleCore } from "@/repository/db/article";
+import { GetArticleCore } from "@/repository/db/article/article";
 
 import { BuildCommentDisplayTree, BuildEmoteDisplayState } from "./article.transform";
 import { CommentSection } from "./section/CommentSection";

@@ -6,7 +6,7 @@ import { Prisma, prisma } from "@labatory/db";
 
 import type { Article_Ctx, Article_Input } from "@/types/article";
 import { type ArticleDbShape, ArticleDTO, getArticleSelect } from "@/repository/dto/article";
-import { serializeArticle } from "../serialize/article";
+import { serializeArticle } from "../../serialize/article";
 
 /**
  * Retrieve a specific visible (non-hidden) article by id.

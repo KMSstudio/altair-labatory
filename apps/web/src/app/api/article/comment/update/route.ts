@@ -9,7 +9,7 @@ import { buildCommentCtx } from "@/app/api/_util/createArticleCtx";
 import { parseBigInt } from "@/app/api/_util/parse";
 import { assertCommentAuthorOrAdmin, mapPermissionError } from "@/app/api/_util/assertPermission";
 
-import { UpdateComment } from "@/repository/db/comment";
+import { UpdateComment } from "@/repository/db/article/comment";
 import type { Comment_Ctx, Comment_UpdateInput } from "@/types/article";
 
 type Body = {

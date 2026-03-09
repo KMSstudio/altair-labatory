@@ -1,6 +1,6 @@
 // @/repository/db/article.ts
 
-"use server";
+import "server-only";
 
 import { Prisma, prisma } from "@labatory/db";
 

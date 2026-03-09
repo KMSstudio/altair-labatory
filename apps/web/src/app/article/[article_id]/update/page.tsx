@@ -5,7 +5,6 @@ import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 
 import { GetArticleCore } from "@/repository/db/article";
-import { serializeArticle } from "@/repository/serialize/article";
 import { ArticleUpdateForm } from "./ArticleUpdateForm";
 
 export default async function Page({
@@ -35,11 +34,10 @@ export default async function Page({
     redirect("/");
   }
 
-  const articleRaw = await GetArticleCore(articleId);
-  if (!articleRaw) {
+  const article = await GetArticleCore(articleId);
+  if (!article) {
     notFound();
   }
-  const article = serializeArticle(articleRaw);
   if (!article.author || userId !== BigInt(article.author?.id)) {
     redirect("/");
   }

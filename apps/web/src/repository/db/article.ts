@@ -2,12 +2,11 @@
 
 "use server";
 
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
-import { Prisma, prisma, type EmoteKind, type EmotePlace } from "@labatory/db";
+import { Prisma, prisma } from "@labatory/db";
 
 import type { Article_Ctx, Article_Input } from "@/types/article";
-import { type ArticleDbShape, getArticleSelect } from "@/repository/dto/article";
+import { type ArticleDbShape, ArticleDTO, getArticleSelect } from "@/repository/dto/article";
+import { serializeArticle } from "../serialize/article";
 
 /**
  * Retrieve a specific visible (non-hidden) article by id.
@@ -17,11 +16,12 @@ import { type ArticleDbShape, getArticleSelect } from "@/repository/dto/article"
  * @param articleId - Target article id.
  * @returns Article DB shape if found and not hidden, otherwise null.
  */
-export async function GetArticleCore(articleId: bigint): Promise<ArticleDbShape | null> {
-  return prisma.article.findUnique({
+export async function GetArticleCore(articleId: bigint): Promise<ArticleDTO | null> {
+  const article = (await prisma.article.findUnique({
     where: { id: articleId, isHidden: false },
     select: getArticleSelect,
-  });
+  })) as ArticleDbShape;
+  return serializeArticle(article);
 }
 
 /**
@@ -93,24 +93,11 @@ export async function UpdateArticleCore(
  * Soft-delete (hide) article.
  */
 export async function DeleteArticle({ articleId }: { articleId: bigint }): Promise<void> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw Error("Unauthorized.");
-
-  let sessionId: bigint;
-  try {
-    sessionId = BigInt(session.user.id);
-  } catch {
-    throw Error("Invalid user id.");
-  }
-
   const article = await prisma.article.findUnique({
     where: { id: articleId },
     select: { authorId: true },
   });
-
   if (!article) throw Error("Article does not Exist.");
-  if (sessionId !== article.authorId) throw Error("Unauthorized");
-
   await prisma.article.update({
     where: { id: articleId },
     data: { isHidden: true, deletedAt: new Date() },
@@ -159,101 +146,3 @@ export async function CreateArticleCore(ctx: Article_Ctx, boardId: bigint, input
     return newArticle.id;
   });
 }
-
-// export async function LinkComments(comments: GetComments_RetType | null): Promise<CommentDisplayType[]> {
-//   const roots: CommentDisplayType[] = [];
-//   const map = new Map<CommentDisplayType["id"], CommentDisplayType>();
-//   if (!comments) return roots;
-
-//   for (const c of comments) map.set(c.id, { ...c, children: [] });
-//   for (const c of comments) {
-//     const cur = map.get(c.id);
-//     if (!cur) continue;
-
-//     if (!cur.parentId) roots.push(cur);
-//     else {
-//       const parent = map.get(cur.parentId);
-//       if (parent) parent.children.push(cur);
-//       else roots.push(cur);
-//     }
-//   }
-//   return roots;
-// }
-
-export async function PostEmote({
-  id,
-  targetPlace,
-  emoteKind,
-}: {
-  id: bigint;
-  targetPlace: EmotePlace;
-  emoteKind: EmoteKind;
-}) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw Error("Unauthorized.");
-
-  let sessionId: bigint;
-  try {
-    sessionId = BigInt(session.user.id);
-  } catch {
-    throw Error("Invalid user id.");
-  }
-
-  let articleId: bigint | null = null;
-  let commentId: bigint | null = null;
-  switch (targetPlace) {
-    case "ARTICLE":
-      articleId = id;
-      break;
-    case "COMMENT":
-      commentId = id;
-      break;
-  }
-
-  const duplicate = await prisma.emote.findFirst({
-    where: { userId: sessionId, articleId, commentId, kind: emoteKind },
-    select: { id: true },
-  });
-
-  if (duplicate) {
-    await prisma.emote.delete({ where: { id: duplicate.id } });
-    return false;
-  }
-
-  await prisma.emote.create({
-    data: { userId: sessionId, articleId, commentId, kind: emoteKind, place: targetPlace },
-  });
-  return true;
-}
-
-export async function GetEmoteCount({ id, targetPlace }: { id: bigint; targetPlace: EmotePlace }) {
-  let articleId: bigint | null = null;
-  let commentId: bigint | null = null;
-  switch (targetPlace) {
-    case "ARTICLE":
-      articleId = id;
-      break;
-    case "COMMENT":
-      commentId = id;
-      break;
-  }
-
-  const res = await prisma.emote.groupBy({
-    by: ["kind"],
-    where: { articleId, commentId },
-    _count: { kind: true },
-  });
-
-  const countMap: Record<EmoteKind, number> = {
-    CHEER: 0,
-    EMPATHY: 0,
-    LIKE: 0,
-    QUESTION: 0,
-    BAD: 0,
-  };
-
-  for (const cur of res) countMap[cur.kind] = cur._count.kind;
-  return countMap;
-}
-
-export type GetEmoteCount_RetType = NonNullable<Awaited<ReturnType<typeof GetEmoteCount>>>;

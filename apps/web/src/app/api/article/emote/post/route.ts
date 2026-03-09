@@ -117,7 +117,6 @@ export async function POST(request: Request) {
 
   try {
     const result = await ToggleEmote(ctx, emoteKind);
-
     const emoteState = BuildEmoteDisplayState(result.emotes, session.user.id);
 
     return NextResponse.json({

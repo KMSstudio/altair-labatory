@@ -21,6 +21,7 @@ export async function GetArticleCore(articleId: bigint): Promise<ArticleDTO | nu
     where: { id: articleId, isHidden: false },
     select: getArticleSelect,
   })) as ArticleDbShape;
+  if (!article) return null;
   return serializeArticle(article);
 }
 

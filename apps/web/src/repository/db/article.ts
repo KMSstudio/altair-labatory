@@ -1,4 +1,4 @@
-// @/util/actions/article.action.ts
+// @/repository/db/article.ts
 
 "use server";
 
@@ -21,7 +21,7 @@ export async function GetArticleCore(articleId: bigint): Promise<ArticleDbShape 
   return prisma.article.findUnique({
     where: { id: articleId, isHidden: false },
     select: getArticleSelect,
-  }) as any;
+  });
 }
 
 /**
@@ -47,7 +47,11 @@ export async function GetArticleCore(articleId: bigint): Promise<ArticleDbShape 
  * @throws Prisma.PrismaClientKnownRequestError
  * If a database constraint violation occurs.
  */
-export async function UpdateArticleCore(articleId: bigint, ctx: Article_Ctx, input: Article_Input): Promise<void> {
+export async function UpdateArticleCore(
+  articleId: bigint,
+  ctx: Article_Ctx,
+  input: Article_Input,
+): Promise<void> {
   await prisma.$transaction(async (tx) => {
     const article = await tx.article.findUnique({
       where: { id: articleId },
@@ -93,7 +97,11 @@ export async function DeleteArticle({ articleId }: { articleId: bigint }): Promi
   if (!session?.user?.id) throw Error("Unauthorized.");
 
   let sessionId: bigint;
-  try { sessionId = BigInt(session.user.id); } catch { throw Error("Invalid user id."); }
+  try {
+    sessionId = BigInt(session.user.id);
+  } catch {
+    throw Error("Invalid user id.");
+  }
 
   const article = await prisma.article.findUnique({
     where: { id: articleId },
@@ -185,13 +193,21 @@ export async function PostEmote({
   if (!session?.user?.id) throw Error("Unauthorized.");
 
   let sessionId: bigint;
-  try { sessionId = BigInt(session.user.id); } catch { throw Error("Invalid user id."); }
+  try {
+    sessionId = BigInt(session.user.id);
+  } catch {
+    throw Error("Invalid user id.");
+  }
 
   let articleId: bigint | null = null;
   let commentId: bigint | null = null;
   switch (targetPlace) {
-    case "ARTICLE": articleId = id; break;
-    case "COMMENT": commentId = id; break;
+    case "ARTICLE":
+      articleId = id;
+      break;
+    case "COMMENT":
+      commentId = id;
+      break;
   }
 
   const duplicate = await prisma.emote.findFirst({
@@ -214,8 +230,12 @@ export async function GetEmoteCount({ id, targetPlace }: { id: bigint; targetPla
   let articleId: bigint | null = null;
   let commentId: bigint | null = null;
   switch (targetPlace) {
-    case "ARTICLE": articleId = id; break;
-    case "COMMENT": commentId = id; break;
+    case "ARTICLE":
+      articleId = id;
+      break;
+    case "COMMENT":
+      commentId = id;
+      break;
   }
 
   const res = await prisma.emote.groupBy({

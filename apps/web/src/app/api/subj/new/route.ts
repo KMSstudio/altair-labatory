@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 
-import {
-  createSubject,
-  isUniqueViolation,
-  parseCreateInputFromJson,
-} from "@/util/subj.action";
+import { createSubject, isUniqueViolation, parseCreateInputFromJson } from "@/util/subj.action";
 
 /**
  * Serializes a Subject record for JSON responses.

@@ -34,13 +34,13 @@ export default async function Page({
   } catch {
     redirect("/");
   }
-  
-  const articleRaw = await GetArticleCore( articleId );
+
+  const articleRaw = await GetArticleCore(articleId);
   if (!articleRaw) {
     notFound();
   }
   const article = serializeArticle(articleRaw);
-  if(!article.author || userId !== BigInt(article.author?.id)){
+  if (!article.author || userId !== BigInt(article.author?.id)) {
     redirect("/");
   }
 

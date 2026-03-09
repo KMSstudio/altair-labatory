@@ -1,4 +1,4 @@
-// @/util/actions/article.action.ts
+// @/repository/db/comments.ts
 
 "use server";
 
@@ -19,7 +19,7 @@ import { serializeComment } from "@/repository/serialize/article";
  * @returns The created comment.
  */
 export async function PostComment(ctx: Comment_Ctx, input: Comment_PostInput): Promise<CommentDTO> {
-  const comment = await prisma.comment.create({
+  const comment = (await prisma.comment.create({
     data: {
       articleId: input.articleId,
       parentId: input.parentId,
@@ -28,7 +28,7 @@ export async function PostComment(ctx: Comment_Ctx, input: Comment_PostInput): P
       authorIp: ctx.authorIp,
     },
     select: getCommentSelect,
-  }) as CommentDbShape;
+  })) as CommentDbShape;
   return serializeComment(comment);
 }
 
@@ -92,13 +92,13 @@ export async function UpdateComment(
  * @returns The deleted comment after update.
  */
 export async function DeleteComment(commentId: bigint): Promise<CommentDTO> {
-  const deleted = await prisma.comment.update({
+  const deleted = (await prisma.comment.update({
     where: { id: commentId },
     data: {
       isHidden: true,
       deletedAt: new Date(),
     },
     select: getCommentSelect,
-  }) as CommentDbShape;
+  })) as CommentDbShape;
   return serializeComment(deleted);
 }

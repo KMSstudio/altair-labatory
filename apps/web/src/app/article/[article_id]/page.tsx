@@ -92,7 +92,7 @@ export default async function Page({
       {/*Display the number of emotes left in this article in detail.*/}
       <section>
         <h2>Emote</h2>
-        <EmoteSection id={articleId} emotes={emoteCount} kind="ARTICLE" />
+        <EmoteSection postId={articleId} emotes={emoteCount} postKind="ARTICLE" />
       </section>
       {/*Display tags of this article.*/}
       <section>
@@ -110,7 +110,7 @@ export default async function Page({
         <h2>Comment {article._count.comments ?? 0}</h2>
 
         {(article._count.comments ?? 0) !== 0 ? (
-          <CommentSection comments={comments} depth={0} viewerId={sessionId} />
+          <CommentSection comments={comments} depth={0} viewerId={sessionId?.toString()} />
         ) : (
           <p>No comment.</p>
         )}

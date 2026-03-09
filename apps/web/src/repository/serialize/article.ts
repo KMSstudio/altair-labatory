@@ -56,7 +56,7 @@ export function serializeArticle(article: ArticleDbShape): ArticleDTO {
     createdAt: article.createdAt.toISOString(),
     updatedAt: article.updatedAt.toISOString(),
 
-    tags: article.tags.map((t) => serializeArticleTag(t)),
+    tags: article.tags.map((t) => serializeArticleTag(t.tag)),
     author: serializePostAuthor(article.author),
     emotes: article.emotes.map((e) => ({
       userId: e.userId.toString(),

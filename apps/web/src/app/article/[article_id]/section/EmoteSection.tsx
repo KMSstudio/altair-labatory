@@ -1,71 +1,96 @@
 "use client";
 
 import { useState } from "react";
-import { GetEmoteCount, type GetEmoteCount_RetType, PostEmote } from "../../actions";
 import { type EmoteKind } from "@labatory/db";
+import type { EmoteDisplayState } from "@/repository/dto/article";
+
+const EMOTE_KINDS: EmoteKind[] = ["CHEER", "EMPATHY", "LIKE", "QUESTION", "BAD"];
+
+function BuildPressedRecord(activeKinds: EmoteKind[]): Record<EmoteKind, boolean> {
+  return {
+    CHEER: activeKinds.includes("CHEER"),
+    EMPATHY: activeKinds.includes("EMPATHY"),
+    LIKE: activeKinds.includes("LIKE"),
+    QUESTION: activeKinds.includes("QUESTION"),
+    BAD: activeKinds.includes("BAD"),
+  };
+}
+
+type PostEmoteResponse = {
+  ok: true;
+  emoteState: EmoteDisplayState;
+};
+
 export function EmoteSection({
-  emotes,
-  id,
-  kind,
+  emoteState,
+  postId,
+  postKind,
 }: {
-  emotes: GetEmoteCount_RetType;
-  id: bigint;
-  kind: "COMMENT" | "ARTICLE";
+  emoteState: EmoteDisplayState;
+  postId: bigint;
+  postKind: "COMMENT" | "ARTICLE";
 }) {
-  const [counts, setCounts] = useState<Record<EmoteKind, number>>(emotes);
-  const [isPressed, setIsPressed] = useState<Record<EmoteKind, boolean>>({
-    CHEER: false,
-    EMPATHY: false,
-    LIKE: false,
-    QUESTION: false,
-    BAD: false,
-  });
-  async function onClick(emoteType: EmoteKind) {
+  const [counts, setCounts] = useState(emoteState.counts);
+  const [isPressed, setIsPressed] = useState<Record<EmoteKind, boolean>>(
+    BuildPressedRecord(emoteState.activeKinds),
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function onClick(emoteKind: EmoteKind) {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     try {
-      const res = await PostEmote({ id, targetPlace: kind, emoteKind: emoteType });
-      setIsPressed((prev) => ({
-        ...prev,
-        [emoteType]: res,
-      }));
-      setCounts(await GetEmoteCount({ id, targetPlace: kind }));
+      const res = await fetch("/api/article/emote/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: postId.toString(),
+          targetPlace: postKind,
+          emoteKind,
+        }),
+      });
+
+      const data = (await res.json().catch(() => null)) as
+        | PostEmoteResponse
+        | { error?: string }
+        | null;
+
+      if (!res.ok) {
+        const error =
+          data && typeof data === "object" && "error" in data
+            ? (data.error ?? "Unknown error.")
+            : "Unknown error.";
+        throw new Error(error);
+      }
+
+      if (!data || typeof data !== "object" || !("emoteState" in data) || !data.emoteState) {
+        throw new Error("Invalid server response.");
+      }
+
+      setCounts(data.emoteState.counts);
+      setIsPressed(BuildPressedRecord(data.emoteState.activeKinds));
     } catch (e) {
       alert(`Posting emote error: ${e instanceof Error ? e.message : "Unknown error."}`);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   return (
     <div>
-      <div>
-        <button onClick={() => onClick("CHEER")} style={{ opacity: isPressed["CHEER"] ? 0.6 : 1 }}>
-          CHEER {counts["CHEER"] ?? 0}
-        </button>
-      </div>
-      <div>
-        <button
-          onClick={() => onClick("EMPATHY")}
-          style={{ opacity: isPressed["EMPATHY"] ? 0.6 : 1 }}
-        >
-          EMPATHY {counts["EMPATHY"] ?? 0}
-        </button>
-      </div>
-      <div>
-        <button onClick={() => onClick("LIKE")} style={{ opacity: isPressed["LIKE"] ? 0.6 : 1 }}>
-          LIKE {counts["LIKE"] ?? 0}
-        </button>
-      </div>
-      <div>
-        <button
-          onClick={() => onClick("QUESTION")}
-          style={{ opacity: isPressed["QUESTION"] ? 0.6 : 1 }}
-        >
-          QUESTION {counts["QUESTION"] ?? 0}
-        </button>
-      </div>
-      <div>
-        <button onClick={() => onClick("BAD")} style={{ opacity: isPressed["BAD"] ? 0.6 : 1 }}>
-          BAD {counts["BAD"] ?? 0}
-        </button>
-      </div>
+      {EMOTE_KINDS.map((emoteKind) => (
+        <div key={emoteKind}>
+          <button
+            type="button"
+            onClick={() => onClick(emoteKind)}
+            disabled={isSubmitting}
+            style={{ opacity: isPressed[emoteKind] ? 0.6 : 1 }}
+          >
+            {emoteKind} {counts[emoteKind] ?? 0}
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

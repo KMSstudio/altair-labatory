@@ -38,7 +38,6 @@ export const normalizeText2String = (value: unknown): string => {
   return trimmed.length ? trimmed : "";
 };
 
-
 /**
  * Extract client IP from request headers.
  */

@@ -1,5 +1,11 @@
 // @/types/article.ts
 
+export type Emote_Ctx = {
+  userId: bigint;
+  postId: bigint;
+  postKind: string;
+};
+
 export type Comment_Ctx = {
   authorId: bigint;
   authorIp: string;

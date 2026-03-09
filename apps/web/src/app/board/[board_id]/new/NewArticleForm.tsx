@@ -54,7 +54,9 @@ export default function NewArticleForm({ boardId }: { boardId: string }) {
 
     if (!res.ok || !("ok" in data) || !data.ok) {
       setSubmitting(false);
-      router.replace(`?error=${encodeURIComponent("error" in data ? data.error : "Unknown error.")}`);
+      router.replace(
+        `?error=${encodeURIComponent("error" in data ? data.error : "Unknown error.")}`,
+      );
       return;
     }
 

@@ -1,4 +1,4 @@
-// @/lib/dto/article.ts
+// @/repository/dto/article.ts
 
 import type { EmoteKind, TagKind } from "@labatory/db";
 
@@ -12,6 +12,15 @@ export type ArticleTagDbShape = {
   text: string | null;
 };
 
+export const getArticleTagSelect = {
+  id: true,
+  kind: true,
+  labId: true,
+  univId: true,
+  subjId: true,
+  text: true,
+} as const;
+
 export type ArticleTagDTO = {
   id: string;
   kind: TagKind;
@@ -23,11 +32,19 @@ export type ArticleTagDTO = {
 
 // EMOTE
 export type PostEmoteDbShape = { userId: bigint; kind: EmoteKind };
+export const getPostEmoteSelect = { userId: true, kind: true } as const;
 export type PostEmoteDTO = { userId: string; kind: EmoteKind };
 
+export type EmoteCountRecord = Record<EmoteKind, number>;
+export type EmoteDisplayState = {
+  counts: EmoteCountRecord;
+  activeKinds: EmoteKind[];
+};
+
 // AUTHOR
-export type PostAuthorDbShape = { id: bigint; displayName: string } & Record<string, any>;
-export type PostAuthorDTO = { id: string; displayName: string } & Record<string, any>;
+export type PostAuthorDbShape = { id: bigint; displayName: string };
+export const getPostAuthorSelect = { id: true, displayName: true } as const;
+export type PostAuthorDTO = { id: string; displayName: string };
 
 // COMMENT
 export type CommentDbShape = {
@@ -37,19 +54,19 @@ export type CommentDbShape = {
   isHidden: boolean;
   parentId: bigint | null;
   content: string;
-  emotes: { userId: bigint; kind: EmoteKind }[];
+  emotes: PostEmoteDbShape[];
   createdAt: Date;
   updatedAt: Date;
 };
 
 export const getCommentSelect = {
   id: true,
-  author: { select: { id: true, displayName: true } },
+  author: { select: getPostAuthorSelect },
   articleId: true,
   isHidden: true,
   parentId: true,
   content: true,
-  emotes: { select: { userId: true, kind: true } },
+  emotes: { select: getPostEmoteSelect },
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -61,9 +78,13 @@ export type CommentDTO = {
   isHidden: boolean;
   parentId: string | null;
   content: string;
-  emotes: { userId: string; kind: EmoteKind }[];
+  emotes: PostEmoteDTO[];
   createdAt: string;
   updatedAt: string;
+};
+
+export type CommentDisplayTree = CommentDTO & {
+  children: CommentDisplayTree[];
 };
 
 // ARTICLE
@@ -76,7 +97,7 @@ export type ArticleDbShape = {
   createdAt: Date;
   updatedAt: Date;
 
-  tags: ArticleTagDbShape[];
+  tags: { tag: ArticleTagDbShape }[];
   author: PostAuthorDbShape | null;
   emotes: PostEmoteDbShape[];
   comments: CommentDbShape[];
@@ -91,23 +112,14 @@ export const getArticleSelect = {
   content: true,
   viewCount: true,
   tags: {
-    include: {
-      tag: {
-        select: {
-          id: true,
-          kind: true,
-          labId: true,
-          univId: true,
-          subjId: true,
-          text: true,
-        },
-      },
+    select: {
+      tag: { select: getArticleTagSelect },
     },
   },
-  author: { select: { id: true, displayName: true } },
+  author: { select: getPostAuthorSelect },
   createdAt: true,
   updatedAt: true,
-  emotes: { select: { userId: true, kind: true } },
+  emotes: { select: getPostEmoteSelect },
   comments: {
     where: { deletedAt: null },
     orderBy: { createdAt: "asc" as const },

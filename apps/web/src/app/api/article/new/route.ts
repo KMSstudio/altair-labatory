@@ -43,8 +43,11 @@ type Body = {
  */
 export async function POST(request: Request) {
   let body: Body;
-  try { body = (await request.json()) as Body; }
-  catch { return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }); }
+  try {
+    body = (await request.json()) as Body;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
 
   const session = await getServerSession(authOptions);
   if (!session?.user) throw Error("User must be logged in.");
@@ -57,13 +60,18 @@ export async function POST(request: Request) {
 
   let boardId: bigint;
   if (!rawBoardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
-  if (!title || !content) return NextResponse.json({ error: "Title and content are required." }, { status: 400 });
-  try { boardId = BigInt(rawBoardId.trim()); }
-  catch { throw Error("Invalid board id."); }
+  if (!title || !content)
+    return NextResponse.json({ error: "Title and content are required." }, { status: 400 });
+  try {
+    boardId = BigInt(rawBoardId.trim());
+  } catch {
+    throw Error("Invalid board id.");
+  }
 
   let ctx;
-  try { ctx = await buildCreateArticleCtx(session); }
-  catch (e) {
+  try {
+    ctx = await buildCreateArticleCtx(session);
+  } catch (e) {
     const msg = e instanceof Error ? e.message : "Internal server error.";
     const status = msg === "User must be logged in." ? 401 : 400;
     return NextResponse.json({ error: msg }, { status });
@@ -78,22 +86,24 @@ export async function POST(request: Request) {
   if (!board.isActive) return NextResponse.json({ error: "Board is inactive." }, { status: 400 });
 
   let tagIds: bigint[];
-  try { tagIds = tagIdsRaw.map((tagId) => BigInt(tagId)); }
-  catch { return NextResponse.json({ error: "Invalid tag id." }, { status: 400 }); }
+  try {
+    tagIds = tagIdsRaw.map((tagId) => BigInt(tagId));
+  } catch {
+    return NextResponse.json({ error: "Invalid tag id." }, { status: 400 });
+  }
 
   try {
-    const articleId = await CreateArticleCore(
-      ctx, boardId,
-      { title, content, tagIds },
-    );
+    const articleId = await CreateArticleCore(ctx, boardId, { title, content, tagIds });
 
     return NextResponse.json({ ok: true, articleId: articleId.toString() }, { status: 200 });
   } catch (e) {
     if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
       return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
-    if (e.code === "P2003") return NextResponse.json({ error: "Invalid reference." }, { status: 400 });
-    if (e.code === "P2002") return NextResponse.json({ error: "Duplicate tags exist." }, { status: 400 });
+    if (e.code === "P2003")
+      return NextResponse.json({ error: "Invalid reference." }, { status: 400 });
+    if (e.code === "P2002")
+      return NextResponse.json({ error: "Duplicate tags exist." }, { status: 400 });
     return NextResponse.json({ error: "Internal database error." }, { status: 500 });
   }
 }

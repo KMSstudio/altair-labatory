@@ -32,7 +32,9 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDT
     setErrorMessage(null);
 
     try {
-      setTags((await SearchArticleTags({ kind: tagKind, query: trimmedQuery })).map(serializeArticleTag));
+      setTags(
+        (await SearchArticleTags({ kind: tagKind, query: trimmedQuery })).map(serializeArticleTag),
+      );
     } catch (e) {
       setErrorMessage(`Selecting tag error: ${e instanceof Error ? e.message : "Unknown Error"}`);
     } finally {
@@ -56,11 +58,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDT
         <strong>Tags search</strong>
         <label>
           <div>
-            <input
-              name="query"
-              value={query}
-              onChange={(e) => setQuery(e.currentTarget.value)}
-            />
+            <input name="query" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
             <select value={tagKind} onChange={(e) => setTagKind(e.target.value as TagKind)}>
               <option value={"TEXT"}>Text</option>
               <option value={"LAB"}>Lab</option>

@@ -2,7 +2,8 @@
 
 import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/util/util";
-import { SerializeComment } from "@/repository/serialize/SerializeComment";
+
+import { serializeComment } from "@/repository/serialize/article";
 import { type EmoteKind, type EmotePlace, Prisma, prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 
@@ -359,7 +360,7 @@ export async function PostComment({
       },
     });
 
-    return SerializeComment(comment);
+    return serializeComment(comment);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Internal server error.";
     throw new Error(message);

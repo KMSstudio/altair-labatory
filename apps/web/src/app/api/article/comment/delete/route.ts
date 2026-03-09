@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import { DeleteComment } from "@/repository/db/comment";
+import { parseBigInt } from "@/app/api/_util/parse";
+import { assertCommentAuthorOrAdmin, mapPermissionError } from "@/app/api/_util/assertPermission";
 
 type Body = {
   commentId: string;
@@ -13,7 +15,6 @@ type Body = {
 
 export async function POST(request: Request) {
   let body: Body;
-
   try {
     body = (await request.json()) as Body;
   } catch {
@@ -25,16 +26,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "User must be logged in." }, { status: 401 });
   }
 
-  const commentIdRaw = body.commentId?.toString().trim() ?? "";
-
-  if (!commentIdRaw)
-    return NextResponse.json({ error: "Comment id is required." }, { status: 400 });
-
   let commentId: bigint;
+  let userId: bigint;
   try {
-    commentId = BigInt(commentIdRaw);
-  } catch {
-    return NextResponse.json({ error: "Invalid comment id." }, { status: 400 });
+    commentId = parseBigInt(body.commentId, "comment id");
+    userId = parseBigInt(session.user.id, "user id");
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Invalid parameter.";
+    return NextResponse.json({ error: msg }, { status: 400 });
+  }
+
+  try {
+    await assertCommentAuthorOrAdmin(commentId, userId, session.user.role);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Internal server error.";
+    const { error, status } = mapPermissionError(msg);
+    return NextResponse.json({ error }, { status });
   }
 
   try {

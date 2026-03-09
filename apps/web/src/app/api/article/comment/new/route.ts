@@ -1,11 +1,18 @@
 // @/app/api/article/comment/new/route.ts
 
 import { NextResponse } from "next/server";
-import { Prisma, prisma } from "@labatory/db";
+import { Prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import { buildCommentCtx } from "@/app/api/_util/createArticleCtx";
+import { parseBigInt } from "@/app/api/_util/parse";
+import {
+  assertArticleCommentable,
+  assertParentCommentInArticle,
+  mapPermissionError,
+} from "@/app/api/_util/assertPermission";
+
 import { PostComment } from "@/repository/db/comment";
 import type { Comment_Ctx, Comment_PostInput } from "@/types/article";
 
@@ -15,6 +22,20 @@ type Body = {
   content: string;
 };
 
+/**
+ * Create a new comment on an article.
+ *
+ * This endpoint creates a comment for a target article.
+ * The requester does not need to be the article author, but must be logged in.
+ *
+ * @param request - HTTP request containing `{ articleId, parentId?, content }`
+ *
+ * @returns
+ * - `200` `{ ok: true, comment }` on success
+ * - `400` for invalid input or invalid article / parent comment state
+ * - `401` when the user is not logged in
+ * - `500` for internal server errors
+ */
 export async function POST(request: Request) {
   let body: Body;
   try {
@@ -24,57 +45,36 @@ export async function POST(request: Request) {
   }
 
   const session = await getServerSession(authOptions);
-  if (!session?.user) throw Error("User must be logged in.");
-  if (!session.user.id) throw Error("Invalid session.");
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "User must be logged in." }, { status: 401 });
+  }
 
-  const articleIdRaw = body.articleId?.toString().trim() ?? "";
-  const parentIdRaw = body.parentId?.toString().trim() ?? "";
   const content = body.content?.toString().trim() ?? "";
-
-  if (!articleIdRaw)
-    return NextResponse.json({ error: "Article id is required." }, { status: 400 });
-  if (!content) return NextResponse.json({ error: "Content is required." }, { status: 400 });
+  if (!content) {
+    return NextResponse.json({ error: "Content is required." }, { status: 400 });
+  }
 
   let articleId: bigint;
-  try {
-    articleId = BigInt(articleIdRaw);
-  } catch {
-    return NextResponse.json({ error: "Invalid article id." }, { status: 400 });
-  }
-
   let parentId: bigint | null = null;
-  if (parentIdRaw) {
-    try {
-      parentId = BigInt(parentIdRaw);
-    } catch {
-      return NextResponse.json({ error: "Invalid parent comment id." }, { status: 400 });
+  try {
+    articleId = parseBigInt(body.articleId, "article id");
+    if (body.parentId != null && body.parentId.toString().trim() !== "") {
+      parentId = parseBigInt(body.parentId, "parent comment id");
     }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Invalid parameter.";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 
-  const article = await prisma.article.findUnique({
-    where: { id: articleId },
-    select: { id: true, isHidden: true },
-  });
-
-  if (!article) return NextResponse.json({ error: "Article does not exist." }, { status: 400 });
-  if (article.isHidden) return NextResponse.json({ error: "Article is hidden." }, { status: 400 });
-
-  if (parentId !== null) {
-    const parent = await prisma.comment.findUnique({
-      where: { id: parentId },
-      select: { id: true, articleId: true, isHidden: true },
-    });
-
-    if (!parent)
-      return NextResponse.json({ error: "Parent comment does not exist." }, { status: 400 });
-    if (parent.isHidden)
-      return NextResponse.json({ error: "Parent comment is hidden." }, { status: 400 });
-    if (parent.articleId !== articleId) {
-      return NextResponse.json(
-        { error: "Parent comment does not belong to the article." },
-        { status: 400 },
-      );
+  try {
+    await assertArticleCommentable(articleId);
+    if (parentId !== null) {
+      await assertParentCommentInArticle(parentId, articleId);
     }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Internal server error.";
+    const { error, status } = mapPermissionError(msg);
+    return NextResponse.json({ error }, { status });
   }
 
   let ctx: Comment_Ctx;

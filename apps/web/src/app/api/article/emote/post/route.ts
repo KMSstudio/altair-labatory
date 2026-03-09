@@ -9,6 +9,7 @@ import { authOptions } from "@/lib/auth";
 import type { Emote_Ctx } from "@/types/article";
 import { ToggleEmote } from "@/repository/db/emote";
 import { BuildEmoteDisplayState } from "@/app/article/[article_id]/article.transform";
+import { parseBigInt, parseEnumValue } from "@/app/api/_util/parse";
 
 type Body = {
   postId: string;
@@ -16,63 +17,27 @@ type Body = {
   emoteKind: string;
 };
 
-function ParseEmotePlace(value: string): EmotePlace {
-  if (!Object.values(EmotePlace).includes(value as EmotePlace)) {
-    throw new Error(`Invalid EmotePlace: ${value}`);
-  }
-  return value as EmotePlace;
-}
-
-function ParseEmoteKind(value: string): EmoteKind {
-  if (!Object.values(EmoteKind).includes(value as EmoteKind)) {
-    throw new Error(`Invalid EmoteKind: ${value}`);
-  }
-  return value as EmoteKind;
-}
-
-function ParseEmoteRequest(
-  sessionUserId: string,
-  postIdRaw: string,
-  postKindRaw: string,
-  emoteKindRaw: string,
-): {
-  userId: bigint;
-  postId: bigint;
-  postKind: EmotePlace;
-  emoteKind: EmoteKind;
-} {
-  let userId: bigint;
-  let postId: bigint;
-  let postKind: EmotePlace;
-  let emoteKind: EmoteKind;
-
-  try {
-    userId = BigInt(sessionUserId);
-  } catch {
-    throw new Error("Invalid user id.");
-  }
-
-  try {
-    postId = BigInt(postIdRaw);
-  } catch {
-    throw new Error("Invalid postId.");
-  }
-
-  try {
-    postKind = ParseEmotePlace(postKindRaw);
-  } catch (e) {
-    throw new Error(e instanceof Error ? e.message : "Invalid postKind.");
-  }
-
-  try {
-    emoteKind = ParseEmoteKind(emoteKindRaw);
-  } catch (e) {
-    throw new Error(e instanceof Error ? e.message : "Invalid emoteKind.");
-  }
-
-  return { userId, postId, postKind, emoteKind };
-}
-
+/**
+ * Toggle an emote on an article or comment.
+ *
+ * This endpoint parses the target post information and emote kind,
+ * then toggles the emote for the current user.
+ *
+ * Validation steps:
+ * 1. Parse request body
+ * 2. Validate user session
+ * 3. Parse `userId`, `postId`, `postKind`, and `emoteKind`
+ * 4. Toggle emote state
+ * 5. Build display state for client response
+ *
+ * @param request - HTTP request containing `{ postId, postKind, emoteKind }`
+ *
+ * @returns
+ * - `200` `{ ok: true, active, emoteState }` on success
+ * - `400` for invalid input
+ * - `401` when the user is not logged in
+ * - `500` for internal server errors
+ */
 export async function POST(request: Request) {
   let body: Body;
 
@@ -87,31 +52,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "User must be logged in." }, { status: 401 });
   }
 
-  const postIdRaw = body.postId?.toString().trim() ?? "";
-  const postKindRaw = body.postKind?.toString().trim() ?? "";
-  const emoteKindRaw = body.emoteKind?.toString().trim() ?? "";
-
-  if (!postIdRaw) return NextResponse.json({ error: "postId is required." }, { status: 400 });
-  if (!postKindRaw) return NextResponse.json({ error: "postKind is required." }, { status: 400 });
-  if (!emoteKindRaw) return NextResponse.json({ error: "emoteKind is required." }, { status: 400 });
-
   let userId: bigint;
   let postId: bigint;
   let postKind: EmotePlace;
   let emoteKind: EmoteKind;
-
   try {
-    ({ userId, postId, postKind, emoteKind } = ParseEmoteRequest(
-      session.user.id,
-      postIdRaw,
-      postKindRaw,
-      emoteKindRaw,
-    ));
+    userId = parseBigInt(session.user.id, "user id");
+    postId = parseBigInt(body.postId, "postId");
+    postKind = parseEnumValue(EmotePlace, body.postKind, "postKind");
+    emoteKind = parseEnumValue(EmoteKind, body.emoteKind, "emoteKind");
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Invalid request." },
-      { status: 400 },
-    );
+    const msg = e instanceof Error ? e.message : "Invalid parameter.";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
   const ctx: Emote_Ctx = { userId, postId, postKind };
 

@@ -46,17 +46,29 @@ function ParseEmoteRequest(
   let postKind: EmotePlace;
   let emoteKind: EmoteKind;
 
-  try { userId = BigInt(sessionUserId); }
-  catch { throw new Error("Invalid user id."); }
+  try {
+    userId = BigInt(sessionUserId);
+  } catch {
+    throw new Error("Invalid user id.");
+  }
 
-  try { postId = BigInt(postIdRaw); }
-  catch { throw new Error("Invalid postId."); }
+  try {
+    postId = BigInt(postIdRaw);
+  } catch {
+    throw new Error("Invalid postId.");
+  }
 
-  try { postKind = ParseEmotePlace(postKindRaw); }
-  catch (e) { throw new Error(e instanceof Error ? e.message : "Invalid postKind."); }
+  try {
+    postKind = ParseEmotePlace(postKindRaw);
+  } catch (e) {
+    throw new Error(e instanceof Error ? e.message : "Invalid postKind.");
+  }
 
-  try { emoteKind = ParseEmoteKind(emoteKindRaw); }
-  catch (e) { throw new Error(e instanceof Error ? e.message : "Invalid emoteKind."); }
+  try {
+    emoteKind = ParseEmoteKind(emoteKindRaw);
+  } catch (e) {
+    throw new Error(e instanceof Error ? e.message : "Invalid emoteKind.");
+  }
 
   return { userId, postId, postKind, emoteKind };
 }
@@ -79,12 +91,9 @@ export async function POST(request: Request) {
   const postKindRaw = body.postKind?.toString().trim() ?? "";
   const emoteKindRaw = body.emoteKind?.toString().trim() ?? "";
 
-  if (!postIdRaw)
-    return NextResponse.json({ error: "postId is required." }, { status: 400 });
-  if (!postKindRaw)
-    return NextResponse.json({ error: "postKind is required." }, { status: 400 });
-  if (!emoteKindRaw)
-    return NextResponse.json({ error: "emoteKind is required." }, { status: 400 });
+  if (!postIdRaw) return NextResponse.json({ error: "postId is required." }, { status: 400 });
+  if (!postKindRaw) return NextResponse.json({ error: "postKind is required." }, { status: 400 });
+  if (!emoteKindRaw) return NextResponse.json({ error: "emoteKind is required." }, { status: 400 });
 
   let userId: bigint;
   let postId: bigint;
@@ -109,10 +118,7 @@ export async function POST(request: Request) {
   try {
     const result = await ToggleEmote(ctx, emoteKind);
 
-    const emoteState = BuildEmoteDisplayState(
-      result.emotes,
-      session.user.id
-    );
+    const emoteState = BuildEmoteDisplayState(result.emotes, session.user.id);
 
     return NextResponse.json({
       ok: true,

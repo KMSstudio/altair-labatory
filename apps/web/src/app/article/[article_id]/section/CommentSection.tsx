@@ -101,12 +101,7 @@ export function CommentSection({
   return (
     <div>
       {comments.map((comment) => (
-        <CommentComponent
-          key={comment.id}
-          comment={comment}
-          depth={depth}
-          viewerId={viewerId}
-        />
+        <CommentComponent key={comment.id} comment={comment} depth={depth} viewerId={viewerId} />
       ))}
     </div>
   );

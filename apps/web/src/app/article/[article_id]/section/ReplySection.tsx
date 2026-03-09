@@ -3,11 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-async function requestPostComment(
-  articleId: bigint,
-  parentId: bigint | null,
-  content: string,
-) {
+async function requestPostComment(articleId: bigint, parentId: bigint | null, content: string) {
   const res = await fetch("/api/article/comment/new", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -18,21 +14,17 @@ async function requestPostComment(
     }),
   });
 
-  const data = (await res.json().catch(() => null)) as
-    | { ok?: boolean; comment?: unknown; error?: string }
-    | null;
+  const data = (await res.json().catch(() => null)) as {
+    ok?: boolean;
+    comment?: unknown;
+    error?: string;
+  } | null;
 
   if (!res.ok) throw new Error(data?.error ?? "Failed to post comment.");
   return data;
 }
 
-export function ReplySection({
-  articleId,
-  parentId,
-}: {
-  articleId: bigint;
-  parentId: bigint;
-}) {
+export function ReplySection({ articleId, parentId }: { articleId: bigint; parentId: bigint }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [loadingSubmit, setLoadingSubmit] = useState(false);

@@ -13,21 +13,17 @@ async function requestDeleteArticle(articleId: bigint) {
     }),
   });
 
-  const data = (await res.json().catch(() => null)) as
-    | { ok?: boolean; articleId?: string; error?: string }
-    | null;
+  const data = (await res.json().catch(() => null)) as {
+    ok?: boolean;
+    articleId?: string;
+    error?: string;
+  } | null;
 
   if (!res.ok) throw new Error(data?.error ?? "Failed to delete article.");
   return data;
 }
 
-export function WriterSection({
-  articleId,
-  boardId,
-}: {
-  articleId: bigint;
-  boardId: bigint;
-}) {
+export function WriterSection({ articleId, boardId }: { articleId: bigint; boardId: bigint }) {
   const router = useRouter();
   const [loadingDelete, setLoadingDelete] = useState(false);
 

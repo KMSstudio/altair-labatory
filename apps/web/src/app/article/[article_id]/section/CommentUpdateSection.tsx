@@ -13,9 +13,11 @@ async function requestCommentUpdate(commentId: bigint, content: string) {
     }),
   });
 
-  const data = (await res.json().catch(() => null)) as
-    | { ok?: boolean; comment?: unknown; error?: string }
-    | null;
+  const data = (await res.json().catch(() => null)) as {
+    ok?: boolean;
+    comment?: unknown;
+    error?: string;
+  } | null;
 
   if (!res.ok) {
     throw new Error(data?.error ?? "Failed to update comment.");
@@ -33,9 +35,11 @@ async function requestCommentDelete(commentId: bigint) {
     }),
   });
 
-  const data = (await res.json().catch(() => null)) as
-    | { ok?: boolean; comment?: unknown; error?: string }
-    | null;
+  const data = (await res.json().catch(() => null)) as {
+    ok?: boolean;
+    comment?: unknown;
+    error?: string;
+  } | null;
 
   if (!res.ok) {
     throw new Error(data?.error ?? "Failed to delete comment.");

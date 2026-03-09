@@ -34,8 +34,7 @@ export async function POST(request: Request) {
   if (!commentIdRaw)
     return NextResponse.json({ error: "Comment id is required." }, { status: 400 });
 
-  if (!content)
-    return NextResponse.json({ error: "Content is required." }, { status: 400 });
+  if (!content) return NextResponse.json({ error: "Content is required." }, { status: 400 });
 
   let commentId: bigint;
   try {

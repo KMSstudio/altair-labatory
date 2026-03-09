@@ -47,8 +47,9 @@ export async function POST(request: Request) {
   }
 
   const session = await getServerSession(authOptions);
-  if (!session?.user) throw Error("User must be logged in.");
-  if (!session.user.id) throw Error("Invalid session.");
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "User must be logged in." }, { status: 401 });
+  }
 
   const articleIdRaw = body.articleId?.toString().trim() ?? "";
   const title = body.title?.toString() ?? "";

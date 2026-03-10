@@ -1,6 +1,6 @@
 // @/repository/db/emote.ts
 
-import "server-only";
+"use server";
 
 import { prisma, type EmoteKind, EmotePlace } from "@labatory/db";
 

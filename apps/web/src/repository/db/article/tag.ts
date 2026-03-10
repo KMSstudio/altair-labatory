@@ -1,6 +1,6 @@
 // @/util/actions/tag.action.ts
 
-import "server-only";
+"use server";
 
 import { prisma, Prisma, type TagKind } from "@labatory/db";
 import type { ArticleTagDbShape } from "@/repository/dto/article";

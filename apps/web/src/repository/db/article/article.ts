@@ -54,11 +54,21 @@ export async function UpdateArticleCore(
   input: Article_Input,
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
-    const article = await tx.article.findUnique({
-      where: { id: articleId },
-      select: { title: true, content: true, authorIp: true },
+    // We use findFirst to query non-PK fields.
+    const article = await tx.article.findFirst({
+      where: {
+        id: articleId,
+        isHidden: false,
+        deletedAt: null,
+      },
+      select: {
+        title: true,
+        content: true,
+        authorIp: true,
+      },
     });
-    if (!article) throw Error("Article does not Exist.");
+
+    if (!article) throw new Error("Article does not exist or is hidden.");
 
     await tx.articleHistory.create({
       data: {
@@ -69,8 +79,12 @@ export async function UpdateArticleCore(
       },
     });
 
-    await tx.article.update({
-      where: { id: articleId },
+    const updated = await tx.article.updateMany({
+      where: {
+        id: articleId,
+        isHidden: false,
+        deletedAt: null,
+      },
       data: {
         title: input.title,
         content: input.content,
@@ -78,31 +92,67 @@ export async function UpdateArticleCore(
       },
     });
 
-    await tx.articleTag.deleteMany({ where: { articleId } });
+    if (updated.count !== 1) {
+      throw new Error("Article was deleted or hidden during update.");
+    }
+
+    await tx.articleTag.deleteMany({
+      where: { articleId },
+    });
 
     if (input.tagIds.length) {
-      const data: Prisma.ArticleTagCreateManyInput[] = input.tagIds.map((tagId) => ({
-        articleId,
-        tagId,
-      }));
-      await tx.articleTag.createMany({ data });
+      await tx.articleTag.createMany({
+        data: input.tagIds.map((tagId) => ({
+          articleId,
+          tagId,
+        })),
+      });
     }
   });
 }
 
 /**
- * Soft-delete (hide) article.
+ * Soft-deletes an article.
+ *
+ * Marks the article as hidden by setting `isHidden = true` and recording
+ * the deletion timestamp in `deletedAt`. This function performs DB-only
+ * logic and assumes that authorization (e.g., author/admin validation)
+ * has already been handled by the caller.
+ *
+ * To prevent race conditions during concurrent delete requests, the final
+ * write operation is guarded with `isHidden: false`. If another request
+ * deletes the article between the read and the write, the update will
+ * affect zero rows and an error will be thrown.
+ *
+ * @param params - Object containing the target article id.
+ * @param params.articleId - The id of the article to delete.
+ *
+ * @throws {Error} If the article does not exist.
+ * @throws {Error} If the article has already been deleted.
+ *
+ * @returns Resolves when the article is successfully soft-deleted.
  */
 export async function DeleteArticle({ articleId }: { articleId: bigint }): Promise<void> {
   const article = await prisma.article.findUnique({
     where: { id: articleId },
-    select: { authorId: true },
+    select: { authorId: true, isHidden: true },
   });
-  if (!article) throw Error("Article does not Exist.");
-  await prisma.article.update({
-    where: { id: articleId },
-    data: { isHidden: true, deletedAt: new Date() },
+
+  if (!article) throw new Error("Article does not exist.");
+  if (article.isHidden) throw new Error("Article already deleted.");
+
+  const result = await prisma.article.updateMany({
+    where: {
+      id: articleId,
+      isHidden: false,
+    },
+    data: {
+      isHidden: true,
+      deletedAt: new Date(),
+    },
   });
+
+  if (result.count === 0) throw new Error("Article already deleted.");
 }
 
 /**

@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
   if (!articleIdRaw)
     return NextResponse.json({ error: "Article id is required." }, { status: 400 });
-  if (!title || !content)
+  if (!title.trim() || !content.trim())
     return NextResponse.json({ error: "Title and content are required." }, { status: 400 });
 
   let articleId: bigint;

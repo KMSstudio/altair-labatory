@@ -1,25 +1,44 @@
-import { authOptions } from "@/lib/auth";
-import { getClientIp } from "@/util/tag.action";
-import { prisma, Prisma } from "@labatory/db";
-import { getServerSession } from "next-auth";
+// @/app/api/article/update/route.ts
+
 import { NextResponse } from "next/server";
+import { Prisma, prisma } from "@labatory/db";
+
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+import { buildCreateArticleCtx } from "@/app/api/_util/createArticleCtx";
+import { UpdateArticleCore } from "@/repository/db/article/article";
 
 type Body = {
-  articleIdRaw: string;
+  articleId: string;
   title: string;
   content: string;
   tagIdsRaw?: string[];
 };
 
+/**
+ * Handle article update requests.
+ *
+ * This API endpoint performs all **server-side validation** before
+ * delegating the actual database write operation to `UpdateArticleCore`.
+ *
+ * Validation performed here includes:
+ * - Request body validation
+ * - Article existence check
+ * - Authentication and client IP extraction via `buildCreateArticleCtx`
+ * - Author ownership check (only author can update)
+ * - Tag ID parsing
+ *
+ * @param request - Incoming HTTP request containing a JSON body.
+ *
+ * @returns
+ * - `200` with `{ ok: true, articleId }` if update succeeds
+ * - `400` for validation errors
+ * - `401` if the user is not authenticated
+ * - `403` if the user is not the author
+ * - `500` for internal or database errors
+ */
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  if (!session.user.id) {
-    return NextResponse.json({ error: "Invalid session." }, { status: 400 });
-  }
-
   let body: Body;
   try {
     body = (await request.json()) as Body;
@@ -27,19 +46,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const newTitle = body.title?.toString() ?? "";
-  const newContent = body.content?.toString() ?? "";
-  const articleIdRaw = body.articleIdRaw?.toString() ?? "";
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "User must be logged in." }, { status: 401 });
+  }
 
-  if (!articleIdRaw) {
+  const articleIdRaw = body.articleId?.toString().trim() ?? "";
+  const title = body.title?.toString() ?? "";
+  const content = body.content?.toString() ?? "";
+  const tagIdsRaw = Array.isArray(body.tagIdsRaw) ? body.tagIdsRaw : [];
+
+  if (!articleIdRaw)
     return NextResponse.json({ error: "Article id is required." }, { status: 400 });
-  }
-  if (!newContent) {
-    return NextResponse.json({ error: "Content is required." }, { status: 400 });
-  }
-  if (!newTitle) {
-    return NextResponse.json({ error: "Title is required." }, { status: 400 });
-  }
+  if (!title.trim() || !content.trim())
+    return NextResponse.json({ error: "Title and content are required." }, { status: 400 });
 
   let articleId: bigint;
   try {
@@ -48,89 +68,44 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid article id." }, { status: 400 });
   }
 
-  let sessionId: bigint;
+  // Load minimal article info for ownership check
+  const article = await prisma.article.findUnique({
+    where: { id: articleId },
+    select: { authorId: true, isHidden: true },
+  });
+
+  if (!article) return NextResponse.json({ error: "Article does not Exist." }, { status: 400 });
+  if (article.isHidden) return NextResponse.json({ error: "Article is hidden." }, { status: 400 });
+
+  let ctx;
   try {
-    sessionId = BigInt(session.user.id);
-  } catch {
-    return NextResponse.json({ error: "Invalid user id." }, { status: 400 });
+    ctx = await buildCreateArticleCtx(session);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Internal server error.";
+    const status = msg === "User must be logged in." ? 401 : 400;
+    return NextResponse.json({ error: msg }, { status });
   }
 
-  const tagIdsRaw = Array.isArray(body.tagIdsRaw) ? body.tagIdsRaw : [];
+  if (article.authorId !== ctx.authorId)
+    return NextResponse.json({ error: "Unauthorized." }, { status: 403 });
   let tagIds: bigint[];
   try {
-    tagIds = tagIdsRaw.map((x) => BigInt(x));
+    tagIds = tagIdsRaw.map((tagId) => BigInt(tagId));
   } catch {
     return NextResponse.json({ error: "Invalid tag id." }, { status: 400 });
   }
 
-  const clientIp = await getClientIp();
-  if (!clientIp) {
-    return NextResponse.json({ error: "Invalid client ip." }, { status: 400 });
-  }
-
-  const article = await prisma.article.findUnique({
-    where: { id: articleId },
-    select: {
-      authorId: true,
-      title: true,
-      content: true,
-      authorIp: true,
-    },
-  });
-
-  if (!article) {
-    return NextResponse.json({ error: "Article does not exist." }, { status: 404 });
-  }
-
-  if (sessionId !== article.authorId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  }
-
   try {
-    await prisma.$transaction(async (tx) => {
-      await tx.articleHistory.create({
-        data: {
-          articleId,
-          oldTitle: article.title,
-          oldContent: article.content,
-          oldAuthorIp: article.authorIp,
-        },
-      });
-
-      await tx.article.update({
-        where: { id: articleId },
-        data: {
-          title: newTitle,
-          content: newContent,
-          authorIp: clientIp,
-        },
-      });
-
-      await tx.articleTag.deleteMany({
-        where: { articleId },
-      });
-
-      if (tagIds.length) {
-        const data: Prisma.ArticleTagCreateManyInput[] = tagIds.map((tagId) => ({
-          articleId,
-          tagId,
-        }));
-        await tx.articleTag.createMany({ data });
-      }
-    });
-
-    return NextResponse.json({ ok: true }, { status: 200 });
+    await UpdateArticleCore(articleId, ctx, { title, content, tagIds });
+    return NextResponse.json({ ok: true, articleId: articleId.toString() }, { status: 200 });
   } catch (e) {
     if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
       return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
-
-    if (e.code === "P2003") {
+    if (e.code === "P2003")
       return NextResponse.json({ error: "Invalid reference." }, { status: 400 });
-    } else if (e.code === "P2002") {
+    if (e.code === "P2002")
       return NextResponse.json({ error: "Duplicate tags exist." }, { status: 400 });
-    } else {
-      return NextResponse.json({ error: "Internal database error." }, { status: 500 });
-    }
+    return NextResponse.json({ error: "Internal database error." }, { status: 500 });
   }
 }

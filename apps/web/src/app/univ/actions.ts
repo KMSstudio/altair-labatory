@@ -1,6 +1,6 @@
 "use server";
 
-import { CreateTag, UpdateTag } from "@/util/tag.action";
+import { CreateTag, UpdateTag } from "@/repository/db/article/tag";
 import { prisma } from "@labatory/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";

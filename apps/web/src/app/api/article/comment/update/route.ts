@@ -1,4 +1,4 @@
-// @/app/api/article/comment/new/route.ts
+// @/app/api/article/comment/update/route.ts
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@labatory/db";
@@ -7,34 +7,34 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { buildCommentCtx } from "@/app/api/_util/createArticleCtx";
 import { parseBigInt } from "@/app/api/_util/parse";
-import {
-  assertArticleCommentable,
-  assertParentCommentInArticle,
-  mapPermissionError,
-} from "@/app/api/_util/assertPermission";
+import { assertCommentAuthorOrAdmin, mapPermissionError } from "@/app/api/_util/assertPermission";
 
-import { PostComment } from "@/repository/db/article/comment";
-import type { Comment_Ctx, Comment_PostInput } from "@/types/article";
+import { UpdateComment } from "@/repository/db/article/comment";
+import type { Comment_Ctx, Comment_UpdateInput } from "@/types/article";
 
 type Body = {
-  articleId: string;
-  parentId?: string | null;
+  commentId: string;
   content: string;
 };
 
 /**
- * Create a new comment on an article.
+ * Update an existing comment.
  *
- * This endpoint creates a comment for a target article.
- * The requester does not need to be the article author, but must be logged in.
+ * This API endpoint allows a user to modify the content of a comment.
+ * The request must include a valid `commentId` and new `content`.
  *
- * @param request - HTTP request containing `{ articleId, parentId?, content }`
+ * Authorization rules:
+ * - The comment author can update the comment.
+ * - An ADMIN user can update any comment.
+ *
+ * @param request - Incoming HTTP request containing `{ commentId, content }`.
  *
  * @returns
- * - `200` `{ ok: true, comment }` on success
- * - `400` for invalid input or invalid article / parent comment state
- * - `401` when the user is not logged in
- * - `500` for internal server errors
+ * - `200` `{ ok: true, comment }` when the comment is successfully updated
+ * - `400` when the request body or parameters are invalid
+ * - `401` when the user is not authenticated
+ * - `403` when the user does not have permission to modify the comment
+ * - `500` for unexpected internal server errors
  */
 export async function POST(request: Request) {
   let body: Body;
@@ -54,23 +54,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Content is required." }, { status: 400 });
   }
 
-  let articleId: bigint;
-  let parentId: bigint | null = null;
+  let commentId: bigint;
+  let userId: bigint;
   try {
-    articleId = parseBigInt(body.articleId, "article id");
-    if (body.parentId != null && body.parentId.toString().trim() !== "") {
-      parentId = parseBigInt(body.parentId, "parent comment id");
-    }
+    commentId = parseBigInt(body.commentId, "comment id");
+    userId = parseBigInt(session.user.id, "user id");
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Invalid parameter.";
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
   try {
-    await assertArticleCommentable(articleId);
-    if (parentId !== null) {
-      await assertParentCommentInArticle(parentId, articleId);
-    }
+    await assertCommentAuthorOrAdmin(commentId, userId, session.user.role);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Internal server error.";
     const { error, status } = mapPermissionError(msg);
@@ -86,20 +81,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: msg }, { status });
   }
 
-  const input: Comment_PostInput = {
-    articleId,
-    parentId,
-    content,
-  };
+  const input: Comment_UpdateInput = { content };
 
   try {
-    const comment = await PostComment(ctx, input);
+    const comment = await UpdateComment(commentId, ctx, input);
     return NextResponse.json({ ok: true, comment }, { status: 200 });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      if (e.code === "P2003")
-        return NextResponse.json({ error: "Invalid reference." }, { status: 400 });
+      return NextResponse.json({ error: "Database error." }, { status: 400 });
     }
-    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
+
+    const msg = e instanceof Error ? e.message : "Internal server error.";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -51,20 +51,20 @@ npm install
 ```bash
 npm run db:up
 ```
-1) Start Node
+2) Start Node
 ```bash
 npm run next:up
 ```
-2) Generate Prisma client and apply migrations
+3) Generate Prisma client and apply migrations
 ```bash
 npm run prisma:generate
 npm run prisma:migrate:dev
 ```
-3) Seed initial data (optional if you only need an empty DB)
+4) Seed initial data (optional if you only need an empty DB)
 ```bash
 npm run prisma:seed
 ```
-4) Run the web app
+5) Run the web app
 ```bash
 npm run web:dev
 # open http://localhost:3000

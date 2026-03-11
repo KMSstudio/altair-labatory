@@ -1,7 +1,7 @@
 // packages\db\src\index.ts
 
 export { prisma } from "./client";
-export { PrismaClient, Prisma } from "../generated/client";
+export { PrismaClient, Prisma } from "@prisma/client";
 
 // type
 export type {
@@ -16,7 +16,7 @@ export type {
   LabReview,
   LabReviewReport,
   VerificationToken,
-} from "../generated/client";
+} from "@prisma/client";
 
 // enum
 export {
@@ -26,4 +26,4 @@ export {
   EmoteKind,
   EmotePlace,
   TagKind,
-} from "../generated/client";
+} from "@prisma/client";

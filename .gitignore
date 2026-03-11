@@ -32,6 +32,3 @@ Desktop.ini
 # Misc temp files
 *.swp
 *.swo
-
-# prisma generated client
-packages/db/generated/

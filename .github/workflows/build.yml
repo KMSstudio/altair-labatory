@@ -51,21 +51,23 @@ jobs:
 
       - name: Next up
         run: npm run next:up
-
-      - name: Wait for Next
+        
+      - name: Wait for next healthcheck
         shell: bash
         run: |
-          for i in {1..60}; do
-            if curl -fs http://localhost:3000 >/dev/null 2>&1; then
-              echo "Next is ready"; exit 0
+          for i in {1..30}; do
+            health=$(docker inspect -f '{{.State.Health.Status}}' $(docker compose ps -q next) 2>/dev/null || true)
+            if [ "$health" = "healthy" ]; then
+              echo "next is healthy"
+              exit 0
             fi
-            echo "Waiting for Next... ($i/60)"
+            echo "Waiting for next health... ($i/30)"
             sleep 1
           done
-          echo "Next not ready in time"
+          echo "next did not become healthy"
           docker compose logs next || true
           exit 1
-          
+                
       - name: Prisma generate
         run: npm run prisma:generate 
 

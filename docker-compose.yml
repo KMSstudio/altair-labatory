@@ -41,6 +41,11 @@ services:
       db:
         condition: service_healthy
     command: tail -f /dev/null
+    healthcheck:
+      test: [ "CMD", "node", "-v" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   labatory_pgdata:

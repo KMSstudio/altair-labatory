@@ -5,14 +5,11 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@prisma/client": [
-        "./generated/client"
+      "@/*": [
+        "./src/*"
       ]
     }
   },
-  "include": [
-    "src/**/*"
-  ],
 }

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
+import { prisma, Prisma } from "@labatory/db";
 import styles from "../subj.module.css";
 
 type ListPageProps = {

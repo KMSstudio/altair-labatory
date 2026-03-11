@@ -4,8 +4,7 @@ import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { hash, compare } from "bcryptjs";
-import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
+import { prisma, Prisma } from "@labatory/db";
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 

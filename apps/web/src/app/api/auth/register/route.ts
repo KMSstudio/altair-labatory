@@ -2,8 +2,7 @@
 
 import { NextResponse } from "next/server";
 import { CreateUserSuite, passwordHashing } from "@/lib/auth";
-import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
+import { prisma, Prisma } from "@labatory/db";
 import { SendVerification } from "@/lib/mail";
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();

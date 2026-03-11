@@ -2,8 +2,7 @@
 
 import { NextResponse } from "next/server";
 import { passwordHashing } from "@/lib/auth";
-import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
+import { prisma, Prisma } from "@labatory/db";
 
 export async function POST(request: Request) {
   let body: { password?: string; tokenHash?: string; email?: string };

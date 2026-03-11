@@ -1,5 +1,4 @@
-import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
+import { prisma, Prisma } from "@labatory/db";
 
 export type LabUpsertInput = {
   nameKo: string;
@@ -322,10 +321,10 @@ export const parseLabUpsertInputFromFormData = (formData: FormData): LabUpsertIn
   const hasAnyNewSubjectField = !!newSubjectNameKo || !!newSubjectNameEn || !!newSubjectDescription;
   const newSubject = hasAnyNewSubjectField
     ? {
-        nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
-        nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
-        description: newSubjectDescription,
-      }
+      nameKo: requireText(newSubjectNameKo, "newSubjectNameKo"),
+      nameEn: requireText(newSubjectNameEn, "newSubjectNameEn"),
+      description: newSubjectDescription,
+    }
     : null;
 
   return {

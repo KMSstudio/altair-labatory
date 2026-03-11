@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@labatory/db";
 import styles from "./lab.module.css";
 
 type LabWithSubject = Prisma.LabGetPayload<{

@@ -26,7 +26,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/next/Dockerfile
-    image: labatory-node:20
+    image: labatory-node:22
     container_name: labatory-next
     ports:
       - "3000:3000"

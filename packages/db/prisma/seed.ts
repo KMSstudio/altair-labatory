@@ -7,7 +7,7 @@ import {
   TagKind,
   UserRole,
   Visibility,
-} from "dist/generated/client";
+} from "../dist/generated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 

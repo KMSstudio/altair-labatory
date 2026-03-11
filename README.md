@@ -51,6 +51,10 @@ npm install
 ```bash
 npm run db:up
 ```
+1) Start Node
+```bash
+npm run next:up
+```
 2) Generate Prisma client and apply migrations
 ```bash
 npm run prisma:generate

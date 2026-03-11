@@ -13,7 +13,7 @@ jobs:
       POSTGRES_DB: labatory
       POSTGRES_USER: labatory
       POSTGRES_PASSWORD: labatory_pw
-      DATABASE_URL: postgresql://labatory:labatory_pw@localhost:4821/labatory?schema=public
+      DATABASE_URL: postgresql://labatory:labatory_pw@db:5432/labatory?schema=public
 
     steps:
       - name: Checkout repository
@@ -49,6 +49,23 @@ jobs:
           docker compose logs db || true
           exit 1
 
+      - name: Next up
+        run: npm run next:up
+
+      - name: Wait for Next
+        shell: bash
+        run: |
+          for i in {1..60}; do
+            if curl -fs http://localhost:3000 >/dev/null 2>&1; then
+              echo "Next is ready"; exit 0
+            fi
+            echo "Waiting for Next... ($i/60)"
+            sleep 1
+          done
+          echo "Next not ready in time"
+          docker compose logs next || true
+          exit 1
+          
       - name: Prisma generate
         run: npm run prisma:generate 
 
@@ -60,6 +77,10 @@ jobs:
     
       - name: Build
         run: npm run web:build
+
+      - name: next down
+        if: always()
+        run: npm run next:down
 
       - name: DB down
         if: always()

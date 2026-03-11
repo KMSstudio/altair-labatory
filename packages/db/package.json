@@ -17,7 +17,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio",
+    "prisma:studio": "prisma studio --browser none --port 4000",
     "prisma:db:push": "prisma db push"
   },
   "dependencies": {
@@ -31,6 +31,7 @@
   "devDependencies": {
     "@types/node": "^25.0.3",
     "prisma": "^7.3.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.0.0"
   }
 }

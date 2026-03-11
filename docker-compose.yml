@@ -16,11 +16,31 @@ services:
     volumes:
       - labatory_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 3s
       retries: 20
     pull_policy: never
+
+  next:
+    build:
+      context: .
+      dockerfile: ./docker/next/Dockerfile
+    image: labatory-node:20
+    container_name: labatory-next
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    volumes:
+      - .:/apps
+      - /apps/node_modules
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: tail -f /dev/null
 
 volumes:
   labatory_pgdata:

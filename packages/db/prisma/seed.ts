@@ -7,7 +7,7 @@ import {
   TagKind,
   UserRole,
   Visibility,
-} from "@prisma/client";
+} from "../generated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 

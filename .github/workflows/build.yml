@@ -13,7 +13,7 @@ jobs:
       POSTGRES_DB: labatory
       POSTGRES_USER: labatory
       POSTGRES_PASSWORD: labatory_pw
-      DATABASE_URL: postgresql://labatory:labatory_pw@db:4821/labatory?schema=public
+      DATABASE_URL: postgresql://labatory:labatory_pw@localhost:4821/labatory?schema=public
       DATABASE_URL_DOCKER: postgresql://labatory:labatory_pw@db:5432/labatory?schema=public
 
     steps:
@@ -49,7 +49,7 @@ jobs:
           echo "DB not ready in time"
           docker compose logs db || true
           exit 1
-          
+
       - name: Prisma generate
         run: npm run prisma:generate 
 

@@ -18,10 +18,10 @@ export async function PageExplorer({
       </div>
     );
   }
-  let start = Math.max(1, currentPage - Number(maxLength / 2));
+  let start = Math.max(1, currentPage - Math.floor(Number(maxLength / 2)));
   const end = Math.min(maxPage, start + maxLength - 1);
-  if (end - start < maxLength) {
-    start = Math.max(1, currentPage - maxLength);
+  if (end - start < maxLength - 1) {
+    start = Math.max(1, currentPage - maxLength + 1);
   }
   return (
     <div>

@@ -51,6 +51,7 @@ export async function GetArticles(boardId: bigint, page: number = 1, pageSize: n
     where: {
       boardId,
       isHidden: false,
+      isPinned: false,
     },
     orderBy: {
       createdAt: "desc",

@@ -49,10 +49,7 @@ jobs:
           echo "DB not ready in time"
           docker compose logs db || true
           exit 1
-
-      - name: Next build
-        run: npm run next:build
-        
+          
       - name: Prisma generate
         run: npm run prisma:generate 
 

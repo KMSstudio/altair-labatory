@@ -13,7 +13,8 @@ jobs:
       POSTGRES_DB: labatory
       POSTGRES_USER: labatory
       POSTGRES_PASSWORD: labatory_pw
-      DATABASE_URL: postgresql://labatory:labatory_pw@db:5432/labatory?schema=public
+      DATABASE_URL: postgresql://labatory:labatory_pw@db:4821/labatory?schema=public
+      DATABASE_URL_DOCKER: postgresql://labatory:labatory_pw@db:5432/labatory?schema=public
 
     steps:
       - name: Checkout repository
@@ -49,25 +50,9 @@ jobs:
           docker compose logs db || true
           exit 1
 
-      - name: Next up
-        run: npm run next:up
+      - name: Next build
+        run: npm run next:build
         
-      - name: Wait for next healthcheck
-        shell: bash
-        run: |
-          for i in {1..30}; do
-            health=$(docker inspect -f '{{.State.Health.Status}}' $(docker compose ps -q next) 2>/dev/null || true)
-            if [ "$health" = "healthy" ]; then
-              echo "next is healthy"
-              exit 0
-            fi
-            echo "Waiting for next health... ($i/30)"
-            sleep 1
-          done
-          echo "next did not become healthy"
-          docker compose logs next || true
-          exit 1
-                
       - name: Prisma generate
         run: npm run prisma:generate 
 
@@ -79,10 +64,6 @@ jobs:
     
       - name: Build
         run: npm run web:build
-
-      - name: next down
-        if: always()
-        run: npm run next:down
 
       - name: DB down
         if: always()

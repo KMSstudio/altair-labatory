@@ -30,16 +30,12 @@ services:
     container_name: labatory-next
     ports:
       - "3000:3000"
-      - "4000:4000"
     volumes:
       - .:/apps
       - /apps/node_modules
     restart: unless-stopped
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-    depends_on:
-      db:
-        condition: service_healthy
+      DATABASE_URL: ${DATABASE_URL_DOCKER}
     command: tail -f /dev/null
     healthcheck:
       test: [ "CMD", "node", "-v" ]

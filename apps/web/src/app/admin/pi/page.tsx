@@ -1,10 +1,10 @@
 // app/admin/pi/page.tsx
 
-import { PIApplicationStatus, prisma, type PIApplication } from "@labatory/db";
+import { PIApplicationStatus, prisma } from "@labatory/db";
 import { PIApplicationListSection } from "./section/PIApplicationListSection";
 
 export default async function PIApplicationPage() {
-  const applications: PIApplication[] = await prisma.pIApplication.findMany({
+  const applications = await prisma.pIApplication.findMany({
     include: {
       user: true,
     },

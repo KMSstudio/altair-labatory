@@ -1,5 +1,4 @@
-import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
+import { prisma, Prisma } from "@labatory/db";
 
 export type SubjectCreateInput = {
   nameKo: string;

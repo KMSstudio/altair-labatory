@@ -4,6 +4,15 @@
     "module": "ES2022",
     "moduleResolution": "Bundler",
     "strict": true,
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@prisma/client": [
+        "./generated/client"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
 }

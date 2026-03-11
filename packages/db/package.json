@@ -17,7 +17,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio --browser none --port 4000",
+    "prisma:studio": "prisma studio",
     "prisma:db:push": "prisma db push"
   },
   "dependencies": {

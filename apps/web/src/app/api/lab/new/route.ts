@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
-import { SerializeLab } from "@/util/serialize/SerializeLab";
+import { SerializeLab } from "@/repository/serialize/SerializeLab";
 
 import {
   isKnownRequestError,

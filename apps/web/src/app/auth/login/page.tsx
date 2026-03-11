@@ -56,7 +56,7 @@ export default function LoginPage() {
       </form>
       {error ? <p role="alert">{error}</p> : null}
       <p>
-        New here? <a href="/register">Create an account</a>
+        New here? <a href="/auth/register">Create an account</a>
       </p>
     </main>
   );

@@ -1,76 +1,80 @@
-import { notFound } from "next/navigation";
-import { GetArticle, GetComments, LinkComments, GetEmoteCount } from "../actions";
+// @/app/article/[article_id]/page.tsx
+
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+
+import { authOptions } from "@/lib/auth";
+import { GetArticleCore } from "@/repository/db/article/article";
+
+import { BuildCommentDisplayTree, BuildEmoteDisplayState } from "./article.transform";
 import { CommentSection } from "./section/CommentSection";
 import { EmoteSection } from "./section/EmoteSection";
 import { CommentForm } from "./section/CommentForm";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { WriterSection } from "./section/WriterSection";
 
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: { article_id: string };
-  searchParams?: { error: string };
-}) {
-  params = await params;
-  searchParams = await searchParams;
-  if (!params.article_id) notFound();
-  let articleId: bigint;
+function ParseArticleId(articleIdRaw: string): bigint {
   try {
-    articleId = BigInt(params.article_id);
+    return BigInt(articleIdRaw);
   } catch {
     notFound();
   }
-  const article = await GetArticle({ articleId });
-  if (!article) {
-    notFound();
+}
+
+function ParseSessionUserId(userIdRaw?: string | null): string | null {
+  if (!userIdRaw) return null;
+  try {
+    return BigInt(userIdRaw).toString();
+  } catch {
+    return null;
   }
-  const emoteCount = await GetEmoteCount({ id: articleId, targetPlace: "ARTICLE" });
-  const commentsRaw = await GetComments({ articleId });
-  const comments = await LinkComments(commentsRaw);
-  const session = await getServerSession(authOptions);
-  let sessionId: bigint | null = null;
-  if (session && session.user) {
-    try {
-      sessionId = BigInt(session.user.id);
-    } catch {
-      sessionId = null;
-    }
-  }
+}
+
+export default async function Page({ params }: { params: { article_id: string } }) {
+  const articleId = ParseArticleId(await params.article_id);
+
+  const [article, session] = await Promise.all([
+    GetArticleCore(articleId),
+    getServerSession(authOptions),
+  ]);
+
+  if (!article) notFound();
+
+  const sessionId = ParseSessionUserId(session?.user?.id);
+  const commentDisplayTree = BuildCommentDisplayTree(article.comments);
+  const emoteDisplayState = BuildEmoteDisplayState(article.emotes, sessionId);
+
   return (
     <article>
-      {/*Display Name, author, created date, and updated Date.
-       If user is the writer of this article, also display edit and delete button.*/}
       <header>
         <div>
           <Link href={`/board/${article.boardId}/list`}>Return to board.</Link>
         </div>
-        {searchParams?.error && <p>{decodeURIComponent(searchParams.error)}</p>}
+
         <h1>{article.title}</h1>
+
         <div>
           <p>{article.author?.displayName ?? "anonymous"}</p>
         </div>
+
         <div>
-          <time dateTime={article.createdAt.toISOString()}>
-            {article.createdAt.toLocaleString()}
-          </time>
-          {article.updatedAt.getTime() !== article.createdAt.getTime() && (
+          <time dateTime={article.createdAt}>{new Date(article.createdAt).toLocaleString()}</time>
+
+          {article.updatedAt !== article.createdAt && (
             <>
               <span> · Edited </span>
-              <time dateTime={article.updatedAt.toISOString()}>
-                {article.updatedAt.toLocaleString()}
+              <time dateTime={article.updatedAt}>
+                {new Date(article.updatedAt).toLocaleString()}
               </time>
             </>
           )}
+
           {sessionId === article.author?.id && (
-            <WriterSection articleId={articleId} boardId={article.boardId} />
+            <WriterSection articleId={BigInt(article.id)} boardId={BigInt(article.boardId)} />
           )}
         </div>
       </header>
-      {/*Display viewcount, the number of comments and emote of this article.*/}
+
       <section>
         <dl>
           <div>
@@ -79,39 +83,47 @@ export default async function Page({
           </div>
           <div>
             <dt>comments</dt>
-            <dd>{article._count.comments ?? 0}</dd>
+            <dd>{article.commentCount}</dd>
           </div>
         </dl>
       </section>
+
       <section>
         <div>{article.content}</div>
       </section>
-      {/*Display the number of emotes left in this article in detail.*/}
+
       <section>
         <h2>Emote</h2>
-        <EmoteSection id={articleId} emotes={emoteCount} kind="ARTICLE" />
+        <EmoteSection
+          emoteState={emoteDisplayState}
+          postId={BigInt(article.id)}
+          postKind="ARTICLE"
+        />
       </section>
-      {/*Display tags of this article.*/}
+
       <section>
         <h2>Tags</h2>
-        {article.tags && (
+        {article.tags.length ? (
           <ol>
             {article.tags.map((articleTag) => (
-              <li key={articleTag.tagId}>{articleTag.tag.text ?? articleTag.tag.id.toString()}</li>
+              <li key={articleTag.id}>{articleTag.text ?? articleTag.id}</li>
             ))}
           </ol>
+        ) : (
+          <p>No tag.</p>
         )}
       </section>
-      {/*Display comments of this article.*/}
-      <section>
-        <h2>Comment {article._count.comments ?? 0}</h2>
 
-        {(article._count.comments ?? 0) !== 0 ? (
-          <CommentSection comments={comments} depth={0} viewerId={sessionId} />
+      <section>
+        <h2>Comment {article.commentCount}</h2>
+
+        {article.commentCount ? (
+          <CommentSection comments={commentDisplayTree} depth={0} viewerId={sessionId} />
         ) : (
           <p>No comment.</p>
         )}
-        <CommentForm articleId={articleId} />
+
+        <CommentForm articleId={BigInt(article.id)} />
       </section>
     </article>
   );

@@ -3,7 +3,7 @@
 import type { EmoteKind, TagKind } from "@labatory/db";
 
 // TAG
-export type ArticleTagDbShape = {
+export type tagDbShape = {
   id: bigint;
   kind: TagKind;
   labId: bigint | null;
@@ -12,7 +12,7 @@ export type ArticleTagDbShape = {
   text: string | null;
 };
 
-export const getArticleTagSelect = {
+export const getTagSelect = {
   id: true,
   kind: true,
   labId: true,
@@ -21,7 +21,7 @@ export const getArticleTagSelect = {
   text: true,
 } as const;
 
-export type ArticleTagDTO = {
+export type tagDTO = {
   id: string;
   kind: TagKind;
   labId?: string;
@@ -97,7 +97,7 @@ export type ArticleDbShape = {
   createdAt: Date;
   updatedAt: Date;
 
-  tags: { tag: ArticleTagDbShape }[];
+  tags: { tag: tagDbShape }[];
   author: PostAuthorDbShape | null;
   emotes: PostEmoteDbShape[];
   comments: CommentDbShape[];
@@ -113,7 +113,7 @@ export const getArticleSelect = {
   viewCount: true,
   tags: {
     select: {
-      tag: { select: getArticleTagSelect },
+      tag: { select: getTagSelect },
     },
   },
   author: { select: getPostAuthorSelect },
@@ -137,7 +137,7 @@ export type ArticleDTO = {
   createdAt: string;
   updatedAt: string;
 
-  tags: ArticleTagDTO[];
+  tags: tagDTO[];
   author: PostAuthorDTO | null;
   emotes: PostEmoteDTO[];
   comments: CommentDTO[];

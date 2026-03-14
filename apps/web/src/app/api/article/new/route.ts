@@ -94,9 +94,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const articleId = await CreateArticleCore(ctx, boardId, { title, content, tagIds });
-
-    return NextResponse.json({ ok: true, articleId: articleId.toString() }, { status: 200 });
+    const newArticle = await CreateArticleCore(ctx, boardId, { title, content, tagIds });
+    return NextResponse.json({ ok: true, article: newArticle }, { status: 200 });
   } catch (e) {
     if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
       return NextResponse.json({ error: "Internal server error." }, { status: 500 });

@@ -3,27 +3,52 @@
 "use client";
 
 import type { TagKind } from "@labatory/db";
-import type { ArticleTagDTO } from "@/repository/dto/article";
-import { SearchArticleTags } from "@/repository/db/article/tag";
-import { serializeArticleTag } from "@/repository/serialize/article";
-import { useState } from "react";
+import type { tagDTO } from "@/repository/dto/article";
+import { useEffect, useState } from "react";
+import { notFound } from "next/navigation";
 
-export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDTO[] }) {
-  const [tags, setTags] = useState<ArticleTagDTO[]>([]);
+export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) {
+  const [tagList, setTagList] = useState<tagDTO[]>([]);
+  const [tags, setTags] = useState<tagDTO[]>([]);
   const [tagKind, setTagKind] = useState<TagKind>("LAB");
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = useState<ArticleTagDTO[]>(SelectedTags);
+  const [selectedTags, setSelectedTags] = useState<tagDTO[]>(SelectedTags);
 
-  function addTag(tag: ArticleTagDTO) {
+  function addTag(tag: tagDTO) {
     if (selectedTags.some((t) => t.id === tag.id)) return;
     setSelectedTags([...selectedTags, tag]);
   }
-  function removeTag(tag: ArticleTagDTO) {
+  function removeTag(tag: tagDTO) {
     setSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
   }
 
+  useEffect(() => {
+    const getTags = async () => {
+      try {
+        const res = await fetch("/api/article/tag/get", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const data = (await res.json().catch(() => null)) as {
+          ok?: boolean;
+          tags?: tagDTO[];
+          error?: string;
+        } | null;
+
+        if (!res.ok || !data?.tags) {
+          throw new Error(data?.error ?? "Failed to get tags.");
+        }
+
+        setTagList(data.tags);
+      } catch (e) {
+        alert(`Fail to load tags: ${e instanceof Error ? e.message : "Unknown Error"}`);
+      }
+    }
+    getTags();
+  }, [])
   async function onSearch() {
     const trimmedQuery = query.trim();
     if (!trimmedQuery) return;
@@ -33,7 +58,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDT
 
     try {
       setTags(
-        (await SearchArticleTags({ kind: tagKind, query: trimmedQuery })).map(serializeArticleTag),
+        tagList.filter((tag) => (tag.kind === tagKind && tag.text?.includes(trimmedQuery)))
       );
     } catch (e) {
       setErrorMessage(`Selecting tag error: ${e instanceof Error ? e.message : "Unknown Error"}`);
@@ -81,8 +106,8 @@ function TagList({
   tags,
   onSelect,
 }: {
-  tags: ArticleTagDTO[];
-  onSelect: (tag: ArticleTagDTO) => void;
+  tags: tagDTO[];
+  onSelect: (tag: tagDTO) => void;
 }) {
   if (tags.length === 0) return <p>No search result.</p>;
 
@@ -101,8 +126,8 @@ function TagItem({
   tag,
   onSelect,
 }: {
-  tag: ArticleTagDTO | null;
-  onSelect: (tag: ArticleTagDTO) => void;
+  tag: tagDTO | null;
+  onSelect: (tag: tagDTO) => void;
 }) {
   if (!tag) return null;
 

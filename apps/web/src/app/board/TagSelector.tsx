@@ -11,7 +11,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
   const [tags, setTags] = useState<tagDTO[]>([]);
   const [tagKind, setTagKind] = useState<TagKind>("LAB");
   const [query, setQuery] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<tagDTO[]>(SelectedTags);
 
@@ -41,6 +41,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
           throw new Error(data?.error ?? "Failed to get tags.");
         }
         setTagList(data.tags);
+        setLoading(false);
       } catch (e) {
         alert(`Fail to load tags: ${e instanceof Error ? e.message : "Unknown Error"}`);
       }
@@ -54,17 +55,12 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
     setLoading(true);
     setErrorMessage(null);
 
-    try {
-      setTags(
-        tagList.filter(
-          (tag) => tag.kind === tagKind && tag.text?.toLowerCase().includes(loweredTrimmedQuery),
-        ),
-      );
-    } catch (e) {
-      setErrorMessage(`Selecting tag error: ${e instanceof Error ? e.message : "Unknown Error"}`);
-    } finally {
-      setLoading(false);
-    }
+    setTags(
+      tagList.filter(
+        (tag) => tag.kind === tagKind && tag.text?.toLowerCase().includes(loweredTrimmedQuery),
+      ),
+    );
+    setLoading(false);
   }
 
   return (

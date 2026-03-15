@@ -5,34 +5,23 @@ import { NextResponse } from "next/server";
 /**
  * Get tags that match the kind and query of request.
  *
- * @param request - HTTP request containing `{ searchQuery, tagKind }`
+ * @param request - HTTP request containing URL. URL contains searchQuery and tagKind.
  * @returns
  * - `200` `{ ok: true, tags }` on success
  * - `500` for internal server errors
  */
 
-type Body = {
-  searchQuery: string;
-  tagKind: TagKind;
-};
 export async function GET(request: Request) {
-  let body: Body;
-  try {
-    body = (await request.json()) as Body;
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  const { searchParams } = new URL(request.url);
+  const searchQuery = searchParams.get("searchQuery");
+  const rawKind = searchParams.get("tagKind");
+
+  if (!searchQuery || !rawKind) {
+    return NextResponse.json({ error: "searchQuery and tagKind are required." }, { status: 400 });
   }
 
-  let trimmedQuery: string;
-  let tagKind: TagKind;
-
-  try {
-    trimmedQuery = body.searchQuery.trim();
-    tagKind = body.tagKind;
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "Invalid parameter.";
-    return NextResponse.json({ error: msg }, { status: 400 });
-  }
+  const trimmedQuery = searchQuery.trim();
+  const tagKind = rawKind as TagKind;
 
   try {
     const tags = await SearchTags({ kind: tagKind, query: trimmedQuery });

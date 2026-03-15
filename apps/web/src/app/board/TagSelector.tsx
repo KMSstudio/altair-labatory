@@ -43,10 +43,11 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
         setTagList(data.tags);
       } catch (e) {
         alert(`Fail to load tags: ${e instanceof Error ? e.message : "Unknown Error"}`);
+      } finally {
+        setLoading(false);
       }
     };
-    setLoading(false);
-    getTagList();
+    void getTagList();
   }, []);
   async function onSearch() {
     const loweredTrimmedQuery = query.trim().toLowerCase();
@@ -55,7 +56,6 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
       return;
     }
 
-    setLoading(true);
     setErrorMessage(null);
 
     setTags(
@@ -63,7 +63,6 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
         (tag) => tag.kind === tagKind && tag.text?.toLowerCase().includes(loweredTrimmedQuery),
       ),
     );
-    setLoading(false);
   }
 
   return (

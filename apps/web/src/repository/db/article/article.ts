@@ -8,16 +8,25 @@ import type { Article_Ctx, Article_Input } from "@/types/article";
 import { type ArticleDbShape, ArticleDTO, getArticleSelect } from "@/repository/dto/article";
 import { serializeArticle } from "../../serialize/article";
 
+type DbClient = Prisma.TransactionClient | typeof prisma;
+
 /**
  * Retrieve a specific visible (non-hidden) article by id.
  *
  * This is a DB-only function. No authentication/authorization is performed here.
  *
  * @param articleId - Target article id.
+ * @param db - Client where query will be performed. Default is prisma.
  * @returns Article DB shape if found and not hidden, otherwise null.
  */
-export async function GetArticleCore(articleId: bigint): Promise<ArticleDTO | null> {
-  const article = (await prisma.article.findUnique({
+export async function GetArticleCore({
+  articleId,
+  db = prisma,
+}: {
+  articleId: bigint;
+  db?: DbClient;
+}): Promise<ArticleDTO | null> {
+  const article = (await db.article.findUnique({
     where: { id: articleId, isHidden: false },
     select: getArticleSelect,
   })) as ArticleDbShape;
@@ -55,7 +64,7 @@ export async function UpdateArticleCore(
   ctx: Article_Ctx,
   input: Article_Input,
 ): Promise<ArticleDTO | null> {
-  await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx) => {
     // We use findFirst to query non-PK fields.
     const article = await tx.article.findFirst({
       where: {
@@ -112,9 +121,8 @@ export async function UpdateArticleCore(
         })),
       });
     }
+    return await GetArticleCore({ articleId, db: tx });
   });
-
-  return await GetArticleCore(articleId);
 }
 
 /**
@@ -193,8 +201,8 @@ export async function CreateArticleCore(
   ctx: Article_Ctx,
   boardId: bigint,
   input: Article_Input,
-): Promise<ArticleDTO> {
-  return prisma.$transaction(async (tx) => {
+): Promise<ArticleDTO | null> {
+  return await prisma.$transaction(async (tx) => {
     const newArticle = await tx.article.create({
       data: {
         title: input.title,
@@ -203,7 +211,7 @@ export async function CreateArticleCore(
         authorIp: ctx.authorIp,
         content: input.content,
       },
-      select: getArticleSelect,
+      select: { id: true },
     });
 
     if (input.tagIds.length) {
@@ -213,6 +221,7 @@ export async function CreateArticleCore(
       }));
       await tx.articleTag.createMany({ data });
     }
-    return serializeArticle(newArticle);
+
+    return await GetArticleCore({ articleId: newArticle.id, db: tx });
   });
 }

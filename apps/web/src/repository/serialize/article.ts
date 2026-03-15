@@ -1,12 +1,12 @@
 // @/util/serialize/article.ts
 
-import type { tagDbShape, tagDTO } from "@/repository/dto/article";
+import type { TagDbShape, TagDTO } from "@/repository/dto/article";
 import type { PostEmoteDbShape, PostEmoteDTO } from "@/repository/dto/article";
 import type { PostAuthorDbShape, PostAuthorDTO } from "@/repository/dto/article";
 import type { CommentDbShape, CommentDTO } from "@/repository/dto/article";
 import type { ArticleDTO, ArticleDbShape } from "@/repository/dto/article";
 
-export function serializeTag(tag: tagDbShape): tagDTO {
+export function serializeTag(tag: TagDbShape): TagDTO {
   return {
     id: tag.id.toString(),
     kind: tag.kind,
@@ -38,7 +38,7 @@ export function serializeComment(comment: CommentDbShape): CommentDTO {
     isHidden: comment.isHidden,
     parentId: comment.parentId ? comment.parentId.toString() : null,
 
-    content: comment.content,
+    content: comment.isHidden ? "This comment is hidden." : comment.content,
     emotes: comment.emotes.map((e) => serializeEmote(e)),
 
     createdAt: comment.createdAt.toISOString(),

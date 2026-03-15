@@ -3,7 +3,7 @@
 "use server";
 
 import { prisma, Prisma, type TagKind } from "@labatory/db";
-import type { tagDTO } from "@/repository/dto/article";
+import type { TagDTO } from "@/repository/dto/article";
 import { name2Text } from "@/util/util";
 import { serializeTag } from "@/repository/serialize/article";
 
@@ -58,7 +58,7 @@ export async function CreateTag({
   id?: bigint;
   text?: string;
   db?: DbClient;
-}): Promise<tagDTO> {
+}): Promise<TagDTO> {
   const data: Prisma.TagCreateInput = { kind };
 
   if (kind === "TEXT") {
@@ -101,7 +101,7 @@ export async function UpdateTag({
   tagId: bigint;
   text?: string;
   db?: DbClient;
-}): Promise<tagDTO> {
+}): Promise<TagDTO> {
   const tag = await db.tag.findUnique({ where: { id: tagId }, select: TagSelect });
   if (!tag) throw Error("Invalid tag id");
 
@@ -139,7 +139,7 @@ export async function GetTag({
 }: {
   tagId: bigint;
   db?: DbClient;
-}): Promise<tagDTO | null> {
+}): Promise<TagDTO | null> {
   const tag = await db.tag.findUnique({ where: { id: tagId }, select: TagSelect });
   if (tag === null) return null;
   return serializeTag(tag);
@@ -147,7 +147,7 @@ export async function GetTag({
 /**
  * Get info of all tags
  */
-export async function GetTags({ db = prisma }: { db?: DbClient }): Promise<tagDTO[]> {
+export async function GetTags({ db = prisma }: { db?: DbClient }): Promise<TagDTO[]> {
   const tags = await db.tag.findMany({ select: TagSelect });
   return tags.map(serializeTag);
 }
@@ -163,7 +163,7 @@ export async function SearchTags({
   kind: TagKind;
   query: string;
   db?: DbClient;
-}): Promise<tagDTO[]> {
+}): Promise<TagDTO[]> {
   const query_trim = query.trim();
   const whereQuery = (q: string) => ({ contains: q, mode: Prisma.QueryMode.insensitive }) as const;
 

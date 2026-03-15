@@ -95,6 +95,7 @@ export async function POST(request: Request) {
 
   try {
     const newArticle = await CreateArticleCore(ctx, boardId, { title, content, tagIds });
+    if (!newArticle) throw new Error();
     return NextResponse.json({ ok: true, article: newArticle }, { status: 200 });
   } catch (e) {
     if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {

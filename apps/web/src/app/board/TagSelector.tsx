@@ -3,23 +3,23 @@
 "use client";
 
 import type { TagKind } from "@labatory/db";
-import type { tagDTO } from "@/repository/dto/article";
+import type { TagDTO } from "@/repository/dto/article";
 import { useEffect, useState } from "react";
 
-export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) {
-  const [tagList, setTagList] = useState<tagDTO[]>([]);
-  const [tags, setTags] = useState<tagDTO[]>([]);
+export function TagSelector({ SelectedTags = [] }: { SelectedTags?: TagDTO[] }) {
+  const [tagList, setTagList] = useState<TagDTO[]>([]);
+  const [tags, setTags] = useState<TagDTO[]>([]);
   const [tagKind, setTagKind] = useState<TagKind>("LAB");
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = useState<tagDTO[]>(SelectedTags);
+  const [selectedTags, setSelectedTags] = useState<TagDTO[]>(SelectedTags);
 
-  function addTag(tag: tagDTO) {
+  function addTag(tag: TagDTO) {
     if (selectedTags.some((t) => t.id === tag.id)) return;
     setSelectedTags([...selectedTags, tag]);
   }
-  function removeTag(tag: tagDTO) {
+  function removeTag(tag: TagDTO) {
     setSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
   }
 
@@ -33,7 +33,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
 
         const data = (await res.json().catch(() => null)) as {
           ok?: boolean;
-          tags?: tagDTO[];
+          tags?: TagDTO[];
           error?: string;
         } | null;
 
@@ -105,8 +105,8 @@ function TagList({
   onSelect,
   emptyMessage = "",
 }: {
-  tags: tagDTO[];
-  onSelect: (tag: tagDTO) => void;
+  tags: TagDTO[];
+  onSelect: (tag: TagDTO) => void;
   emptyMessage?: string;
 }) {
   if (tags.length === 0) return <p>{emptyMessage}</p>;
@@ -122,7 +122,7 @@ function TagList({
   );
 }
 
-function TagItem({ tag, onSelect }: { tag: tagDTO | null; onSelect: (tag: tagDTO) => void }) {
+function TagItem({ tag, onSelect }: { tag: TagDTO; onSelect: (tag: TagDTO) => void }) {
   if (!tag) return null;
 
   return (

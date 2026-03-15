@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { TagSelector } from "@/app/board/TagSelector";
-import type { ArticleDTO, tagDTO } from "@/repository/dto/article";
+import type { ArticleDTO, TagDTO } from "@/repository/dto/article";
 
 type ApiOk = { ok: true; article: ArticleDTO };
 type ApiErr = { error: string };
@@ -15,7 +15,7 @@ export function ArticleUpdateForm({ article }: { article: ArticleDTO }) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
-  const selectedTags: tagDTO[] = article.tags ?? [];
+  const selectedTags: TagDTO[] = article.tags ?? [];
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

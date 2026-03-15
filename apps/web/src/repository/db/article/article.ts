@@ -26,24 +26,6 @@ export async function GetArticleCore(articleId: bigint): Promise<ArticleDTO | nu
 }
 
 /**
- * Increase a viewcount by one of a specific visible (non-hidden) article by id.
- *
- * This is a DB-only function. No authentication/authorization is performed here.
- *
- * @param articleId - Target article id.
- */
-export async function IncreaseArticleViewCount(articleId: bigint): Promise<void> {
-  await prisma.article.updateMany({
-    where: {
-      id: articleId,
-    },
-    data: {
-      viewCount: { increment: 1 },
-    },
-  });
-}
-
-/**
  * Update an existing article's title/content/tags, and store the previous version in `articleHistory`.
  *
  * This is a **DB-only function**. Caller must ensure:
@@ -109,7 +91,6 @@ export async function UpdateArticleCore(
           title: input.title,
           content: input.content,
           authorIp: ctx.authorIp,
-          editedAt: new Date(),
         },
         select: getArticleSelect,
       });

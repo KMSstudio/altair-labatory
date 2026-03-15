@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
-import { GetArticleCore, IncreaseArticleViewCount } from "@/repository/db/article/article";
+import { GetArticleCore } from "@/repository/db/article/article";
 
 import { BuildCommentDisplayTree, BuildEmoteDisplayState } from "./article.transform";
 import { CommentSection } from "./section/CommentSection";
@@ -34,14 +34,6 @@ export default async function Page({ params }: { params: { article_id: string } 
   params = await params;
   const articleId = ParseArticleId(params.article_id);
 
-  try {
-    await IncreaseArticleViewCount(articleId);
-  } catch (error) {
-    console.error("Failed to increment article view count", {
-      articleId: articleId.toString(),
-      error,
-    });
-  }
   const [article, session] = await Promise.all([
     GetArticleCore(articleId),
     getServerSession(authOptions),
@@ -69,10 +61,12 @@ export default async function Page({ params }: { params: { article_id: string } 
         <div>
           <time dateTime={article.createdAt}>{new Date(article.createdAt).toLocaleString()}</time>
 
-          {article.editedAt && (
+          {article.updatedAt !== article.createdAt && (
             <>
               <span> · Edited </span>
-              <time dateTime={article.editedAt}>{new Date(article.editedAt).toLocaleString()}</time>
+              <time dateTime={article.updatedAt}>
+                {new Date(article.updatedAt).toLocaleString()}
+              </time>
             </>
           )}
 

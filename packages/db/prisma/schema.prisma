@@ -368,7 +368,6 @@ model Article {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
 
-  editedAt  DateTime?                @map("edited_at")
   deletedAt DateTime? @map("deleted_at")
   isPinned  Boolean   @default(false) @map("is_pinned")
   isHidden  Boolean   @default(false) @map("is_hidden")

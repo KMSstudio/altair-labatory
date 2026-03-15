@@ -54,7 +54,7 @@ function CommentComponent({
 
       <div>
         {createdAt.toDateString()}
-        {isEdited ? (
+        {isEdited && !comment.isHidden ? (
           <span>
             {" · Edited "}
             <time dateTime={updatedAt.toISOString()}>{updatedAt.toLocaleString()}</time>

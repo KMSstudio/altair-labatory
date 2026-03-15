@@ -41,16 +41,19 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
           throw new Error(data?.error ?? "Failed to get tags.");
         }
         setTagList(data.tags);
-        setLoading(false);
       } catch (e) {
         alert(`Fail to load tags: ${e instanceof Error ? e.message : "Unknown Error"}`);
       }
     };
+    setLoading(false);
     getTagList();
   }, []);
   async function onSearch() {
     const loweredTrimmedQuery = query.trim().toLowerCase();
-    if (!loweredTrimmedQuery) return;
+    if (!loweredTrimmedQuery) {
+      setTags([]);
+      return;
+    }
 
     setLoading(true);
     setErrorMessage(null);

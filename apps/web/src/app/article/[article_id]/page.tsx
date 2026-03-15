@@ -34,13 +34,13 @@ export default async function Page({ params }: { params: { article_id: string } 
   params = await params;
   const articleId = ParseArticleId(params.article_id);
 
-  const [_, article, session] = await Promise.all([
-    IncreaseArticleViewCount(articleId),
+  const [article, session] = await Promise.all([
     GetArticleCore(articleId),
     getServerSession(authOptions),
   ]);
 
   if (!article) notFound();
+  await IncreaseArticleViewCount(articleId);
 
   const sessionId = ParseSessionUserId(session?.user?.id);
   const commentDisplayTree = BuildCommentDisplayTree(article.comments);
@@ -65,9 +65,7 @@ export default async function Page({ params }: { params: { article_id: string } 
           {article.editedAt && (
             <>
               <span> · Edited </span>
-              <time dateTime={article.editedAt}>
-                {new Date(article.editedAt).toLocaleString()}
-              </time>
+              <time dateTime={article.editedAt}>{new Date(article.editedAt).toLocaleString()}</time>
             </>
           )}
 

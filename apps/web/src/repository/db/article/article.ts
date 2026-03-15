@@ -33,14 +33,14 @@ export async function GetArticleCore(articleId: bigint): Promise<ArticleDTO | nu
  * @param articleId - Target article id.
  */
 export async function IncreaseArticleViewCount(articleId: bigint): Promise<void> {
-  await prisma.article.update({
+  await prisma.article.updateMany({
     where: {
       id: articleId,
     },
     data: {
-      viewCount: { increment: 1 }
-    }
-  })
+      viewCount: { increment: 1 },
+    },
+  });
 }
 
 /**
@@ -59,7 +59,7 @@ export async function IncreaseArticleViewCount(articleId: bigint): Promise<void>
  * @param articleId - Target article id to update.
  * @param ctx - Context information (authorId/authorIp).
  * @param input - Update payload (title/content/tagIds).
- * 
+ *
  * @returns Article DB shape when the article is successfully updated.
  *
  * @throws Error
@@ -73,7 +73,7 @@ export async function UpdateArticleCore(
   ctx: Article_Ctx,
   input: Article_Input,
 ): Promise<ArticleDTO | null> {
-  const updatedArticle = await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
     // We use findFirst to query non-PK fields.
     const article = await tx.article.findFirst({
       where: {
@@ -111,13 +111,12 @@ export async function UpdateArticleCore(
           authorIp: ctx.authorIp,
           editedAt: new Date(),
         },
-        select: getArticleSelect
+        select: getArticleSelect,
       });
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025")
         throw new Error("Article was deleted or hidden during update.");
-      else
-        throw e;
+      else throw e;
     }
 
     await tx.articleTag.deleteMany({
@@ -158,7 +157,11 @@ export async function UpdateArticleCore(
  *
  * @returns Article DB shape when the article is successfully soft-deleted.
  */
-export async function DeleteArticle({ articleId }: { articleId: bigint }): Promise<ArticleDTO | null> {
+export async function DeleteArticle({
+  articleId,
+}: {
+  articleId: bigint;
+}): Promise<ArticleDTO | null> {
   const article = await prisma.article.findUnique({
     where: { id: articleId },
     select: { authorId: true, isHidden: true },
@@ -177,18 +180,14 @@ export async function DeleteArticle({ articleId }: { articleId: bigint }): Promi
         isHidden: true,
         deletedAt: new Date(),
       },
-      select: {
-        id: true
-      }
+      select: getArticleSelect,
     });
-    return await GetArticleCore(result.id);
+    return serializeArticle(result);
   } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025")
       throw new Error("Article already deleted.");
-    else
-      throw e;
+    else throw e;
   }
-
 }
 
 /**
@@ -209,7 +208,11 @@ export async function DeleteArticle({ articleId }: { articleId: bigint }): Promi
  * If a database constraint violation occurs (e.g., invalid foreign key,
  * duplicate entries, etc.).
  */
-export async function CreateArticleCore(ctx: Article_Ctx, boardId: bigint, input: Article_Input): Promise<ArticleDTO> {
+export async function CreateArticleCore(
+  ctx: Article_Ctx,
+  boardId: bigint,
+  input: Article_Input,
+): Promise<ArticleDTO> {
   return prisma.$transaction(async (tx) => {
     const newArticle = await tx.article.create({
       data: {

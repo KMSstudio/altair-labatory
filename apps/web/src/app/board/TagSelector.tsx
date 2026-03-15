@@ -5,7 +5,6 @@
 import type { TagKind } from "@labatory/db";
 import type { tagDTO } from "@/repository/dto/article";
 import { useEffect, useState } from "react";
-import { notFound } from "next/navigation";
 
 export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) {
   const [tagList, setTagList] = useState<tagDTO[]>([]);
@@ -45,9 +44,9 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
       } catch (e) {
         alert(`Fail to load tags: ${e instanceof Error ? e.message : "Unknown Error"}`);
       }
-    }
+    };
     getTagList();
-  }, [])
+  }, []);
   async function onSearch() {
     const loweredTrimmedQuery = query.trim().toLowerCase();
     if (!loweredTrimmedQuery) return;
@@ -57,7 +56,9 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
 
     try {
       setTags(
-        tagList.filter((tag) => (tag.kind === tagKind && tag.text?.toLowerCase().includes(loweredTrimmedQuery)))
+        tagList.filter(
+          (tag) => tag.kind === tagKind && tag.text?.toLowerCase().includes(loweredTrimmedQuery),
+        ),
       );
     } catch (e) {
       setErrorMessage(`Selecting tag error: ${e instanceof Error ? e.message : "Unknown Error"}`);
@@ -101,13 +102,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
   );
 }
 
-function TagList({
-  tags,
-  onSelect,
-}: {
-  tags: tagDTO[];
-  onSelect: (tag: tagDTO) => void;
-}) {
+function TagList({ tags, onSelect }: { tags: tagDTO[]; onSelect: (tag: tagDTO) => void }) {
   if (tags.length === 0) return <p>No search result.</p>;
 
   return (
@@ -121,13 +116,7 @@ function TagList({
   );
 }
 
-function TagItem({
-  tag,
-  onSelect,
-}: {
-  tag: tagDTO | null;
-  onSelect: (tag: tagDTO) => void;
-}) {
+function TagItem({ tag, onSelect }: { tag: tagDTO | null; onSelect: (tag: tagDTO) => void }) {
   if (!tag) return null;
 
   return (

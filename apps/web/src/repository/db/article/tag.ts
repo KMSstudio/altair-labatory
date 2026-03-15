@@ -127,7 +127,7 @@ export async function UpdateTag({
     select: TagSelect,
   });
 
-  return serializeTag(updatedTag)
+  return serializeTag(updatedTag);
 }
 
 /**
@@ -142,19 +142,14 @@ export async function GetTag({
 }): Promise<tagDTO | null> {
   const tag = await db.tag.findUnique({ where: { id: tagId }, select: TagSelect });
   if (tag === null) return null;
-  return serializeTag(tag)
+  return serializeTag(tag);
 }
 /**
  * Get info of all tags
  */
-export async function GetTags({
-  db = prisma,
-}: {
-  db?: DbClient;
-}): Promise<tagDTO[] | null> {
+export async function GetTags({ db = prisma }: { db?: DbClient }): Promise<tagDTO[]> {
   const tags = await db.tag.findMany({ select: TagSelect });
-  if (tags === null) return null;
-  return tags.map(serializeTag)
+  return tags.map(serializeTag);
 }
 
 /**

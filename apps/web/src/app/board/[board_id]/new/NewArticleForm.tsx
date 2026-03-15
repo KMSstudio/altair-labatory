@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TagSelector } from "../../TagSelector";
-import { ArticleDTO } from "@/repository/dto/article";
+import type { ArticleDTO } from "@/repository/dto/article";
 
 type ApiBody = {
   boardId: string;

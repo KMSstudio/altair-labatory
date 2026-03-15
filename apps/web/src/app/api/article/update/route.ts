@@ -8,7 +8,7 @@ import { authOptions } from "@/lib/auth";
 
 import { buildCreateArticleCtx } from "@/app/api/_util/createArticleCtx";
 import { UpdateArticleCore } from "@/repository/db/article/article";
-import { assertArticleAuthorOrAdmin, mapPermissionError } from "../../_util/assertPermission";
+import { assertArticleAuthorOrAdmin, mapPermissionError } from "@/app/api/_util/assertPermission";
 
 type Body = {
   articleId: string;

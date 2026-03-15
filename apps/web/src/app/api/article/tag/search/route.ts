@@ -1,5 +1,5 @@
 import { SearchTags } from "@/repository/db/article/tag";
-import { TagKind } from "@labatory/db";
+import type { TagKind } from "@labatory/db";
 import { NextResponse } from "next/server";
 
 /**

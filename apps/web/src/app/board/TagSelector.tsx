@@ -72,7 +72,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
 
       <div>
         <strong>Selected Tags</strong>
-        <TagList tags={selectedTags} onSelect={removeTag} />
+        <TagList tags={selectedTags} onSelect={removeTag} emptyMessage="No selected tags." />
         {selectedTags.map((tag) => (
           <input key={tag.id} type="hidden" value={tag.id} name="tagIds" />
         ))}
@@ -95,14 +95,22 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
           </div>
         </label>
 
-        <TagList tags={tags} onSelect={addTag} />
+        <TagList tags={tags} onSelect={addTag} emptyMessage="No search result." />
       </div>
     </div>
   );
 }
 
-function TagList({ tags, onSelect }: { tags: tagDTO[]; onSelect: (tag: tagDTO) => void }) {
-  if (tags.length === 0) return <p>No search result.</p>;
+function TagList({
+  tags,
+  onSelect,
+  emptyMessage = "",
+}: {
+  tags: tagDTO[];
+  onSelect: (tag: tagDTO) => void;
+  emptyMessage?: string;
+}) {
+  if (tags.length === 0) return <p>{emptyMessage}</p>;
 
   return (
     <ul>

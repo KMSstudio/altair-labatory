@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
  * @param request - HTTP request containing URL. URL contains searchQuery and tagKind.
  * @returns
  * - `200` `{ ok: true, tags }` on success
+ * - `400` for invaild query or tagKind
  * - `500` for internal server errors
  */
 
@@ -21,15 +22,15 @@ export async function GET(request: Request) {
   }
 
   const trimmedQuery = searchQuery.trim();
+  const allowedKinds: readonly TagKind[] = ["TEXT", "LAB", "UNIV", "SUBJECT"];
+  if (!trimmedQuery || !allowedKinds.includes(rawKind as TagKind)) {
+    return NextResponse.json({ error: "Invalid searchQuery or tagKind." }, { status: 400 });
+  }
   const tagKind = rawKind as TagKind;
-
   try {
     const tags = await SearchTags({ kind: tagKind, query: trimmedQuery });
     return NextResponse.json({ ok: true, tags }, { status: 200 });
-  } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Internal server error." },
-      { status: 500 },
-    );
+  } catch {
+    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }

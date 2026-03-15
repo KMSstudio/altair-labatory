@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
-import { GetArticleCore } from "@/repository/db/article/article";
+import { GetArticleCore, IncreaseArticleViewCount } from "@/repository/db/article/article";
 
 import { BuildCommentDisplayTree, BuildEmoteDisplayState } from "./article.transform";
 import { CommentSection } from "./section/CommentSection";
@@ -34,7 +34,8 @@ export default async function Page({ params }: { params: { article_id: string } 
   params = await params;
   const articleId = ParseArticleId(params.article_id);
 
-  const [article, session] = await Promise.all([
+  const [_, article, session] = await Promise.all([
+    IncreaseArticleViewCount(articleId),
     GetArticleCore(articleId),
     getServerSession(authOptions),
   ]);
@@ -61,11 +62,11 @@ export default async function Page({ params }: { params: { article_id: string } 
         <div>
           <time dateTime={article.createdAt}>{new Date(article.createdAt).toLocaleString()}</time>
 
-          {article.updatedAt !== article.createdAt && (
+          {article.editedAt && (
             <>
               <span> · Edited </span>
-              <time dateTime={article.updatedAt}>
-                {new Date(article.updatedAt).toLocaleString()}
+              <time dateTime={article.editedAt}>
+                {new Date(article.editedAt).toLocaleString()}
               </time>
             </>
           )}

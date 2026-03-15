@@ -795,6 +795,7 @@ async function main() {
       content: "Changed content.",
       authorId: students[4].id,
       authorIp: "121.165.73.52",
+      editedAt: new Date(Date.now() + 1000),
       updatedAt: new Date(Date.now() + 1000),
     }
   });

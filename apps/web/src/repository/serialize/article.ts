@@ -55,6 +55,7 @@ export function serializeArticle(article: ArticleDbShape): ArticleDTO {
     viewCount: article.viewCount,
     createdAt: article.createdAt.toISOString(),
     updatedAt: article.updatedAt.toISOString(),
+    editedAt: article.editedAt ? article.editedAt.toISOString() : null,
 
     tags: article.tags.map((t) => serializeTag(t.tag)),
     author: serializePostAuthor(article.author),

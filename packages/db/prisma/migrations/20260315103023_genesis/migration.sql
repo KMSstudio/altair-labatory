@@ -208,6 +208,7 @@ CREATE TABLE "articles" (
     "author_ip" VARCHAR(45) NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "edited_at" TIMESTAMP(3),
     "deleted_at" TIMESTAMP(3),
     "is_pinned" BOOLEAN NOT NULL DEFAULT false,
     "is_hidden" BOOLEAN NOT NULL DEFAULT false,

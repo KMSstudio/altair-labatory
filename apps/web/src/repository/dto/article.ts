@@ -96,6 +96,7 @@ export type ArticleDbShape = {
   viewCount: number;
   createdAt: Date;
   updatedAt: Date;
+  editedAt: Date | null;
 
   tags: { tag: tagDbShape }[];
   author: PostAuthorDbShape | null;
@@ -119,9 +120,9 @@ export const getArticleSelect = {
   author: { select: getPostAuthorSelect },
   createdAt: true,
   updatedAt: true,
+  editedAt: true,
   emotes: { select: getPostEmoteSelect },
   comments: {
-    where: { deletedAt: null },
     orderBy: { createdAt: "asc" as const },
     select: getCommentSelect,
   },
@@ -136,6 +137,7 @@ export type ArticleDTO = {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
+  editedAt: string | null;
 
   tags: tagDTO[];
   author: PostAuthorDTO | null;

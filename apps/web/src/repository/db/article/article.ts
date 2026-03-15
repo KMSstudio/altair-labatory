@@ -210,7 +210,6 @@ export async function CreateArticleCore(ctx: Article_Ctx, boardId: bigint, input
       }));
       await tx.articleTag.createMany({ data });
     }
-    console.log(newArticle.tags.length)
     return serializeArticle(newArticle);
   });
 }

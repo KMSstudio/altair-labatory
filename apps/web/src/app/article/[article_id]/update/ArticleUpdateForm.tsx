@@ -6,16 +6,16 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { TagSelector } from "@/app/board/TagSelector";
-import type { ArticleDTO, ArticleTagDTO } from "@/repository/dto/article";
+import type { ArticleDTO, tagDTO } from "@/repository/dto/article";
 
-type ApiOk = { ok: true; articleId: string };
+type ApiOk = { ok: true; article: ArticleDTO };
 type ApiErr = { error: string };
 
 export function ArticleUpdateForm({ article }: { article: ArticleDTO }) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
-  const selectedTags: ArticleTagDTO[] = article.tags ?? [];
+  const selectedTags: tagDTO[] = article.tags ?? [];
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,13 +46,13 @@ export function ArticleUpdateForm({ article }: { article: ArticleDTO }) {
 
     const data = (await res.json().catch(() => ({}))) as Partial<ApiOk & ApiErr>;
 
-    if (!res.ok || !data.ok || !data.articleId) {
+    if (!res.ok || !data.ok || !data.article) {
       setSubmitting(false);
       router.replace(`?error=${encodeURIComponent(data.error ?? "Unknown error.")}`);
       return;
     }
 
-    router.push(`/article/${data.articleId}`);
+    router.push(`/article/${data.article.id}`);
   }
 
   return (

@@ -25,7 +25,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
   }
 
   useEffect(() => {
-    const getTags = async () => {
+    const getTagList = async () => {
       try {
         const res = await fetch("/api/article/tag/get", {
           method: "GET",
@@ -41,24 +41,23 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: tagDTO[] }) 
         if (!res.ok || !data?.tags) {
           throw new Error(data?.error ?? "Failed to get tags.");
         }
-
         setTagList(data.tags);
       } catch (e) {
         alert(`Fail to load tags: ${e instanceof Error ? e.message : "Unknown Error"}`);
       }
     }
-    getTags();
+    getTagList();
   }, [])
   async function onSearch() {
-    const trimmedQuery = query.trim();
-    if (!trimmedQuery) return;
+    const loweredTrimmedQuery = query.trim().toLowerCase();
+    if (!loweredTrimmedQuery) return;
 
     setLoading(true);
     setErrorMessage(null);
 
     try {
       setTags(
-        tagList.filter((tag) => (tag.kind === tagKind && tag.text?.includes(trimmedQuery)))
+        tagList.filter((tag) => (tag.kind === tagKind && tag.text?.toLowerCase().includes(loweredTrimmedQuery)))
       );
     } catch (e) {
       setErrorMessage(`Selecting tag error: ${e instanceof Error ? e.message : "Unknown Error"}`);

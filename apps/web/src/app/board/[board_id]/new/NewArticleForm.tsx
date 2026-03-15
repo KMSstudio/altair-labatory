@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TagSelector } from "../../TagSelector";
+import { ArticleDTO } from "@/repository/dto/article";
 
 type ApiBody = {
   boardId: string;
@@ -49,7 +50,7 @@ export default function NewArticleForm({ boardId }: { boardId: string }) {
     }
 
     const data = (await res.json().catch(() => ({}))) as
-      | { ok: true; articleId: string }
+      | { ok: true; article: ArticleDTO }
       | { error: string };
 
     if (!res.ok || !("ok" in data) || !data.ok) {
@@ -60,7 +61,7 @@ export default function NewArticleForm({ boardId }: { boardId: string }) {
       return;
     }
 
-    router.push(`/article/${data.articleId}`);
+    router.push(`/article/${data.article.id}`);
   }
 
   return (

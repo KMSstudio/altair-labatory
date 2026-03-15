@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
  */
 export async function GET(request: Request) {
     try {
-        const tags = GetTags({});
+        const tags = await GetTags({});
         return NextResponse.json({ ok: true, tags }, { status: 200 });
     } catch (e) {
         return NextResponse.json(

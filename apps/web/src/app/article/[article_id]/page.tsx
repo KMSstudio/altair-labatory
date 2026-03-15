@@ -34,13 +34,20 @@ export default async function Page({ params }: { params: { article_id: string } 
   params = await params;
   const articleId = ParseArticleId(params.article_id);
 
+  try {
+    await IncreaseArticleViewCount(articleId);
+  } catch (error) {
+    console.error("Failed to increment article view count", {
+      articleId: articleId.toString(),
+      error,
+    });
+  }
   const [article, session] = await Promise.all([
     GetArticleCore(articleId),
     getServerSession(authOptions),
   ]);
 
   if (!article) notFound();
-  await IncreaseArticleViewCount(articleId);
 
   const sessionId = ParseSessionUserId(session?.user?.id);
   const commentDisplayTree = BuildCommentDisplayTree(article.comments);

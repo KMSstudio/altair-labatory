@@ -1,5 +1,6 @@
+import { parseEnumValue } from "@/app/api/_util/parse";
 import { SearchTags } from "@/repository/db/article/tag";
-import type { TagKind } from "@labatory/db";
+import { TagKind } from "@labatory/db";
 import { NextResponse } from "next/server";
 
 /**
@@ -22,11 +23,12 @@ export async function GET(request: Request) {
   }
 
   const trimmedQuery = searchQuery.trim();
-  const allowedKinds: readonly TagKind[] = ["TEXT", "LAB", "UNIV", "SUBJECT"];
-  if (!trimmedQuery || !allowedKinds.includes(rawKind as TagKind)) {
-    return NextResponse.json({ error: "Invalid searchQuery or tagKind." }, { status: 400 });
+  let tagKind: TagKind;
+  try {
+    tagKind = parseEnumValue(TagKind, rawKind, "tagKind");
+  } catch (e) {
+    return NextResponse.json({ error: `${e}` }, { status: 400 });
   }
-  const tagKind = rawKind as TagKind;
   try {
     const tags = await SearchTags({ kind: tagKind, query: trimmedQuery });
     return NextResponse.json({ ok: true, tags }, { status: 200 });

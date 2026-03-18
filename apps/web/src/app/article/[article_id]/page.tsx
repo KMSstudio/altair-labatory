@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: { article_id: string } 
   const articleId = ParseArticleId(params.article_id);
 
   const [article, session] = await Promise.all([
-    GetArticleCore(articleId),
+    GetArticleCore({ articleId }),
     getServerSession(authOptions),
   ]);
 

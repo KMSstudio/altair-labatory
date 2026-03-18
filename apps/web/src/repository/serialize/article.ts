@@ -1,19 +1,19 @@
 // @/util/serialize/article.ts
 
-import type { ArticleTagDbShape, ArticleTagDTO } from "@/repository/dto/article";
+import type { TagDbShape, TagDTO } from "@/repository/dto/article";
 import type { PostEmoteDbShape, PostEmoteDTO } from "@/repository/dto/article";
 import type { PostAuthorDbShape, PostAuthorDTO } from "@/repository/dto/article";
 import type { CommentDbShape, CommentDTO } from "@/repository/dto/article";
 import type { ArticleDTO, ArticleDbShape } from "@/repository/dto/article";
 
-export function serializeArticleTag(articleTag: ArticleTagDbShape): ArticleTagDTO {
+export function serializeTag(tag: TagDbShape): TagDTO {
   return {
-    id: articleTag.id.toString(),
-    kind: articleTag.kind,
-    labId: articleTag.labId?.toString(),
-    subjId: articleTag.subjId?.toString(),
-    univId: articleTag.univId?.toString(),
-    text: articleTag.text,
+    id: tag.id.toString(),
+    kind: tag.kind,
+    labId: tag.labId?.toString(),
+    subjId: tag.subjId?.toString(),
+    univId: tag.univId?.toString(),
+    text: tag.text,
   };
 }
 
@@ -38,7 +38,7 @@ export function serializeComment(comment: CommentDbShape): CommentDTO {
     isHidden: comment.isHidden,
     parentId: comment.parentId ? comment.parentId.toString() : null,
 
-    content: comment.content,
+    content: comment.isHidden ? "This comment is hidden." : comment.content,
     emotes: comment.emotes.map((e) => serializeEmote(e)),
 
     createdAt: comment.createdAt.toISOString(),
@@ -56,7 +56,7 @@ export function serializeArticle(article: ArticleDbShape): ArticleDTO {
     createdAt: article.createdAt.toISOString(),
     updatedAt: article.updatedAt.toISOString(),
 
-    tags: article.tags.map((t) => serializeArticleTag(t.tag)),
+    tags: article.tags.map((t) => serializeTag(t.tag)),
     author: serializePostAuthor(article.author),
     emotes: article.emotes.map((e) => ({
       userId: e.userId.toString(),

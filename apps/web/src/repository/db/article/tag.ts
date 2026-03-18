@@ -3,8 +3,9 @@
 "use server";
 
 import { prisma, Prisma, type TagKind } from "@labatory/db";
-import type { ArticleTagDbShape } from "@/repository/dto/article";
+import type { TagDTO } from "@/repository/dto/article";
 import { name2Text } from "@/util/util";
+import { serializeTag } from "@/repository/serialize/article";
 
 type DbClient = Prisma.TransactionClient | typeof prisma;
 
@@ -57,7 +58,7 @@ export async function CreateTag({
   id?: bigint;
   text?: string;
   db?: DbClient;
-}): Promise<ArticleTagDbShape> {
+}): Promise<TagDTO> {
   const data: Prisma.TagCreateInput = { kind };
 
   if (kind === "TEXT") {
@@ -81,7 +82,8 @@ export async function CreateTag({
     data.text = await fetchNameText(kind, db, id);
   }
 
-  return db.tag.create({ data, select: TagSelect });
+  const newTag = await db.tag.create({ data, select: TagSelect });
+  return serializeTag(newTag);
 }
 
 /**
@@ -99,7 +101,7 @@ export async function UpdateTag({
   tagId: bigint;
   text?: string;
   db?: DbClient;
-}): Promise<ArticleTagDbShape> {
+}): Promise<TagDTO> {
   const tag = await db.tag.findUnique({ where: { id: tagId }, select: TagSelect });
   if (!tag) throw Error("Invalid tag id");
 
@@ -119,11 +121,13 @@ export async function UpdateTag({
     nextText = await fetchNameText(tag.kind, db, refId);
   }
 
-  return db.tag.update({
+  const updatedTag = await db.tag.update({
     where: { id: tag.id },
     data: { text: nextText },
     select: TagSelect,
   });
+
+  return serializeTag(updatedTag);
 }
 
 /**
@@ -135,14 +139,23 @@ export async function GetTag({
 }: {
   tagId: bigint;
   db?: DbClient;
-}): Promise<ArticleTagDbShape | null> {
-  return db.tag.findUnique({ where: { id: tagId }, select: TagSelect });
+}): Promise<TagDTO | null> {
+  const tag = await db.tag.findUnique({ where: { id: tagId }, select: TagSelect });
+  if (tag === null) return null;
+  return serializeTag(tag);
+}
+/**
+ * Get info of all tags
+ */
+export async function GetTags({ db = prisma }: { db?: DbClient }): Promise<TagDTO[]> {
+  const tags = await db.tag.findMany({ select: TagSelect });
+  return tags.map(serializeTag);
 }
 
 /**
  * Search tags by kind and partial text match.
  */
-export async function SearchArticleTags({
+export async function SearchTags({
   kind,
   query,
   db = prisma,
@@ -150,12 +163,13 @@ export async function SearchArticleTags({
   kind: TagKind;
   query: string;
   db?: DbClient;
-}): Promise<ArticleTagDbShape[]> {
+}): Promise<TagDTO[]> {
   const query_trim = query.trim();
   const whereQuery = (q: string) => ({ contains: q, mode: Prisma.QueryMode.insensitive }) as const;
 
-  return db.tag.findMany({
+  const tags = await db.tag.findMany({
     where: { AND: [{ text: whereQuery(query_trim), kind }] },
     select: TagSelect,
   });
+  return tags.map(serializeTag);
 }

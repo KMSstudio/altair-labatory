@@ -34,7 +34,7 @@ export default async function Page({
     redirect("/");
   }
 
-  const article = await GetArticleCore(articleId);
+  const article = await GetArticleCore({ articleId });
   if (!article) {
     notFound();
   }

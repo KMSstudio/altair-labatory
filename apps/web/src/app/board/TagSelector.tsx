@@ -3,43 +3,66 @@
 "use client";
 
 import type { TagKind } from "@labatory/db";
-import type { ArticleTagDTO } from "@/repository/dto/article";
-import { SearchArticleTags } from "@/repository/db/article/tag";
-import { serializeArticleTag } from "@/repository/serialize/article";
-import { useState } from "react";
+import type { TagDTO } from "@/repository/dto/article";
+import { useEffect, useState } from "react";
 
-export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDTO[] }) {
-  const [tags, setTags] = useState<ArticleTagDTO[]>([]);
+export function TagSelector({ SelectedTags = [] }: { SelectedTags?: TagDTO[] }) {
+  const [tagList, setTagList] = useState<TagDTO[]>([]);
+  const [tags, setTags] = useState<TagDTO[]>([]);
   const [tagKind, setTagKind] = useState<TagKind>("LAB");
   const [query, setQuery] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = useState<ArticleTagDTO[]>(SelectedTags);
+  const [selectedTags, setSelectedTags] = useState<TagDTO[]>(SelectedTags);
 
-  function addTag(tag: ArticleTagDTO) {
+  function addTag(tag: TagDTO) {
     if (selectedTags.some((t) => t.id === tag.id)) return;
     setSelectedTags([...selectedTags, tag]);
   }
-  function removeTag(tag: ArticleTagDTO) {
+  function removeTag(tag: TagDTO) {
     setSelectedTags(selectedTags.filter((t) => t.id !== tag.id));
   }
 
-  async function onSearch() {
-    const trimmedQuery = query.trim();
-    if (!trimmedQuery) return;
+  useEffect(() => {
+    const getTagList = async () => {
+      try {
+        const res = await fetch("/api/article/tag/get", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
 
-    setLoading(true);
+        const data = (await res.json().catch(() => null)) as {
+          ok?: boolean;
+          tags?: TagDTO[];
+          error?: string;
+        } | null;
+
+        if (!res.ok || !data?.tags) {
+          throw new Error(data?.error ?? "Failed to get tags.");
+        }
+        setTagList(data.tags);
+      } catch (e) {
+        alert(`Fail to load tags: ${e instanceof Error ? e.message : "Unknown Error"}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+    void getTagList();
+  }, []);
+  async function onSearch() {
+    const loweredTrimmedQuery = query.trim().toLowerCase();
+    if (!loweredTrimmedQuery) {
+      setTags([]);
+      return;
+    }
+
     setErrorMessage(null);
 
-    try {
-      setTags(
-        (await SearchArticleTags({ kind: tagKind, query: trimmedQuery })).map(serializeArticleTag),
-      );
-    } catch (e) {
-      setErrorMessage(`Selecting tag error: ${e instanceof Error ? e.message : "Unknown Error"}`);
-    } finally {
-      setLoading(false);
-    }
+    setTags(
+      tagList.filter(
+        (tag) => tag.kind === tagKind && tag.text?.toLowerCase().includes(loweredTrimmedQuery),
+      ),
+    );
   }
 
   return (
@@ -48,7 +71,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDT
 
       <div>
         <strong>Selected Tags</strong>
-        <TagList tags={selectedTags} onSelect={removeTag} />
+        <TagList tags={selectedTags} onSelect={removeTag} emptyMessage="No selected tags." />
         {selectedTags.map((tag) => (
           <input key={tag.id} type="hidden" value={tag.id} name="tagIds" />
         ))}
@@ -71,7 +94,7 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDT
           </div>
         </label>
 
-        <TagList tags={tags} onSelect={addTag} />
+        <TagList tags={tags} onSelect={addTag} emptyMessage="No search result." />
       </div>
     </div>
   );
@@ -80,11 +103,13 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: ArticleTagDT
 function TagList({
   tags,
   onSelect,
+  emptyMessage = "",
 }: {
-  tags: ArticleTagDTO[];
-  onSelect: (tag: ArticleTagDTO) => void;
+  tags: TagDTO[];
+  onSelect: (tag: TagDTO) => void;
+  emptyMessage?: string;
 }) {
-  if (tags.length === 0) return <p>No search result.</p>;
+  if (tags.length === 0) return <p>{emptyMessage}</p>;
 
   return (
     <ul>
@@ -97,13 +122,7 @@ function TagList({
   );
 }
 
-function TagItem({
-  tag,
-  onSelect,
-}: {
-  tag: ArticleTagDTO | null;
-  onSelect: (tag: ArticleTagDTO) => void;
-}) {
+function TagItem({ tag, onSelect }: { tag: TagDTO; onSelect: (tag: TagDTO) => void }) {
   if (!tag) return null;
 
   return (

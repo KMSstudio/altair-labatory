@@ -8,6 +8,7 @@ import { authOptions } from "@/lib/auth";
 
 import { buildCreateArticleCtx } from "@/app/api/_util/createArticleCtx";
 import { UpdateArticleCore } from "@/repository/db/article/article";
+import { assertArticleAuthorOrAdmin, mapPermissionError } from "@/app/api/_util/assertPermission";
 
 type Body = {
   articleId: string;
@@ -86,8 +87,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: msg }, { status });
   }
 
-  if (article.authorId !== ctx.authorId)
-    return NextResponse.json({ error: "Unauthorized." }, { status: 403 });
+  try {
+    await assertArticleAuthorOrAdmin(articleId, ctx.authorId, session.user.role);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Internal server error.";
+    const { error, status } = mapPermissionError(msg);
+    return NextResponse.json({ error }, { status });
+  }
+
   let tagIds: bigint[];
   try {
     tagIds = tagIdsRaw.map((tagId) => BigInt(tagId));
@@ -96,8 +103,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    await UpdateArticleCore(articleId, ctx, { title, content, tagIds });
-    return NextResponse.json({ ok: true, articleId: articleId.toString() }, { status: 200 });
+    const updatedArticle = await UpdateArticleCore(articleId, ctx, { title, content, tagIds });
+    if (!updatedArticle) throw new Error();
+    return NextResponse.json({ ok: true, article: updatedArticle }, { status: 200 });
   } catch (e) {
     if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
       return NextResponse.json({ error: "Internal server error." }, { status: 500 });

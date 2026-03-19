@@ -22,26 +22,26 @@ import { getBoard } from "@/repository/db/article/board";
  * - `500` for internal or database errors
  */
 export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const boardIdRaw = searchParams.get("boardId");
+  const { searchParams } = new URL(request.url);
+  const boardIdRaw = searchParams.get("boardId");
 
-    if (!boardIdRaw) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
+  if (!boardIdRaw) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
 
-    let boardId: bigint;
-    try {
-        boardId = BigInt(boardIdRaw);
-    } catch {
-        return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
+  let boardId: bigint;
+  try {
+    boardId = BigInt(boardIdRaw);
+  } catch {
+    return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
+  }
+
+  try {
+    const board = await getBoard({ boardId });
+    if (!board) return NextResponse.json({ error: "Board does not exists." }, { status: 404 });
+    return NextResponse.json({ ok: true, board }, { status: 200 });
+  } catch (e) {
+    if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
+      return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
-
-    try {
-        const board = await getBoard({ boardId });
-        if (!board) return NextResponse.json({ error: "Board does not exists." }, { status: 404 });
-        return NextResponse.json({ ok: true, board }, { status: 200 });
-    } catch (e) {
-        if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
-            return NextResponse.json({ error: "Internal server error." }, { status: 500 });
-        }
-        return NextResponse.json({ error: "Internal database error." }, { status: 500 });
-    }
+    return NextResponse.json({ error: "Internal database error." }, { status: 500 });
+  }
 }

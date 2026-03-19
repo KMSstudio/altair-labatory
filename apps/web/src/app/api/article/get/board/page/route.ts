@@ -46,7 +46,7 @@ export async function GET(request: Request) {
   try {
     const articles = await getBoardArticles({
       boardId,
-      start: (page - 1) * pageSize + 1,
+      start: (page - 1) * pageSize,
       finish: page * pageSize,
     });
     return NextResponse.json({ ok: true, articles }, { status: 200 });

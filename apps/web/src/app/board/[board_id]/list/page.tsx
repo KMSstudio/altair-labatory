@@ -44,7 +44,7 @@ export default async function Page({
   const maxPage = Math.ceil(board._count.articles / pageSize);
   let articles: ArticleDTO[];
   let pinnedArticles: ArticleDTO[];
-  const start = pageSize * (page - 1) + 1;
+  const start = pageSize * (page - 1);
   const finish = pageSize * page;
   try {
     articles = await getBoardArticles({ boardId, start, finish });

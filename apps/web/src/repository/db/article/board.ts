@@ -26,8 +26,8 @@ export async function getBoard({ boardId }: { boardId: bigint }): Promise<BoardD
  * filter hidden, pinned articles.
  *
  * @param {bigint} boardId - Id of board where target articles are located.
- * @param {number} start - The starting index (1-based, inclusive).
- * @param {number} finish - The ending index (inclusive). The number of items returned is (finish - start + 1).
+ * @param {number} start - The starting index (0-based, inclusive).
+ * @param {number} finish - The ending index (exclusive). The number of items returned is (finish - start).
  *
  * @return list of articleDTO.
  * @throws if start is less than 0 or finish is less than or equal to start.
@@ -41,11 +41,11 @@ export async function getBoardArticles({
   start: number;
   finish: number;
 }): Promise<ArticleDTO[]> {
-  if (start < 1) {
-    throw new Error("start index must be greater than 0.");
+  if (start < 0) {
+    throw new Error("start index must be greater than or equal to 0.");
   }
   if (finish <= start) {
-    throw new Error("finish index must be greater than or equal to start index.");
+    throw new Error("finish index must be greater than start index.");
   }
 
   const articles = await prisma.article.findMany({
@@ -57,8 +57,8 @@ export async function getBoardArticles({
     orderBy: {
       createdAt: "desc",
     },
-    skip: start - 1,
-    take: finish - start + 1,
+    skip: start,
+    take: finish - start,
     select: getArticleSelect,
   });
   return articles.map(serializeArticle);

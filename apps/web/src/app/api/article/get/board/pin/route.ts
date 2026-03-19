@@ -1,4 +1,4 @@
-// @/app/api/article/update/route.ts
+// @/app/api/article/get/board/pin/route.ts
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@labatory/db";

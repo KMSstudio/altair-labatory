@@ -1,16 +1,11 @@
 // @/app/board/[board_id]/list/page.tsx
 
 import { notFound } from "next/navigation";
-import {
-  GetArticles,
-  GetArticles_RetType,
-  GetBoard,
-  GetPinnedArticles,
-  GetPinnedArticles_RetType,
-} from "../../actions";
 import ArticleList from "./ArticleList";
 import { PageExplorer } from "./PageExplorer";
 import Link from "next/link";
+import { getBoard, getBoardArticles, getPinnedArticles } from "@/repository/db/article/board";
+import { ArticleDTO } from "@/repository/dto/article";
 
 export default async function Page({
   params,
@@ -28,7 +23,7 @@ export default async function Page({
   } catch {
     notFound();
   }
-  const board = await GetBoard(boardId);
+  const board = await getBoard({ boardId });
   if (!board) {
     notFound();
   }
@@ -47,12 +42,13 @@ export default async function Page({
   }
   const pageSize = 10;
   const maxPage = Math.ceil(board._count.articles / pageSize);
-  let articles: GetArticles_RetType;
-  let pinnedArticles: GetPinnedArticles_RetType;
-
+  let articles: ArticleDTO[];
+  let pinnedArticles: ArticleDTO[];
+  const start = pageSize * (page - 1);
+  const finish = pageSize * page;
   try {
-    articles = await GetArticles(boardId, page, pageSize);
-    pinnedArticles = await GetPinnedArticles(boardId);
+    articles = await getBoardArticles({ boardId, start, finish });
+    pinnedArticles = await getPinnedArticles({ boardId });
   } catch (e) {
     return <div>{e instanceof Error ? e.message : "Unable to load"}</div>;
   }
@@ -69,7 +65,7 @@ export default async function Page({
         <Link href={`/board/${boardId}/new`}>Write a new article</Link>
       </div>
       <ArticleList articles={articles} pinnedArticles={pinnedArticles} />
-      <PageExplorer BoardId={board.id} currentPage={page} maxPage={maxPage} maxLength={5} />
+      <PageExplorer BoardId={BigInt(board.id)} currentPage={page} maxPage={maxPage} maxLength={5} />
     </main>
   );
 }

@@ -1,4 +1,4 @@
-// @/app/api/article/update/route.ts
+// @/app/api/article/get/board/page/route.ts
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@labatory/db";
@@ -36,24 +36,18 @@ export async function GET(request: Request) {
   } catch {
     return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
   }
-  let page: number;
-  try {
-    page = Number(pageRaw);
-  } catch {
+  const page = Number(pageRaw);
+  if (!Number.isFinite(page) || page < 1)
     return NextResponse.json({ error: "Invalid page." }, { status: 400 });
-  }
-  let pageSize: number;
-  try {
-    pageSize = Number(pageSizeRaw);
-  } catch {
+  const pageSize = Number(pageSizeRaw);
+  if (!Number.isFinite(pageSize) || pageSize < 1)
     return NextResponse.json({ error: "Invalid page size." }, { status: 400 });
-  }
 
   try {
     const articles = await getBoardArticles({
       boardId,
-      start: page * pageSize,
-      finish: (page + 1) * pageSize,
+      start: (page - 1) * pageSize + 1,
+      finish: page * pageSize,
     });
     return NextResponse.json({ ok: true, articles }, { status: 200 });
   } catch (e) {

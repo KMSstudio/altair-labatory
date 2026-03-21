@@ -5,18 +5,14 @@ import { Prisma } from "@labatory/db";
 
 import { getBoardArticles } from "@/repository/db/article/board";
 
-/* eslint-disable */
-type body = {
+type Body = {
   boardId: string;
   page: string;
   pageSize: string;
 };
-/* eslint-enable */
 
 /**
- * Get a page of articles in a board.
- *
- * This API endpoint performs all **server-side validation** before
+ * Get a paginated list of articles in a board.
  *
  * Validation performed here includes:
  * - Request URL validation
@@ -32,23 +28,25 @@ type body = {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
-  const boardIdRaw = searchParams.get("boardId");
-  const pageRaw = searchParams.get("page");
-  const pageSizeRaw = searchParams.get("pageSize");
-  if (!boardIdRaw) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
-  if (!pageRaw || !pageSizeRaw)
+  const body: Body = {
+    boardId: searchParams.get("boardId") ?? "",
+    page: searchParams.get("page") ?? "",
+    pageSize: searchParams.get("pageSize") ?? "",
+  };
+  if (!body.boardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
+  if (!body.page || !body.pageSize)
     return NextResponse.json({ error: "page and page size are required." }, { status: 400 });
 
   let boardId: bigint;
   try {
-    boardId = BigInt(boardIdRaw);
+    boardId = BigInt(body.boardId);
   } catch {
     return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
   }
-  const page = Number(pageRaw);
+  const page = Number(body.page);
   if (!Number.isFinite(page) || page < 1)
     return NextResponse.json({ error: "Invalid page." }, { status: 400 });
-  const pageSize = Number(pageSizeRaw);
+  const pageSize = Number(body.pageSize);
   if (!Number.isFinite(pageSize) || pageSize < 1)
     return NextResponse.json({ error: "Invalid page size." }, { status: 400 });
 

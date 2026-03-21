@@ -5,16 +5,12 @@ import { Prisma } from "@labatory/db";
 
 import { getPinnedArticles } from "@/repository/db/article/board";
 
-/* eslint-disable */
-type body = {
+type Body = {
   boardId: string;
 };
-/* eslint-enable */
 
 /**
- * Get all pinned article of a board.
- *
- * This API endpoint performs all **server-side validation** before
+ * Get all pinned articles in a board.
  *
  * Validation performed here includes:
  * - Request URL validation
@@ -28,13 +24,15 @@ type body = {
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const boardIdRaw = searchParams.get("boardId");
+  const body: Body = {
+    boardId: searchParams.get("boardId") ?? "",
+  };
 
-  if (!boardIdRaw) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
+  if (!body.boardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
 
   let boardId: bigint;
   try {
-    boardId = BigInt(boardIdRaw);
+    boardId = BigInt(body.boardId);
   } catch {
     return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
   }

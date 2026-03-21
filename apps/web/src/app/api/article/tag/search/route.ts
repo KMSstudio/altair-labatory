@@ -3,12 +3,10 @@ import { SearchTags } from "@/repository/db/article/tag";
 import { TagKind } from "@labatory/db";
 import { NextResponse } from "next/server";
 
-/* eslint-disable */
-type body = {
+type Body = {
   searchQuery: string;
   tagKind: string;
 };
-/* eslint-enable */
 
 /**
  * Get tags that match the kind and query of request.
@@ -22,17 +20,18 @@ type body = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const searchQuery = searchParams.get("searchQuery");
-  const rawKind = searchParams.get("tagKind");
-
-  if (!searchQuery || !rawKind) {
+  const body: Body = {
+    searchQuery: searchParams.get("searchQuery") ?? "",
+    tagKind: searchParams.get("tagKind") ?? "",
+  };
+  if (!body.searchQuery || !body.tagKind) {
     return NextResponse.json({ error: "searchQuery and tagKind are required." }, { status: 400 });
   }
 
-  const trimmedQuery = searchQuery.trim();
+  const trimmedQuery = body.searchQuery.trim();
   let tagKind: TagKind;
   try {
-    tagKind = parseEnumValue(TagKind, rawKind, "tagKind");
+    tagKind = parseEnumValue(TagKind, body.tagKind, "tagKind");
   } catch (e) {
     return NextResponse.json({ error: `${e}` }, { status: 400 });
   }

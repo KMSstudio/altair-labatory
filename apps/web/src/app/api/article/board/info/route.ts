@@ -1,9 +1,15 @@
-// @/app/api/article/get/board/info/route.ts
+// @/app/api/article/board/info/route.ts
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@labatory/db";
 
 import { getBoard } from "@/repository/db/article/board";
+
+/* eslint-disable */
+type body = {
+  boardId: string;
+};
+/* eslint-enable */
 
 /**
  * Get id, name, description, and the number of articles of a board.

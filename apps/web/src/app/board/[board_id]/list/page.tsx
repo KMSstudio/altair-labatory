@@ -5,7 +5,7 @@ import ArticleList from "./ArticleList";
 import { PageExplorer } from "./PageExplorer";
 import Link from "next/link";
 import { getBoard, getBoardArticles, getPinnedArticles } from "@/repository/db/article/board";
-import { ArticleDTO } from "@/repository/dto/article";
+import { ArticleDTO, BoardDTO } from "@/repository/dto/article";
 
 export default async function Page({
   params,
@@ -23,13 +23,6 @@ export default async function Page({
   } catch {
     notFound();
   }
-  const board = await getBoard({ boardId });
-  if (!board) {
-    notFound();
-  }
-  if (!board.isActive) {
-    notFound();
-  }
 
   let page: number = 1;
   if (searchParams?.page) {
@@ -41,17 +34,28 @@ export default async function Page({
     }
   }
   const pageSize = 10;
-  const maxPage = Math.ceil(board._count.articles / pageSize);
+  let board: BoardDTO | null = null;
   let articles: ArticleDTO[];
   let pinnedArticles: ArticleDTO[];
   const start = pageSize * (page - 1);
   const finish = pageSize * page;
   try {
-    articles = await getBoardArticles({ boardId, start, finish });
-    pinnedArticles = await getPinnedArticles({ boardId });
+    [board, articles, pinnedArticles] = await Promise.all([
+      await getBoard({ boardId }),
+      await getBoardArticles({ boardId, start, finish }),
+      await getPinnedArticles({ boardId }),
+    ]);
+    if (!board || !board.isActive) {
+      throw new Error();
+    }
   } catch (e) {
-    return <div>{e instanceof Error ? e.message : "Unable to load"}</div>;
+    if (!board || !board.isActive) {
+      notFound();
+    } else {
+      return <div>{e instanceof Error ? e.message : "Unable to load board articles."}</div>;
+    }
   }
+  const maxPage = Math.ceil(board._count.articles / pageSize);
   return (
     <main>
       <header>

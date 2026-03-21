@@ -1,9 +1,17 @@
-// @/app/api/article/get/board/page/route.ts
+// @/app/api/article/board/page/route.ts
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@labatory/db";
 
 import { getBoardArticles } from "@/repository/db/article/board";
+
+/* eslint-disable */
+type body = {
+  boardId: string;
+  page: string;
+  pageSize: string;
+};
+/* eslint-enable */
 
 /**
  * Get a page of articles in a board.
@@ -20,6 +28,7 @@ import { getBoardArticles } from "@/repository/db/article/board";
  * - `400` for validation errors
  * - `500` for internal or database errors
  */
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 

@@ -1,9 +1,15 @@
-// @/app/api/article/get/board/pin/route.ts
+// @/app/api/article/board/pin/route.ts
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@labatory/db";
 
 import { getPinnedArticles } from "@/repository/db/article/board";
+
+/* eslint-disable */
+type body = {
+  boardId: string;
+};
+/* eslint-enable */
 
 /**
  * Get all pinned article of a board.

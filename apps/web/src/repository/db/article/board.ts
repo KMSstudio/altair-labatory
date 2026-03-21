@@ -1,7 +1,6 @@
-import { ArticleDTO, getArticleSelect } from "@/repository/dto/article";
-import { BoardDTO, getBoardSelect } from "@/repository/dto/board";
-import { serializeArticle } from "@/repository/serialize/article";
-import { serializeBoard } from "@/repository/serialize/board";
+import type { ArticleDTO, BoardDTO } from "@/repository/dto/article";
+import { getBoardSelect, getArticleSelect } from "@/repository/dto/article";
+import { serializeArticle, serializeBoard } from "@/repository/serialize/article";
 import { prisma } from "@labatory/db";
 
 /**
@@ -73,7 +72,7 @@ export async function getBoardArticles({
  *
  * @return list of articleDTO.
  */
-export async function getPinnedArticles({ boardId }: { boardId: bigint }) {
+export async function getPinnedArticles({ boardId }: { boardId: bigint }): Promise<ArticleDTO[]> {
   const pinnedArticles = await prisma.article.findMany({
     where: {
       boardId,

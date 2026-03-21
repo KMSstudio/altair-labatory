@@ -3,6 +3,13 @@ import { SearchTags } from "@/repository/db/article/tag";
 import { TagKind } from "@labatory/db";
 import { NextResponse } from "next/server";
 
+/* eslint-disable */
+type body = {
+  searchQuery: string;
+  tagKind: string;
+};
+/* eslint-enable */
+
 /**
  * Get tags that match the kind and query of request.
  *

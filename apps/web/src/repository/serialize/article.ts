@@ -5,6 +5,8 @@ import type { PostEmoteDbShape, PostEmoteDTO } from "@/repository/dto/article";
 import type { PostAuthorDbShape, PostAuthorDTO } from "@/repository/dto/article";
 import type { CommentDbShape, CommentDTO } from "@/repository/dto/article";
 import type { ArticleDTO, ArticleDbShape } from "@/repository/dto/article";
+import type { BoardAclDTO, BoardAclDbShape } from "@/repository/dto/article";
+import type { BoardDTO, BoardDbShape } from "@/repository/dto/article";
 
 export function serializeTag(tag: TagDbShape): TagDTO {
   return {
@@ -65,5 +67,28 @@ export function serializeArticle(article: ArticleDbShape): ArticleDTO {
     comments: article.comments.map(serializeComment),
 
     commentCount: article._count.comments,
+  };
+}
+
+export function serializeBoardAcl(boardAcl: BoardAclDbShape): BoardAclDTO {
+  return {
+    id: boardAcl.id.toString(),
+    boardId: boardAcl.boardId.toString(),
+    action: boardAcl.action,
+    role: boardAcl.role,
+  };
+}
+
+export function serializeBoard(board: BoardDbShape): BoardDTO {
+  return {
+    id: board.id.toString(),
+    nameKo: board.nameKo,
+    nameEn: board.nameEn,
+    description: board.description?.toString(),
+    isActive: board.isActive,
+    aclRules: board.aclRules.map(serializeBoardAcl),
+    _count: {
+      articles: board._count.articles,
+    },
   };
 }

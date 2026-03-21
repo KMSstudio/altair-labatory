@@ -1,11 +1,7 @@
-import { GetArticles_RetType, GetPinnedArticles_RetType } from "../../actions";
+import { ArticleDTO } from "@/repository/dto/article";
 import Link from "next/link";
 
-async function PinnedArticleItem({
-  pinnedArticle,
-}: {
-  pinnedArticle: GetPinnedArticles_RetType[number];
-}) {
+async function PinnedArticleItem({ pinnedArticle }: { pinnedArticle: ArticleDTO }) {
   return (
     <li>
       <div>
@@ -17,7 +13,7 @@ async function PinnedArticleItem({
   );
 }
 
-async function ArticleItem({ article }: { article: GetArticles_RetType[number] }) {
+async function ArticleItem({ article }: { article: ArticleDTO }) {
   return (
     <li>
       <div>
@@ -26,12 +22,12 @@ async function ArticleItem({ article }: { article: GetArticles_RetType[number] }
         </Link>
       </div>
       <div>
-        <p>emote:{article._count.emotes}</p>
-        <p>comment:{article._count.comments}</p>
+        <p>emote:{article.emotes.length}</p>
+        <p>comment:{article.comments.length}</p>
         <p>view:{article.viewCount}</p>
       </div>
       <div>
-        <p>{article.createdAt.toDateString()}</p>
+        <p>{article.createdAt}</p>
       </div>
     </li>
   );
@@ -41,8 +37,8 @@ export default async function ArticleList({
   articles,
   pinnedArticles,
 }: {
-  articles: GetArticles_RetType | null;
-  pinnedArticles: GetPinnedArticles_RetType | null;
+  articles: ArticleDTO[];
+  pinnedArticles: ArticleDTO[] | null;
 }) {
   return (
     <section>

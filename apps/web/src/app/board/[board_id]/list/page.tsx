@@ -1,16 +1,11 @@
 // @/app/board/[board_id]/list/page.tsx
 
 import { notFound } from "next/navigation";
-import {
-  GetArticles,
-  GetArticles_RetType,
-  GetBoard,
-  GetPinnedArticles,
-  GetPinnedArticles_RetType,
-} from "../../actions";
 import ArticleList from "./ArticleList";
 import { PageExplorer } from "./PageExplorer";
 import Link from "next/link";
+import { getBoard, getBoardArticles, getPinnedArticles } from "@/repository/db/article/board";
+import { ArticleDTO, BoardDTO } from "@/repository/dto/article";
 
 export default async function Page({
   params,
@@ -28,13 +23,6 @@ export default async function Page({
   } catch {
     notFound();
   }
-  const board = await GetBoard(boardId);
-  if (!board) {
-    notFound();
-  }
-  if (!board.isActive) {
-    notFound();
-  }
 
   let page: number = 1;
   if (searchParams?.page) {
@@ -46,16 +34,28 @@ export default async function Page({
     }
   }
   const pageSize = 10;
-  const maxPage = Math.ceil(board._count.articles / pageSize);
-  let articles: GetArticles_RetType;
-  let pinnedArticles: GetPinnedArticles_RetType;
-
+  let board: BoardDTO | null = null;
+  let articles: ArticleDTO[];
+  let pinnedArticles: ArticleDTO[];
+  const start = pageSize * (page - 1);
+  const finish = pageSize * page;
   try {
-    articles = await GetArticles(boardId, page, pageSize);
-    pinnedArticles = await GetPinnedArticles(boardId);
+    [board, articles, pinnedArticles] = await Promise.all([
+      await getBoard({ boardId }),
+      await getBoardArticles({ boardId, start, finish }),
+      await getPinnedArticles({ boardId }),
+    ]);
+    if (!board || !board.isActive) {
+      throw new Error();
+    }
   } catch (e) {
-    return <div>{e instanceof Error ? e.message : "Unable to load"}</div>;
+    if (!board || !board.isActive) {
+      notFound();
+    } else {
+      return <div>{e instanceof Error ? e.message : "Unable to load board articles."}</div>;
+    }
   }
+  const maxPage = Math.ceil(board._count.articles / pageSize);
   return (
     <main>
       <header>
@@ -69,7 +69,7 @@ export default async function Page({
         <Link href={`/board/${boardId}/new`}>Write a new article</Link>
       </div>
       <ArticleList articles={articles} pinnedArticles={pinnedArticles} />
-      <PageExplorer BoardId={board.id} currentPage={page} maxPage={maxPage} maxLength={5} />
+      <PageExplorer BoardId={BigInt(board.id)} currentPage={page} maxPage={maxPage} maxLength={5} />
     </main>
   );
 }

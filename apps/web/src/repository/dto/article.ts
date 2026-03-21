@@ -1,6 +1,7 @@
 // @/repository/dto/article.ts
 
 import type { EmoteKind, TagKind } from "@labatory/db";
+import type { UserRole } from "@labatory/db";
 
 // TAG
 export type TagDbShape = {
@@ -144,7 +145,6 @@ export type ArticleDTO = {
   commentCount: number;
 };
 
-import type { UserRole } from "@labatory/db";
 // BOARD ACL
 export type BoardAclDbShape = {
   id: bigint;

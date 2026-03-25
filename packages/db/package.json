@@ -15,6 +15,7 @@
     "build": "tsc -p tsconfig.build.json",
     "seed": "tsx prisma/seed.ts",
     "prisma:generate": "prisma generate",
+    "prisma:migrate:reset": "prisma migrate reset",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",

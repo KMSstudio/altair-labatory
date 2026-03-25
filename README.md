@@ -59,15 +59,6 @@ The `.env` file must be located at the root and follow the required format.
 | `POSTGRES_PASSWORD`    | PostgreSQL password                                                 |
 | `DATABASE_URL`         | PostgreSQL connection string                                        |
 
-### Initialize Database (First Setup)
-
-If this is your ***first time*** setting up the environment, build the Prisma client.
-This should also be done whenever files in `/packages/db/src` are modified.
-
-```bash
-npm run prisma:build
-```
-
 ### Run the Database
 
 We use a Docker PostgreSQL image as the database and Prisma as the ORM.
@@ -88,6 +79,15 @@ You can use Prisma Studio for database management (web-based GUI):
 
 ```bash
 npm run prisma:studio
+```
+
+### Build Prisma Client (First Setup)
+
+If this is your ***first time*** setting up the environment, build the Prisma client.
+This should also be done whenever files in `/packages/db/src` are modified.
+
+```bash
+npm run prisma:build
 ```
 
 ### Run the Web Application

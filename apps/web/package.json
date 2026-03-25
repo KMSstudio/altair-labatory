@@ -12,7 +12,6 @@
     "format:check": "prettier --check . --ignore-path ../../.prettierignore"
   },
   "dependencies": {
-    "@labatory/auth": "*",
     "@labatory/db": "*",
     "bcryptjs": "^2.4.3",
     "next": "^16.0.10",

@@ -1,0 +1,9 @@
+.git
+.github
+node_modules
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+coverage
+npm-debug.log*

@@ -17,6 +17,7 @@ PostgreSQL runs locally via Docker Compose.
 * Docker Desktop
 * Docker Compose
 * Git
+* Web Browser
 
 ### Install
 

@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-import { record_view } from "@/repository/db/article/view";
+import { CreateArticleViewLog } from "@/repository/db/article/view";
 import { getClientIp } from "@/util/util";
 
 type Body = {
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await record_view({ articleId, ip, userId });
+    await CreateArticleViewLog({ articleId, ip, userId });
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

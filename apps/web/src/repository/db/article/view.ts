@@ -1,13 +1,11 @@
 // @/repository/db/article/view.ts
 
-"use server";
-
 import { prisma } from "@labatory/db";
 
 /**
- * Record a new article view log.
+ * Create a new article view log.
  */
-export async function record_view({
+export async function CreateArticleViewLog({
   articleId,
   ip,
   userId,

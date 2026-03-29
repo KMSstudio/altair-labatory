@@ -62,7 +62,7 @@ export async function createPiCore({
  * @param input - new name, email, scholarUrl, labId, and userId of Pi.
  * @param db - Client where query will be performed. Default is prisma.
  * @returns Pi DTO of updated pi.
- * @throws Pi id is invaild, or internal server error occurs.
+ * @throws If Pi id is invalid, or internal server error occurs.
  */
 export async function updatePiCore({
   piId,
@@ -101,7 +101,7 @@ export async function updatePiCore({
  *
  * @param piId - Target pi id.
  * @param db - Client where query will be performed. Default is prisma.
- * @throws if pi id is invaild.
+ * @throws if pi id is invalid.
  * @returns Pi DTO of deleted pi.
  */
 export async function deletePiCore({

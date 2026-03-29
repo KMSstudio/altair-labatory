@@ -1,4 +1,4 @@
-// @/repository/db/subject.ts
+// @/repository/db/labatory/subject.ts
 
 import { getSubjectSelect, type SubjectDbShape, type SubjectDTO } from "@/repository/dto/labatory";
 import { serializeSubject } from "@/repository/serialize/labatory";
@@ -42,7 +42,7 @@ export async function getSubjectCore({
  * 2) Create tag associated with that subject.
  *
  * @param input - korean name, english name, and description of new subject.
- * @returns University DTO of new University.
+ * @returns Subject DTO of new subject.
  */
 export async function createSubjectCore({
   input,
@@ -73,7 +73,7 @@ export async function createSubjectCore({
  * - Input validation (non-empty names, etc.)
  *
  * The update runs in a single transaction:
- * 1) Check whether the subject with input id is exists.
+ * 1) Check whether the subject with input id exists.
  * 2) Update subject fields.
  * 3) Update tag name associated with subject.
  *
@@ -142,7 +142,7 @@ export async function updateSubjectCore({
  *
  * @param subjectId - Target subject id.
  * @param db - Client where query will be performed. Default is prisma.
- * @throws If subject id is invaild.
+ * @throws If subject id is invalid.
  * @returns Subject DB shape of deleted subject.
  */
 export async function deleteSubjectCore({
@@ -188,7 +188,7 @@ export async function deleteSubjectCore({
  * - Move all ArticleTag edges from 'fromId' to 'toId'.
  * - Deactivates the source subject (`fromId`) via `deleteSubjectCore` (soft delete).
  *
- * @param sourceSubjectId - Id of sourse subject.
+ * @param sourceSubjectId - Id of source subject.
  * @param destinationSubjectId - Id of destination subject.
  * @throws if either subject does not exist, or already deleted, or destination subject was deleted during merge.
  * @returns subjectDTO of merged destination subject.
@@ -217,10 +217,10 @@ export async function mergeSubjectCore({
       },
     });
     if (!fromSubj) {
-      throw new Error("Invaild sourse subject id.");
+      throw new Error("Invalid source subject id.");
     }
     if (fromSubj.isDeleted) {
-      throw new Error("Sourse subject is deleted.");
+      throw new Error("source subject is deleted.");
     }
     const toSubj = await tx.subject.findUnique({
       where: {
@@ -235,7 +235,7 @@ export async function mergeSubjectCore({
       },
     });
     if (!toSubj) {
-      throw new Error("Invaild destination subject id.");
+      throw new Error("Invalid destination subject id.");
     }
     if (toSubj.isDeleted) {
       throw new Error("Destination subject is deleted.");

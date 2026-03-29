@@ -12,6 +12,7 @@ import { CommentSection } from "./section/CommentSection";
 import { EmoteSection } from "./section/EmoteSection";
 import { CommentForm } from "./section/CommentForm";
 import { WriterSection } from "./section/WriterSection";
+import { ViewCounter } from "./ViewCounter";
 
 function ParseArticleId(articleIdRaw: string): bigint {
   try {
@@ -47,6 +48,7 @@ export default async function Page({ params }: { params: { article_id: string } 
 
   return (
     <article>
+      <ViewCounter articleId={article.id} />
       <header>
         <div>
           <Link href={`/board/${article.boardId}/list`}>Return to board.</Link>

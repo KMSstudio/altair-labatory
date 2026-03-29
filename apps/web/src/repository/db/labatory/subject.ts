@@ -91,40 +91,40 @@ export async function createSubjectCore({
 export async function updateSubjectCore({
   subjectId,
   input,
-  db = prisma,
 }: {
   subjectId: bigint;
   input: Subject_Input;
-  db?: DbClient;
 }): Promise<SubjectDTO | null> {
-  try {
-    const updatedSubject = await db.subject.update({
-      where: {
-        id: subjectId,
-        isDeleted: false,
-      },
-      data: {
-        nameKo: input.nameKo,
-        nameEn: input.nameEn,
-        description: input.description,
-      },
-      select: {
-        id: true,
-        tag: {
-          select: {
-            id: true,
+  return prisma.$transaction(async (tx) => {
+    try {
+      const updatedSubject = await tx.subject.update({
+        where: {
+          id: subjectId,
+          isDeleted: false,
+        },
+        data: {
+          nameKo: input.nameKo,
+          nameEn: input.nameEn,
+          description: input.description,
+        },
+        select: {
+          id: true,
+          tag: {
+            select: {
+              id: true,
+            },
           },
         },
-      },
-    });
-    if (updatedSubject.tag) await UpdateTag({ tagId: updatedSubject.tag.id, db });
-    else await CreateTag({ kind: "SUBJECT", id: updatedSubject.id, db });
-    return await getSubjectCore({ subjectId: updatedSubject.id, db });
-  } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code == "P2025") {
-      throw new Error("Subject does not exists or was deleted during update.");
-    } else throw e;
-  }
+      });
+      if (updatedSubject.tag) await UpdateTag({ tagId: updatedSubject.tag.id, db: tx });
+      else await CreateTag({ kind: "SUBJECT", id: updatedSubject.id, db: tx });
+      return await getSubjectCore({ subjectId: updatedSubject.id, db: tx });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code == "P2025") {
+        throw new Error("Subject does not exists or was deleted during update.");
+      } else throw e;
+    }
+  });
 }
 
 /**

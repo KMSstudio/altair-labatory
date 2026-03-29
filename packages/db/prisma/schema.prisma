@@ -61,6 +61,7 @@ model User {
   reviewReports  LabReviewReport[]
   
   updatedBoard    Board[]
+  articleViewLogs ArticleViewLog[]
   @@map("users")
 }
 
@@ -353,7 +354,6 @@ model Article {
   title     String @db.VarChar(200)
   content   String
   articleHistory ArticleHistory[]
-  viewCount Int    @default(0) @map("view_count")
 
   tags      ArticleTag[]
 
@@ -364,6 +364,7 @@ model Article {
   emotes Emote[]
 
   comments  Comment[]
+  viewLogs  ArticleViewLog[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
@@ -374,6 +375,22 @@ model Article {
 
   @@index([createdAt], map: "idx_articles_created_at")
   @@map("articles")
+}
+
+model ArticleViewLog {
+  id        BigInt   @id @default(autoincrement())
+
+  articleId BigInt   @map("article_id")
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  userId    BigInt?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  ip        String   @db.VarChar(45)
+  viewedAt  DateTime @default(now()) @map("viewed_at")
+
+  @@index([articleId], map: "idx_article_view_log_article_id")
+  @@map("article_view_log")
 }
 
 model ArticleHistory {

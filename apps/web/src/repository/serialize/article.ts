@@ -54,7 +54,7 @@ export function serializeArticle(article: ArticleDbShape): ArticleDTO {
     boardId: article.boardId.toString(),
     title: article.title,
     content: article.content,
-    viewCount: article.viewCount,
+    viewCount: article._count.viewLogs,
     createdAt: article.createdAt.toISOString(),
     updatedAt: article.updatedAt.toISOString(),
 

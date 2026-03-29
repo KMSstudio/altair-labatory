@@ -94,7 +94,6 @@ export type ArticleDbShape = {
   boardId: bigint;
   title: string;
   content: string;
-  viewCount: number;
   createdAt: Date;
   updatedAt: Date;
 
@@ -103,7 +102,7 @@ export type ArticleDbShape = {
   emotes: PostEmoteDbShape[];
   comments: CommentDbShape[];
 
-  _count: { comments: number };
+  _count: { comments: number; viewLogs: number };
 };
 
 export const getArticleSelect = {
@@ -111,7 +110,6 @@ export const getArticleSelect = {
   boardId: true,
   title: true,
   content: true,
-  viewCount: true,
   tags: {
     select: {
       tag: { select: getTagSelect },
@@ -125,7 +123,7 @@ export const getArticleSelect = {
     orderBy: { createdAt: "asc" as const },
     select: getCommentSelect,
   },
-  _count: { select: { comments: true } },
+  _count: { select: { comments: true, viewLogs: true } },
 } as const;
 
 export type ArticleDTO = {

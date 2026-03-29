@@ -137,16 +137,13 @@ export async function updateSubjectCore({
  *
  * To prevent race conditions during concurrent delete requests, the final
  * write operation is guarded with `isDeleted: false`. If another request
- * deletes the article between the read and the write, the update will
+ * deletes the subject between the read and the write, the update will
  * affect zero rows and an error will be thrown.
  *
- * @param params - Object containing the target article id.
- * @param params.articleId - The id of the article to delete.
- *
- * @throws {Error} If the article does not exist.
- * @throws {Error} If the article has already been deleted.
- *
- * @returns Article DB shape when the article is successfully soft-deleted.
+ * @param subjectId - Target subject id.
+ * @param db - Client where query will be performed. Default is prisma.
+ * @throws If subject id is invaild.
+ * @returns Subject DB shape of deleted subject.
  */
 export async function deleteSubjectCore({
   subjectId,
@@ -258,8 +255,13 @@ export async function mergeSubjectCore({
     }
 
     const fromTagId = fromSubj.tag?.id ?? null;
-    const toTagId = toSubj.tag?.id ?? null;
-    if (fromTagId != null && toTagId != null) {
+    if (fromTagId != null) {
+      let toTagId = toSubj.tag?.id ?? null;
+      if (!toTagId) {
+        toTagId = BigInt(
+          (await CreateTag({ kind: "SUBJECT", id: destinationSubjectId, db: tx })).id,
+        );
+      }
       const tagLinks = await tx.articleTag.findMany({
         where: { tagId: fromTagId },
         select: { articleId: true },

@@ -390,6 +390,8 @@ model ArticleViewLog {
   viewedAt  DateTime @default(now()) @map("viewed_at")
 
   @@index([articleId], map: "idx_article_view_log_article_id")
+  @@index([viewedAt], map: "idx_article_view_log_viewed_at")
+  @@index([userId], map: "idx_article_view_log_user_id")
   @@map("article_view_log")
 }
 

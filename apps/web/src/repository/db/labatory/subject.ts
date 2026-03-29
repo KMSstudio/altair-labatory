@@ -83,55 +83,48 @@ export async function createSubjectCore({
  * @returns Subject DB shape when the subject is successfully updated.
  *
  * @throws {Error}
- * If the target subject does not exist.
+ * If a database constraint violation occurs.
  *
  * @throws {Prisma.PrismaClientKnownRequestError}
- * If a database constraint violation occurs.
+ * If the target subject does not exist.
  */
 export async function updateSubjectCore({
   subjectId,
   input,
+  db = prisma,
 }: {
   subjectId: bigint;
   input: Subject_Input;
+  db?: DbClient;
 }): Promise<SubjectDTO | null> {
-  return await prisma.$transaction(async (tx) => {
-    const subj = await tx.subject.findUnique({
+  try {
+    const updatedSubject = await db.subject.update({
       where: {
         id: subjectId,
+        isDeleted: false,
       },
-    });
-    if (!subj) throw new Error("Subject does not exist.");
-
-    try {
-      const updatedSubject = await tx.subject.update({
-        where: {
-          id: subjectId,
-          isActive: true,
-        },
-        data: {
-          nameKo: input.nameKo,
-          nameEn: input.nameEn,
-          description: input.description,
-        },
-        select: {
-          id: true,
-          tag: {
-            select: {
-              id: true,
-            },
+      data: {
+        nameKo: input.nameKo,
+        nameEn: input.nameEn,
+        description: input.description,
+      },
+      select: {
+        id: true,
+        tag: {
+          select: {
+            id: true,
           },
         },
-      });
-      if (updatedSubject.tag) await UpdateTag({ tagId: updatedSubject.tag.id, db: tx });
-      else await CreateTag({ kind: "SUBJECT", id: updatedSubject.id, db: tx });
-      return await getSubjectCore({ subjectId: updatedSubject.id, db: tx });
-    } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code == "P2025") {
-        throw new Error("Subject was deleted during update.");
-      } else throw e;
-    }
-  });
+      },
+    });
+    if (updatedSubject.tag) await UpdateTag({ tagId: updatedSubject.tag.id, db });
+    else await CreateTag({ kind: "SUBJECT", id: updatedSubject.id, db });
+    return await getSubjectCore({ subjectId: updatedSubject.id, db });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code == "P2025") {
+      throw new Error("Subject does not exists or was deleted during update.");
+    } else throw e;
+  }
 }
 
 /**
@@ -277,7 +270,7 @@ export async function mergeSubjectCore({
       });
       await tx.articleTag.deleteMany({ where: { tagId: fromTagId } });
     }
-    deleteSubjectCore({ subjectId: sourceSubjectId, db: tx });
+    await deleteSubjectCore({ subjectId: sourceSubjectId, db: tx });
     const mergedSubject = await getSubjectCore({ subjectId: destinationSubjectId, db: tx });
     if (!mergedSubject) throw new Error("Destination subject was deleted during merge process.");
     return mergedSubject;

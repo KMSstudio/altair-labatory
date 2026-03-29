@@ -21,7 +21,7 @@ export async function getUniversityCore({
   db = prisma,
 }: {
   universityId: bigint;
-  db: DbClient;
+  db?: DbClient;
 }): Promise<UniversityDTO | null> {
   const univ = await db.university.findUnique({
     where: {
@@ -49,7 +49,7 @@ export async function createUniversityCore({
   input: University_Input;
 }): Promise<UniversityDTO> {
   return await prisma.$transaction(async (tx) => {
-    const univ = (await prisma.university.create({
+    const univ = (await tx.university.create({
       data: {
         nameKo: input.nameKo,
         nameEn: input.nameEn,
@@ -84,7 +84,7 @@ export async function updateUniversityCore({
 }): Promise<UniversityDTO | null> {
   return await prisma.$transaction(async (tx) => {
     try {
-      const univ = await prisma.university.update({
+      const univ = await tx.university.update({
         where: {
           id: universityId,
         },

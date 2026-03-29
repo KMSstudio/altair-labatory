@@ -26,6 +26,6 @@ export type Pi_Application_Input = {
   requestedName: string;
   labId: bigint | null;
   schoolEmail: string;
-  ScholarUrl: string;
+  scholarUrl: string;
   note: string | null;
 };

@@ -24,7 +24,7 @@ export async function getPiApplication({
   db = prisma,
 }: {
   piApplicationId: bigint;
-  db: DbClient;
+  db?: DbClient;
 }): Promise<PiApplicationDTO | null> {
   const piApplication = (await db.pIApplication.findUnique({
     where: {
@@ -55,7 +55,7 @@ export async function createPiApplication({
 }: {
   userId: bigint;
   input: Pi_Application_Input;
-  db: DbClient;
+  db?: DbClient;
 }): Promise<PiApplicationDTO> {
   const newPiApplication = (await db.pIApplication.create({
     data: {
@@ -63,7 +63,7 @@ export async function createPiApplication({
       requestedName: input.requestedName,
       labId: input.labId,
       schoolEmail: input.schoolEmail,
-      ScholarUrl: input.ScholarUrl,
+      ScholarUrl: input.scholarUrl,
       note: input.note,
     },
     select: getPiApplicationSelect,
@@ -78,19 +78,22 @@ export async function createPiApplication({
  * - Input validation (vaild scholarUrl, valid labId, etc.)
  *
  * @param userId - Id of user how are submitting this pi application.
- * @param input - pi application payload(requestedName, labId, schoolEmail, ScholarUrl, note)
+ * @param input - pi application payload(requestedName, labId, schoolEmail, scholarUrl, note)
+ * @param db - Client where query will be performed. Default is prisma.
  * @throws if pi application id is invalid.
  * @returns updated Pi application DTO.
  */
 export async function updatePiApplication({
   piApplicationId,
   input,
+  db = prisma,
 }: {
   piApplicationId: bigint;
   input: Pi_Application_Input;
+  db?: DbClient;
 }): Promise<PiApplicationDTO> {
   try {
-    const updatedPiApplication = (await prisma.pIApplication.update({
+    const updatedPiApplication = (await db.pIApplication.update({
       where: {
         id: piApplicationId,
         status: "PENDING",
@@ -99,7 +102,7 @@ export async function updatePiApplication({
         requestedName: input.requestedName,
         labId: input.labId,
         schoolEmail: input.schoolEmail,
-        ScholarUrl: input.ScholarUrl,
+        ScholarUrl: input.scholarUrl,
         note: input.note,
       },
       select: getPiApplicationSelect,
@@ -118,7 +121,7 @@ export async function updatePiApplication({
  * This is a DB-only function.  No authentication/authorization is performed here.
  *
  * @param userId - Id of user how are submitting this pi application.
- * @param input - pi application payload(requestedName, labId, schoolEmail, ScholarUrl, note)
+ * @param input - pi application payload(requestedName, labId, schoolEmail, scholarUrl, note)
  * @param db - Client where query will be performed. Default is prisma.
  * @throws if pi application id is invalid.
  * @returns updated Pi application DTO.
@@ -130,7 +133,7 @@ export async function changePiApplicationStatus({
 }: {
   piApplicationId: bigint;
   newStatus: PIApplicationStatus;
-  db: DbClient;
+  db?: DbClient;
 }): Promise<PiApplicationDTO> {
   try {
     const updatedPiApplication = (await db.pIApplication.update({

@@ -20,7 +20,7 @@ export async function getPiCore({
   db = prisma,
 }: {
   piId: bigint;
-  db: DbClient;
+  db?: DbClient;
 }): Promise<PiDTO | null> {
   const pi = await db.pI.findUnique({
     where: { id: piId },
@@ -60,19 +60,24 @@ export async function createPiCore({
  *
  * @param piId - Id of pi whose information will be changed
  * @param input - new name, email, scholarUrl, labId, and userId of Pi.
+ * @param db - Client where query will be performed. Default is prisma.
  * @returns Pi DTO of updated pi.
  * @throws Pi id is invaild, or internal server error occurs.
  */
 export async function updatePiCore({
   piId,
   input,
+  db = prisma,
 }: {
   piId: bigint;
   input: Pi_Input;
+  db?: DbClient;
 }): Promise<PiDTO> {
   try {
-    const updatedPi = (await prisma.pI.update({
-      where: { id: piId },
+    const updatedPi = (await db.pI.update({
+      where: {
+        id: piId,
+      },
       data: {
         name: input.name,
         email: input.email,

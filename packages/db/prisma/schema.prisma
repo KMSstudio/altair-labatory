@@ -198,6 +198,7 @@ model Subject {
   nameEn      String  @db.VarChar(200) @map("name_en")
   description String? @db.Text
   isActive    Boolean @default(true) @map("is_active")
+  isDeleted   Boolean @default(false) @map("is_deleted")
 
   labs LabSubject[]
 
@@ -205,6 +206,7 @@ model Subject {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
+  deletedAt DateTime?                @map("deleted_at")
 
   @@unique([nameKo], map: "subjects_name_ko_key")
   @@unique([nameEn], map: "subjects_name_en_key")

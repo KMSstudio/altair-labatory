@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TagSelector } from "../../TagSelector";
 import type { ArticleDTO } from "@/repository/dto/article";
+import styles from "../../board.module.css";
 
 type ApiBody = {
   boardId: string;
@@ -65,24 +66,25 @@ export default function NewArticleForm({ boardId }: { boardId: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} id="target-form">
+    <form className={styles.form} onSubmit={onSubmit} id="target-form">
       <input type="hidden" name="boardId" value={boardId} />
 
-      <div>
+      <div className={styles.formGroup}>
         <label htmlFor="title">Title</label>
         <input id="title" name="title" type="text" required defaultValue="" />
       </div>
 
-      <div>
+      <div className={styles.formGroup}>
         <label htmlFor="content">Content</label>
         <textarea id="content" name="content" required defaultValue="" />
       </div>
 
       <TagSelector />
-
-      <button type="submit" id="submit-btn" disabled={submitting}>
-        {submitting ? "submitting..." : "submit"}
-      </button>
+      <div className={styles.submitRow}>
+        <button className={styles.primary} type="submit" id="submit-btn" disabled={submitting}>
+          {submitting ? "submitting..." : "submit"}
+        </button>
+      </div>
     </form>
   );
 }

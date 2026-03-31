@@ -5,6 +5,7 @@
 import type { TagKind } from "@labatory/db";
 import type { TagDTO } from "@/repository/dto/article";
 import { useEffect, useState } from "react";
+import styles from './board.module.css'
 
 export function TagSelector({ SelectedTags = [] }: { SelectedTags?: TagDTO[] }) {
   const [tagList, setTagList] = useState<TagDTO[]>([]);
@@ -66,10 +67,10 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: TagDTO[] }) 
   }
 
   return (
-    <div>
+    <div className={styles.tagSelector}>
       {errorMessage ? <p>{errorMessage}</p> : null}
 
-      <div>
+      <div className={styles.tagSelectorSection}>
         <strong>Selected Tags</strong>
         <TagList tags={selectedTags} onSelect={removeTag} emptyMessage="No selected tags." />
         {selectedTags.map((tag) => (
@@ -77,10 +78,10 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: TagDTO[] }) 
         ))}
       </div>
 
-      <div>
+      <div className={styles.tagSelectorSection}>
         <strong>Tags search</strong>
         <label>
-          <div>
+          <div className={styles.tagSelectorControls}>
             <input name="query" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
             <select value={tagKind} onChange={(e) => setTagKind(e.target.value as TagKind)}>
               <option value={"TEXT"}>Text</option>
@@ -88,7 +89,13 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: TagDTO[] }) 
               <option value={"UNIV"}>Univ</option>
               <option value={"SUBJECT"}>Subject</option>
             </select>
-            <button type="button" disabled={loading} onClick={onSearch} formNoValidate>
+            <button 
+              className={styles.tagActionButton}
+              type="button" 
+              disabled={loading} 
+              onClick={onSearch} 
+              formNoValidate
+            >
               Search
             </button>
           </div>
@@ -112,7 +119,7 @@ function TagList({
   if (tags.length === 0) return <p>{emptyMessage}</p>;
 
   return (
-    <ul>
+    <ul className={styles.tagList}>
       {tags.map((tag) => (
         <li key={tag.id}>
           <TagItem tag={tag} onSelect={onSelect} />
@@ -127,7 +134,10 @@ function TagItem({ tag, onSelect }: { tag: TagDTO; onSelect: (tag: TagDTO) => vo
 
   return (
     <div>
-      <button type="button" onClick={() => onSelect(tag)}>
+      <button 
+        className={styles.tagButton}
+        type="button" 
+        onClick={() => onSelect(tag)}>
         {tag.text}
       </button>
     </div>

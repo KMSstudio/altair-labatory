@@ -1,0 +1,418 @@
+.boardShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem 0 3rem;
+}
+
+.boardHeader {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.boardTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.boardTitle small {
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.boardDescription {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.primary,
+.ghost,
+.danger {
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.primary {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+}
+
+.ghost {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.danger {
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.searchShell {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.searchBar {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  flex: 1 1 260px;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.tagToggleButton {
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.selectedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tagChip,
+.tagChipActive,
+.tagChipMuted {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tagChip {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.tagChipActive {
+  background: #111827;
+  color: #ffffff;
+  border: 1px solid #111827;
+}
+
+.tagChipMuted {
+  background: #f9fafb;
+  color: #6b7280;
+  border: 1px dashed #d1d5db;
+}
+
+.tagPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tagButton {
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.tagButton:hover {
+  border-color: #111827;
+}
+
+.tagButtonSelected {
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #111827;
+  background: #111827;
+  color: #ffffff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.articleSection {
+  display: grid;
+  gap: 1rem;
+}
+
+.articleList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.articleItem,
+.pinnedArticleItem {
+  display: grid;
+  gap: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+.pinnedArticleItem {
+  background: #f9fafb;
+  border-color: #cfd8e3;
+}
+
+.articleTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.articleTitleWrap {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.articleTitleLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.articleTitleLink:hover {
+  text-decoration: underline;
+}
+
+.articleTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  word-break: break-word;
+}
+
+.pinnedBadge {
+  background: #111827;
+  color: #ffffff;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.articleMeta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #4b5563;
+  font-size: 0.92rem;
+}
+
+.articleDate {
+  color: #6b7280;
+  font-size: 0.88rem;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.pageLink,
+.pageCurrent {
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.pageLink {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.pageLink:hover {
+  border-color: #111827;
+}
+
+.pageCurrent {
+  background: #111827;
+  color: #ffffff;
+  border: 1px solid #111827;
+}
+
+.emptyMessage {
+  margin: 0;
+  color: #6b7280;
+}
+
+.formShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem 0 3rem;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.formGroup {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.form label {
+  font-weight: 600;
+  color: #111827;
+}
+
+.form input[type="text"],
+.form input[type="search"],
+.form input[type="email"],
+.form input[type="url"],
+.form input[type="tel"],
+.form input[type="password"],
+.form input[type="number"],
+.form input:not([type]),
+.form textarea,
+.form select {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #ffffff;
+}
+
+.form textarea {
+  min-height: 220px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.errorText {
+  margin: 0;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.tagSelector {
+  display: grid;
+  gap: 1rem;
+}
+
+.tagSelectorSection {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.tagList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tagSelectorControls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.tagSelectorControls input,
+.tagSelectorControls select {
+  flex: 1 1 180px;
+}
+
+.tagActionButton {
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.submitRow {
+  display: flex;
+  justify-content: flex-end;
+}

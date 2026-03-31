@@ -1,12 +1,15 @@
 import { ArticleDTO } from "@/repository/dto/article";
 import Link from "next/link";
+import styles from "../../board.module.css";
 
 async function PinnedArticleItem({ pinnedArticle }: { pinnedArticle: ArticleDTO }) {
   return (
-    <li>
+    <li className={styles.pinnedArticleItem}>
       <div>
-        <Link href={`/article/${pinnedArticle.id}`}>
-          <h3>{pinnedArticle.title}</h3>
+        <Link 
+          className={styles.articleTitleLink}
+          href={`/article/${pinnedArticle.id}`}>
+          <h3 className={styles.articleTitle}>{pinnedArticle.title}</h3>
         </Link>
       </div>
     </li>
@@ -15,18 +18,21 @@ async function PinnedArticleItem({ pinnedArticle }: { pinnedArticle: ArticleDTO 
 
 async function ArticleItem({ article }: { article: ArticleDTO }) {
   return (
-    <li>
+    <li className={styles.articleItem}>
       <div>
-        <Link href={`/article/${article.id}`}>
-          <h3>{article.title}</h3>
+        <Link 
+          className={styles.articleTitleLink}
+          href={`/article/${article.id}`}
+        >
+          <h3 className={styles.articleTitle}>{article.title}</h3>
         </Link>
       </div>
-      <div>
+      <div className={styles.articleMeta}>
         <p>emote:{article.emotes.length}</p>
         <p>comment:{article.comments.length}</p>
         <p>view:{article.viewCount}</p>
       </div>
-      <div>
+      <div className={styles.articleDate}>
         <p>{article.createdAt}</p>
       </div>
     </li>
@@ -41,9 +47,9 @@ export default async function ArticleList({
   pinnedArticles: ArticleDTO[] | null;
 }) {
   return (
-    <section>
-      <h2>Articles</h2>
-      <ul>
+    <section className={styles.articleSection}>
+      <h2 className={styles.sectionTitle}>Articles</h2>
+      <ul className={styles.articleList}>
         {pinnedArticles &&
           pinnedArticles.map((pinnedArticle) => (
             <PinnedArticleItem key={pinnedArticle.id} pinnedArticle={pinnedArticle} />

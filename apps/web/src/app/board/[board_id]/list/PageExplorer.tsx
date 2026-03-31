@@ -1,4 +1,5 @@
 import Link from "next/link";
+import styles from "../../board.module.css";
 
 export async function PageExplorer({
   BoardId,
@@ -24,7 +25,7 @@ export async function PageExplorer({
     start = Math.max(1, currentPage - maxLength + 1);
   }
   return (
-    <div>
+    <div className={styles.pagination}>
       {Array.from({ length: end - start + 1 }, (_, i) => start + i).map((idx) => (
         <PageExplorerItem
           key={idx}
@@ -47,8 +48,13 @@ async function PageExplorerItem({
   isCurrentPage: boolean;
 }) {
   return isCurrentPage ? (
-    <p>{pageNumber}</p>
+    <p className={styles.pageCurrent}>{pageNumber}</p>
   ) : (
-    <Link href={`/board/${BoardId}/list?page=${pageNumber}`}>{pageNumber}</Link>
+    <Link 
+      className={styles.pageLink}
+      href={`/board/${BoardId}/list?page=${pageNumber}`}
+    >
+      {pageNumber}
+    </Link>
   );
 }

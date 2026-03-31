@@ -35,6 +35,21 @@ export async function getSubjectCore({
 }
 
 /**
+ * Retrieve entire subjects data.
+ *
+ * This is a DB-only function. No authentication/authorization is performed here.
+ *
+ * @param db - Client where query will be performed. Default is prisma.
+ * @returns List of subject DB shape.
+ */
+export async function getSubjects({ db = prisma }: { db?: DbClient }): Promise<SubjectDTO[]> {
+  const subjects = (await db.subject.findMany({
+    select: getSubjectSelect,
+  })) as SubjectDbShape[];
+  return subjects.map(serializeSubject);
+}
+
+/**
  * Create new Subject.
  *
  * The update runs in a single transaction:
@@ -157,6 +172,9 @@ export async function deleteSubjectCore({
       id: subjectId,
       isDeleted: false,
     },
+    select: {
+      id: true,
+    },
   });
   if (!subj) throw new Error("Subject does not exist or already deleted.");
 
@@ -179,6 +197,14 @@ export async function deleteSubjectCore({
     else throw e;
   }
 }
+
+const LIGHTWEIGHT_TAG_SELECT = {
+  id: true,
+  isDeleted: true,
+  tag: {
+    select: { id: true },
+  },
+};
 
 /**
  * Merge two Subjects into one.
@@ -208,40 +234,22 @@ export async function mergeSubjectCore({
       where: {
         id: sourceSubjectId,
       },
-      select: {
-        id: true,
-        isDeleted: true,
-        tag: {
-          select: { id: true },
-        },
-      },
+      select: LIGHTWEIGHT_TAG_SELECT,
     });
-    if (!fromSubj) {
+    if (!fromSubj || fromSubj.isDeleted) {
       throw new Error("Invalid source subject id.");
-    }
-    if (fromSubj.isDeleted) {
-      throw new Error("source subject is deleted.");
     }
     const toSubj = await tx.subject.findUnique({
       where: {
         id: destinationSubjectId,
       },
-      select: {
-        id: true,
-        isDeleted: true,
-        tag: {
-          select: { id: true },
-        },
-      },
+      select: LIGHTWEIGHT_TAG_SELECT,
     });
-    if (!toSubj) {
+    if (!toSubj || toSubj.isDeleted) {
       throw new Error("Invalid destination subject id.");
     }
-    if (toSubj.isDeleted) {
-      throw new Error("Destination subject is deleted.");
-    }
 
-    const labLinks = await tx.labSubject.findMany({
+    const labLinks: { labId: bigint }[] = await tx.labSubject.findMany({
       where: { subjectId: sourceSubjectId },
       select: { labId: true },
     });
@@ -262,7 +270,7 @@ export async function mergeSubjectCore({
           (await CreateTag({ kind: "SUBJECT", id: destinationSubjectId, db: tx })).id,
         );
       }
-      const tagLinks = await tx.articleTag.findMany({
+      const tagLinks: { articleId: bigint }[] = await tx.articleTag.findMany({
         where: { tagId: fromTagId },
         select: { articleId: true },
       });

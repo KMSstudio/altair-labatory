@@ -50,10 +50,7 @@ async function PageExplorerItem({
   return isCurrentPage ? (
     <p className={styles.pageCurrent}>{pageNumber}</p>
   ) : (
-    <Link 
-      className={styles.pageLink}
-      href={`/board/${BoardId}/list?page=${pageNumber}`}
-    >
+    <Link className={styles.pageLink} href={`/board/${BoardId}/list?page=${pageNumber}`}>
       {pageNumber}
     </Link>
   );

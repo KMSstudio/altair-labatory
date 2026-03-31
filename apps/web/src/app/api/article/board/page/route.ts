@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     boardId: searchParams.get("boardId") ?? "",
     page: searchParams.get("page") ?? "",
     pageSize: searchParams.get("pageSize") ?? "",
-    tags: searchParams.getAll('tags'),
+    tags: searchParams.getAll("tags"),
   };
 
   if (!body.boardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
@@ -53,10 +53,10 @@ export async function GET(request: Request) {
   if (!Number.isFinite(pageSize) || pageSize < 1)
     return NextResponse.json({ error: "Invalid page size." }, { status: 400 });
 
-  const tags: bigint[] = []
+  const tags: bigint[] = [];
   try {
-    body.tags?.map(e => {
-      tags.push(BigInt(e))
+    body.tags?.map((e) => {
+      tags.push(BigInt(e));
     });
   } catch {
     return NextResponse.json({ error: "Invalid tags." }, { status: 400 });

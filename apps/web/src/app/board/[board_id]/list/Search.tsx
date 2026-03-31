@@ -1,47 +1,39 @@
-'use client'
+"use client";
 
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styles from "../../board.module.css";
 
 export default function Search({ tags }: { tags: string[] }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
 
-  useEffect(() => {
-    const tagsFromUrl = searchParams.getAll('tags[]');
-    setSelectedTags(tagsFromUrl);
-  }, [searchParams]);
+  const selectedTags = searchParams.getAll("tags[]");
 
   function toggleTag(tag: string) {
     const nextSelectedTags = selectedTags.includes(tag)
       ? selectedTags.filter((v) => v !== tag)
-      : [...selectedTags, tag]     
-    setSelectedTags(nextSelectedTags)
+      : [...selectedTags, tag];
+
     const params = new URLSearchParams(searchParams.toString());
 
-    params.delete('tags[]');
-    nextSelectedTags.map(v => {
-      params.append("tags[]", v)
+    params.delete("tags[]");
+    nextSelectedTags.forEach((v) => {
+      params.append("tags[]", v);
     });
 
-    router.replace(`${pathname}?${params.toString()}`)
+    router.replace(`${pathname}?${params.toString()}`);
   }
   return (
     <div className={styles.searchShell}>
       <div className={styles.searchBar}>
-        <input 
-          className={styles.searchInput}
-          type='text'
-          placeholder="검색어입력"
-        />
-        <button 
+        <input className={styles.searchInput} type="text" placeholder="검색어입력" />
+        <button
           className={styles.tagToggleButton}
-          type='button'
-          onClick={() => setIsOpen(prev => !prev)}
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
         >
           태그 추가
         </button>
@@ -49,14 +41,11 @@ export default function Search({ tags }: { tags: string[] }) {
       <div className={styles.tagPicker}>
         {isOpen && (
           <div>
-            {tags.map(tag => (
+            {tags.map((tag) => (
               <button
-                className={selectedTags.includes(tag) 
-                  ? styles.tagButtonSelected 
-                  : styles.tagButton
-                }
-                key = {tag}
-                type='button'
+                className={selectedTags.includes(tag) ? styles.tagButtonSelected : styles.tagButton}
+                key={tag}
+                type="button"
                 onClick={() => toggleTag(tag)}
               >
                 #{tag}
@@ -66,6 +55,5 @@ export default function Search({ tags }: { tags: string[] }) {
         )}
       </div>
     </div>
-    
   );
 }

@@ -15,25 +15,21 @@ export default async function Page({
   searchParams,
 }: {
   params: { board_id: string };
-  searchParams?: { 'tags[]': string | string[], page?: string };
+  searchParams?: { "tags[]": string | string[]; page?: string };
 }) {
   params = await params;
   searchParams = await searchParams;
 
   const allTags = await GetTags({});
 
-  const tagTexts = searchParams?.["tags[]"] 
+  const tagTexts = searchParams?.["tags[]"];
   const normalizedTagTexts =
-    typeof tagTexts === 'string'
-      ? [tagTexts]
-      : Array.isArray(tagTexts)
-        ? tagTexts
-        : [];
+    typeof tagTexts === "string" ? [tagTexts] : Array.isArray(tagTexts) ? tagTexts : [];
 
   const tagIds = normalizedTagTexts
     .map((text) => allTags.find((tag) => tag.text === text)?.id)
     .filter((id) => id !== undefined)
-    .map(id => BigInt(id));
+    .map((id) => BigInt(id));
 
   let boardId;
   try {
@@ -73,7 +69,8 @@ export default async function Page({
     } else {
       return <div>{e instanceof Error ? e.message : "Unable to load board articles."}</div>;
     }
-  }    
+  }
+
   const maxPage = Math.ceil(board._count.articles / pageSize);
   return (
     <main className={styles.boardShell}>
@@ -85,9 +82,11 @@ export default async function Page({
         {board.description && <p className={styles.boardDescription}>{board.description}</p>}
       </header>
       <div className={styles.actions}>
-        <Link className={styles.primary} href={`/board/${boardId}/new`}>Write a new article</Link>
+        <Link className={styles.primary} href={`/board/${boardId}/new`}>
+          Write a new article
+        </Link>
       </div>
-      <Search tags={allTags?.map(e => e?.text ?? '')} />
+      <Search tags={allTags?.map((e) => e?.text ?? "")} />
       <ArticleList articles={articles} pinnedArticles={pinnedArticles} />
       <PageExplorer BoardId={BigInt(board.id)} currentPage={page} maxPage={maxPage} maxLength={5} />
     </main>

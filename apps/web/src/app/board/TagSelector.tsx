@@ -5,7 +5,7 @@
 import type { TagKind } from "@labatory/db";
 import type { TagDTO } from "@/repository/dto/article";
 import { useEffect, useState } from "react";
-import styles from './board.module.css'
+import styles from "./board.module.css";
 
 export function TagSelector({ SelectedTags = [] }: { SelectedTags?: TagDTO[] }) {
   const [tagList, setTagList] = useState<TagDTO[]>([]);
@@ -89,11 +89,11 @@ export function TagSelector({ SelectedTags = [] }: { SelectedTags?: TagDTO[] }) 
               <option value={"UNIV"}>Univ</option>
               <option value={"SUBJECT"}>Subject</option>
             </select>
-            <button 
+            <button
               className={styles.tagActionButton}
-              type="button" 
-              disabled={loading} 
-              onClick={onSearch} 
+              type="button"
+              disabled={loading}
+              onClick={onSearch}
               formNoValidate
             >
               Search
@@ -134,10 +134,7 @@ function TagItem({ tag, onSelect }: { tag: TagDTO; onSelect: (tag: TagDTO) => vo
 
   return (
     <div>
-      <button 
-        className={styles.tagButton}
-        type="button" 
-        onClick={() => onSelect(tag)}>
+      <button className={styles.tagButton} type="button" onClick={() => onSelect(tag)}>
         {tag.text}
       </button>
     </div>

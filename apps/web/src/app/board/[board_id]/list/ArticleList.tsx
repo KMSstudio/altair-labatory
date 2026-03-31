@@ -6,9 +6,7 @@ async function PinnedArticleItem({ pinnedArticle }: { pinnedArticle: ArticleDTO 
   return (
     <li className={styles.pinnedArticleItem}>
       <div>
-        <Link 
-          className={styles.articleTitleLink}
-          href={`/article/${pinnedArticle.id}`}>
+        <Link className={styles.articleTitleLink} href={`/article/${pinnedArticle.id}`}>
           <h3 className={styles.articleTitle}>{pinnedArticle.title}</h3>
         </Link>
       </div>
@@ -20,10 +18,7 @@ async function ArticleItem({ article }: { article: ArticleDTO }) {
   return (
     <li className={styles.articleItem}>
       <div>
-        <Link 
-          className={styles.articleTitleLink}
-          href={`/article/${article.id}`}
-        >
+        <Link className={styles.articleTitleLink} href={`/article/${article.id}`}>
           <h3 className={styles.articleTitle}>{article.title}</h3>
         </Link>
       </div>

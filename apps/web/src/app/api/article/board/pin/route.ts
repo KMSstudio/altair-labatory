@@ -27,7 +27,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const body: Body = {
     boardId: searchParams.get("boardId") ?? "",
-    tags: searchParams.getAll('tags'),
+    tags: searchParams.getAll("tags"),
   };
 
   if (!body.boardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
@@ -39,10 +39,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
   }
 
-  const tags: bigint[] = []
+  const tags: bigint[] = [];
   try {
-    body.tags?.map(e => {
-      tags.push(BigInt(e))
+    body.tags?.map((e) => {
+      tags.push(BigInt(e));
     });
   } catch {
     return NextResponse.json({ error: "Invalid tags." }, { status: 400 });

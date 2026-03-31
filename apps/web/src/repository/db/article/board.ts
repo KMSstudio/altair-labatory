@@ -27,6 +27,7 @@ export async function getBoard({ boardId }: { boardId: bigint }): Promise<BoardD
  * @param {bigint} boardId - Id of board where target articles are located.
  * @param {number} start - The starting index (0-based, inclusive).
  * @param {number} finish - The ending index (exclusive). The number of items returned is (finish - start).
+ * @param {bigint[]} tags - Optional tag IDs
  *
  * @return list of articleDTO.
  * @throws if start is less than 0 or finish is less than or equal to start.
@@ -49,29 +50,21 @@ export async function getBoardArticles({
     throw new Error("finish index must be greater than start index.");
   }
 
-  const whereTags = tags.length > 0 ?
-    tags.map(id => ({
-        tags: {
-          some: { 
-            tagId: id 
-          }
-        }
-      }))
-    : [];
-
   const articles = await prisma.article.findMany({
     where: {
       boardId,
       isHidden: false,
       isPinned: false,
-      AND: tags.length > 0 ?
-        tags.map(id => ({
-            tags: {
-              some: { 
-                tagId: id 
-              }
-            }
-        })) : [],
+      AND:
+        tags.length > 0
+          ? tags.map((id) => ({
+              tags: {
+                some: {
+                  tagId: id,
+                },
+              },
+            }))
+          : [],
     },
     orderBy: {
       createdAt: "desc",
@@ -80,7 +73,6 @@ export async function getBoardArticles({
     take: finish - start,
     select: getArticleSelect,
   });
-  // console.log(articles)
   return articles.map(serializeArticle);
 }
 
@@ -90,29 +82,32 @@ export async function getBoardArticles({
  * filter hidden articles.
  *
  * @param {bigint} boardId - Id of board where target articles are located.
+ * @param {bigint[]} tags - Optional tag IDs
  *
  * @return list of articleDTO.
  */
-export async function getPinnedArticles({ 
+export async function getPinnedArticles({
   boardId,
   tags = [],
-}: { 
-  boardId: bigint,
-  tags?: bigint[], 
+}: {
+  boardId: bigint;
+  tags?: bigint[];
 }): Promise<ArticleDTO[]> {
   const pinnedArticles = await prisma.article.findMany({
     where: {
       boardId,
       isHidden: false,
       isPinned: true,
-      AND: tags.length > 0 ?
-        tags.map(id => ({
-            tags: {
-              some: { 
-                tagId: id 
-              }
-            }
-        })) : [],
+      AND:
+        tags.length > 0
+          ? tags.map((id) => ({
+              tags: {
+                some: {
+                  tagId: id,
+                },
+              },
+            }))
+          : [],
     },
     orderBy: {
       createdAt: "desc",

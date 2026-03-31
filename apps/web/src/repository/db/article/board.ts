@@ -35,10 +35,12 @@ export async function getBoardArticles({
   boardId,
   start,
   finish,
+  tags = [],
 }: {
   boardId: bigint;
   start: number;
   finish: number;
+  tags?: bigint[];
 }): Promise<ArticleDTO[]> {
   if (start < 0) {
     throw new Error("start index must be greater than or equal to 0.");
@@ -47,11 +49,29 @@ export async function getBoardArticles({
     throw new Error("finish index must be greater than start index.");
   }
 
+  const whereTags = tags.length > 0 ?
+    tags.map(id => ({
+        tags: {
+          some: { 
+            tagId: id 
+          }
+        }
+      }))
+    : [];
+
   const articles = await prisma.article.findMany({
     where: {
       boardId,
       isHidden: false,
       isPinned: false,
+      AND: tags.length > 0 ?
+        tags.map(id => ({
+            tags: {
+              some: { 
+                tagId: id 
+              }
+            }
+        })) : [],
     },
     orderBy: {
       createdAt: "desc",
@@ -60,6 +80,7 @@ export async function getBoardArticles({
     take: finish - start,
     select: getArticleSelect,
   });
+  // console.log(articles)
   return articles.map(serializeArticle);
 }
 
@@ -72,12 +93,26 @@ export async function getBoardArticles({
  *
  * @return list of articleDTO.
  */
-export async function getPinnedArticles({ boardId }: { boardId: bigint }): Promise<ArticleDTO[]> {
+export async function getPinnedArticles({ 
+  boardId,
+  tags = [],
+}: { 
+  boardId: bigint,
+  tags?: bigint[], 
+}): Promise<ArticleDTO[]> {
   const pinnedArticles = await prisma.article.findMany({
     where: {
       boardId,
       isHidden: false,
       isPinned: true,
+      AND: tags.length > 0 ?
+        tags.map(id => ({
+            tags: {
+              some: { 
+                tagId: id 
+              }
+            }
+        })) : [],
     },
     orderBy: {
       createdAt: "desc",

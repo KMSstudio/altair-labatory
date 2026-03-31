@@ -6,16 +6,34 @@ import { PageExplorer } from "./PageExplorer";
 import Link from "next/link";
 import { getBoard, getBoardArticles, getPinnedArticles } from "@/repository/db/article/board";
 import { ArticleDTO, BoardDTO } from "@/repository/dto/article";
+import { GetTags } from "@/repository/db/article/tag";
+import Search from "./Search";
+import styles from "../../board.module.css";
 
 export default async function Page({
   params,
   searchParams,
 }: {
   params: { board_id: string };
-  searchParams?: { page?: string };
+  searchParams?: { 'tags[]': string | string[], page?: string };
 }) {
   params = await params;
   searchParams = await searchParams;
+
+  const allTags = await GetTags({});
+
+  const tagTexts = searchParams?.["tags[]"] 
+  const normalizedTagTexts =
+    typeof tagTexts === 'string'
+      ? [tagTexts]
+      : Array.isArray(tagTexts)
+        ? tagTexts
+        : [];
+
+  const tagIds = normalizedTagTexts
+    .map((text) => allTags.find((tag) => tag.text === text)?.id)
+    .filter((id) => id !== undefined)
+    .map(id => BigInt(id));
 
   let boardId;
   try {
@@ -33,6 +51,7 @@ export default async function Page({
       notFound();
     }
   }
+
   const pageSize = 10;
   let board: BoardDTO | null = null;
   let articles: ArticleDTO[];
@@ -42,8 +61,8 @@ export default async function Page({
   try {
     [board, articles, pinnedArticles] = await Promise.all([
       await getBoard({ boardId }),
-      await getBoardArticles({ boardId, start, finish }),
-      await getPinnedArticles({ boardId }),
+      await getBoardArticles({ boardId, start, finish, tags: tagIds }),
+      await getPinnedArticles({ boardId, tags: tagIds }),
     ]);
     if (!board || !board.isActive) {
       throw new Error();
@@ -54,20 +73,21 @@ export default async function Page({
     } else {
       return <div>{e instanceof Error ? e.message : "Unable to load board articles."}</div>;
     }
-  }
+  }    
   const maxPage = Math.ceil(board._count.articles / pageSize);
   return (
-    <main>
-      <header>
-        <h1>
+    <main className={styles.boardShell}>
+      <header className={styles.boardHeader}>
+        <h1 className={styles.boardTitle}>
           <span lang="ko">{board.nameKo}</span>
           <small lang="en">{board.nameEn}</small>
         </h1>
-        {board.description && <p>{board.description}</p>}
+        {board.description && <p className={styles.boardDescription}>{board.description}</p>}
       </header>
-      <div>
-        <Link href={`/board/${boardId}/new`}>Write a new article</Link>
+      <div className={styles.actions}>
+        <Link className={styles.primary} href={`/board/${boardId}/new`}>Write a new article</Link>
       </div>
+      <Search tags={allTags?.map(e => e?.text ?? '')} />
       <ArticleList articles={articles} pinnedArticles={pinnedArticles} />
       <PageExplorer BoardId={BigInt(board.id)} currentPage={page} maxPage={maxPage} maxLength={5} />
     </main>

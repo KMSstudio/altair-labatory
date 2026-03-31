@@ -7,6 +7,7 @@ import { getPinnedArticles } from "@/repository/db/article/board";
 
 type Body = {
   boardId: string;
+  tags: string[];
 };
 
 /**
@@ -26,6 +27,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const body: Body = {
     boardId: searchParams.get("boardId") ?? "",
+    tags: searchParams.getAll('tags'),
   };
 
   if (!body.boardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
@@ -37,8 +39,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid board id." }, { status: 400 });
   }
 
+  const tags: bigint[] = []
   try {
-    const pinnedArticles = await getPinnedArticles({ boardId });
+    body.tags?.map(e => {
+      tags.push(BigInt(e))
+    });
+  } catch {
+    return NextResponse.json({ error: "Invalid tags." }, { status: 400 });
+  }
+
+  try {
+    const pinnedArticles = await getPinnedArticles({ boardId, tags: tags });
     return NextResponse.json({ ok: true, pinnedArticles }, { status: 200 });
   } catch (e) {
     if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {

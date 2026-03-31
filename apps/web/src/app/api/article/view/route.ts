@@ -48,10 +48,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid article id." }, { status: 400 });
   }
 
-  const ip = await getClientIp();
-  if (!ip) {
-    return NextResponse.json({ error: "Invalid client ip." }, { status: 400 });
-  }
+  const ip = (await getClientIp()) ?? "unknown";
 
   const session = await getServerSession(authOptions);
   let userId: bigint | null = null;

@@ -44,6 +44,9 @@ export async function getSubjectCore({
  */
 export async function getSubjects({ db = prisma }: { db?: DbClient }): Promise<SubjectDTO[]> {
   const subjects = (await db.subject.findMany({
+    where: {
+      isDeleted: false,
+    },
     select: getSubjectSelect,
   })) as SubjectDbShape[];
   return subjects.map(serializeSubject);

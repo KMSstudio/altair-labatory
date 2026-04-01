@@ -35,7 +35,7 @@ export async function getSubjectCore({
 }
 
 /**
- * Retrieve entire subjects data.
+ * Retrieve entire (not deleted) subjects data.
  *
  * This is a DB-only function. No authentication/authorization is performed here.
  *

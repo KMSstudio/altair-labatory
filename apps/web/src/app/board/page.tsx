@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getBoardList } from "@/repository/db/article/board";
@@ -20,7 +20,7 @@ function BoardItem({ board }: { board: BoardDTO }) {
 
 export default async function Page() {
   const session = await getServerSession(authOptions);
-  if (!session) return notFound();
+  if (!session) return redirect("/login");
 
   const boards = await getBoardList();
 

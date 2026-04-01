@@ -96,6 +96,9 @@ export async function getBoardList(): Promise<BoardDTO[]> {
     where: {
       isActive: true,
     },
+    orderBy: {
+      id: "asc",
+    },
     select: getBoardSelect,
   });
   return boards.map(serializeBoard);

@@ -86,3 +86,20 @@ export async function getPinnedArticles({ boardId }: { boardId: bigint }): Promi
   });
   return pinnedArticles.map(serializeArticle);
 }
+
+/**
+ * Get a list of all active boards.
+ * @returns List of BoardDTO.
+ */
+export async function getBoardList(): Promise<BoardDTO[]> {
+  const boards = await prisma.board.findMany({
+    where: {
+      isActive: true,
+    },
+    orderBy: {
+      id: "asc",
+    },
+    select: getBoardSelect,
+  });
+  return boards.map(serializeBoard);
+}

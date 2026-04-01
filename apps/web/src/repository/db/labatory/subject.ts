@@ -35,7 +35,7 @@ export async function getSubjectCore({
 }
 
 /**
- * Retrieve entire subjects data.
+ * Retrieve entire (not deleted) subjects data.
  *
  * This is a DB-only function. No authentication/authorization is performed here.
  *
@@ -44,6 +44,9 @@ export async function getSubjectCore({
  */
 export async function getSubjects({ db = prisma }: { db?: DbClient }): Promise<SubjectDTO[]> {
   const subjects = (await db.subject.findMany({
+    where: {
+      isDeleted: false,
+    },
     select: getSubjectSelect,
   })) as SubjectDbShape[];
   return subjects.map(serializeSubject);

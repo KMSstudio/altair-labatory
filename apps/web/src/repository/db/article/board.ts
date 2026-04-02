@@ -3,6 +3,9 @@ import { getBoardSelect, getArticleSelect } from "@/repository/dto/article";
 import { serializeArticle, serializeBoard } from "@/repository/serialize/article";
 import { prisma } from "@labatory/db";
 
+const buildTagFilter = (tags: bigint[]) =>
+  tags.length > 0 ? tags.map((id) => ({ tags: { some: { tagId: id } } })) : [];
+
 /**
  * Get an information of board.
  * @param {bigint} boardId - Id of target board.
@@ -27,6 +30,7 @@ export async function getBoard({ boardId }: { boardId: bigint }): Promise<BoardD
  * @param {bigint} boardId - Id of board where target articles are located.
  * @param {number} start - The starting index (0-based, inclusive).
  * @param {number} finish - The ending index (exclusive). The number of items returned is (finish - start).
+ * @param {bigint[]} tags - Optional tag IDs
  *
  * @return list of articleDTO.
  * @throws if start is less than 0 or finish is less than or equal to start.
@@ -35,10 +39,12 @@ export async function getBoardArticles({
   boardId,
   start,
   finish,
+  tags = [],
 }: {
   boardId: bigint;
   start: number;
   finish: number;
+  tags?: bigint[];
 }): Promise<ArticleDTO[]> {
   if (start < 0) {
     throw new Error("start index must be greater than or equal to 0.");
@@ -52,6 +58,7 @@ export async function getBoardArticles({
       boardId,
       isHidden: false,
       isPinned: false,
+      AND: buildTagFilter(tags),
     },
     orderBy: {
       createdAt: "desc",
@@ -69,15 +76,23 @@ export async function getBoardArticles({
  * filter hidden articles.
  *
  * @param {bigint} boardId - Id of board where target articles are located.
+ * @param {bigint[]} tags - Optional tag IDs
  *
  * @return list of articleDTO.
  */
-export async function getPinnedArticles({ boardId }: { boardId: bigint }): Promise<ArticleDTO[]> {
+export async function getPinnedArticles({
+  boardId,
+  tags = [],
+}: {
+  boardId: bigint;
+  tags?: bigint[];
+}): Promise<ArticleDTO[]> {
   const pinnedArticles = await prisma.article.findMany({
     where: {
       boardId,
       isHidden: false,
       isPinned: true,
+      AND: buildTagFilter(tags),
     },
     orderBy: {
       createdAt: "desc",

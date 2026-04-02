@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import ArticleForm from "./NewArticleForm";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import styles from "../../board.module.css";
 
 export default async function Page({
   params,
@@ -17,9 +18,11 @@ export default async function Page({
   params = await params;
   searchParams = await searchParams;
   return (
-    <main>
-      <h1>New article</h1>
-      {searchParams?.error && <p>{decodeURIComponent(searchParams.error)}</p>}
+    <main className={styles.formShell}>
+      <h1 className={styles.boardTitle}>New article</h1>
+      {searchParams?.error && (
+        <p className={styles.errorText}>{decodeURIComponent(searchParams.error)}</p>
+      )}
       <ArticleForm boardId={params.board_id} />
     </main>
   );

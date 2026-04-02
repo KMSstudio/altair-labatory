@@ -9,6 +9,7 @@ type Body = {
   boardId: string;
   page: string;
   pageSize: string;
+  tags: string[];
 };
 
 /**
@@ -32,7 +33,9 @@ export async function GET(request: Request) {
     boardId: searchParams.get("boardId") ?? "",
     page: searchParams.get("page") ?? "",
     pageSize: searchParams.get("pageSize") ?? "",
+    tags: searchParams.getAll("tags[]"),
   };
+
   if (!body.boardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
   if (!body.page || !body.pageSize)
     return NextResponse.json({ error: "page and page size are required." }, { status: 400 });
@@ -50,11 +53,21 @@ export async function GET(request: Request) {
   if (!Number.isFinite(pageSize) || pageSize < 1)
     return NextResponse.json({ error: "Invalid page size." }, { status: 400 });
 
+  const tags: bigint[] = [];
+  try {
+    body.tags?.forEach((e) => {
+      tags.push(BigInt(e));
+    });
+  } catch {
+    return NextResponse.json({ error: "Invalid tags." }, { status: 400 });
+  }
+
   try {
     const articles = await getBoardArticles({
       boardId,
       start: (page - 1) * pageSize,
       finish: page * pageSize,
+      tags: tags,
     });
     return NextResponse.json({ ok: true, articles }, { status: 200 });
   } catch (e) {

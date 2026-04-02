@@ -9,6 +9,7 @@ import { ArticleDTO, BoardDTO } from "@/repository/dto/article";
 import { GetTags } from "@/repository/db/article/tag";
 import Search from "./Search";
 import styles from "../../board.module.css";
+import { Suspense } from "react";
 
 export default async function Page({
   params,
@@ -86,7 +87,9 @@ export default async function Page({
           Write a new article
         </Link>
       </div>
-      <Search tags={allTags?.map((e) => e?.text ?? "")} />
+      <Suspense fallback={null}>
+        <Search tags={allTags.map((e) => e?.text).filter((t): t is string => !!t)} />
+      </Suspense>
       <ArticleList articles={articles} pinnedArticles={pinnedArticles} />
       <PageExplorer BoardId={BigInt(board.id)} currentPage={page} maxPage={maxPage} maxLength={5} />
     </main>

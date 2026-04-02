@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     boardId: searchParams.get("boardId") ?? "",
     page: searchParams.get("page") ?? "",
     pageSize: searchParams.get("pageSize") ?? "",
-    tags: searchParams.getAll("tags"),
+    tags: searchParams.getAll("tags[]"),
   };
 
   if (!body.boardId) return NextResponse.json({ error: "Board id is required." }, { status: 400 });
@@ -55,7 +55,7 @@ export async function GET(request: Request) {
 
   const tags: bigint[] = [];
   try {
-    body.tags?.map((e) => {
+    body.tags?.forEach((e) => {
       tags.push(BigInt(e));
     });
   } catch {

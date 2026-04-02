@@ -20,6 +20,7 @@ export default function Search({ tags }: { tags: string[] }) {
     const params = new URLSearchParams(searchParams.toString());
 
     params.delete("tags[]");
+    params.delete("page");
     nextSelectedTags.forEach((v) => {
       params.append("tags[]", v);
     });

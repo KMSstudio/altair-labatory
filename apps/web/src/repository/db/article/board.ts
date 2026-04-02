@@ -3,6 +3,9 @@ import { getBoardSelect, getArticleSelect } from "@/repository/dto/article";
 import { serializeArticle, serializeBoard } from "@/repository/serialize/article";
 import { prisma } from "@labatory/db";
 
+const buildTagFilter = (tags: bigint[]) =>
+  tags.length > 0 ? tags.map((id) => ({ tags: { some: { tagId: id } } })) : [];
+
 /**
  * Get an information of board.
  * @param {bigint} boardId - Id of target board.
@@ -55,16 +58,7 @@ export async function getBoardArticles({
       boardId,
       isHidden: false,
       isPinned: false,
-      AND:
-        tags.length > 0
-          ? tags.map((id) => ({
-              tags: {
-                some: {
-                  tagId: id,
-                },
-              },
-            }))
-          : [],
+      AND: buildTagFilter(tags),
     },
     orderBy: {
       createdAt: "desc",
@@ -98,16 +92,7 @@ export async function getPinnedArticles({
       boardId,
       isHidden: false,
       isPinned: true,
-      AND:
-        tags.length > 0
-          ? tags.map((id) => ({
-              tags: {
-                some: {
-                  tagId: id,
-                },
-              },
-            }))
-          : [],
+      AND: buildTagFilter(tags),
     },
     orderBy: {
       createdAt: "desc",

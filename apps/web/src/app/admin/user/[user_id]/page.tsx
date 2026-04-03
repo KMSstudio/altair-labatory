@@ -1,4 +1,3 @@
-
 export default async function Page() {
   return (
     <main>
@@ -6,7 +5,6 @@ export default async function Page() {
     </main>
   );
 }
-
 
 // import Link from "next/link";
 // import { notFound } from "next/navigation";

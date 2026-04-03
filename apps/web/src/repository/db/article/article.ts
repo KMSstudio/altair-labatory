@@ -64,7 +64,7 @@ export async function UpdateArticleCore(
   ctx: Article_Ctx,
   input: Article_Input,
 ): Promise<ArticleDTO | null> {
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     // We use findFirst to query non-PK fields.
     const article = await tx.article.findFirst({
       where: {
@@ -202,7 +202,7 @@ export async function CreateArticleCore(
   boardId: bigint,
   input: Article_Input,
 ): Promise<ArticleDTO | null> {
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const newArticle = await tx.article.create({
       data: {
         title: input.title,

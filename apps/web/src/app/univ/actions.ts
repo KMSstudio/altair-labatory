@@ -1,7 +1,7 @@
 "use server";
 
 import { CreateTag, UpdateTag } from "@/repository/db/article/tag";
-import { prisma } from "@labatory/db";
+import { Prisma, prisma } from "@labatory/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -58,7 +58,7 @@ const parseUnivInput = (formData: FormData): UnivInput => ({
  */
 export async function createUniversity(formData: FormData) {
   const data = parseUnivInput(formData);
-  const created = await prisma.$transaction(async (tx) => {
+  const created = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const created = await tx.university.create({ data });
     await CreateTag({ kind: "UNIV", id: created.id, db: tx });
     return created;
@@ -78,7 +78,7 @@ export async function updateUniversity(formData: FormData) {
   }
   const id = BigInt(idValue);
   const data = parseUnivInput(formData);
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const univ = await tx.university.update({
       where: { id },
       data,

@@ -48,7 +48,7 @@ export async function createUniversityCore({
 }: {
   input: University_Input;
 }): Promise<UniversityDTO> {
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const univ = (await tx.university.create({
       data: {
         nameKo: input.nameKo,
@@ -82,7 +82,7 @@ export async function updateUniversityCore({
   universityId: bigint;
   input: University_Input;
 }): Promise<UniversityDTO | null> {
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     try {
       const univ = await tx.university.update({
         where: {

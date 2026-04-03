@@ -2,7 +2,7 @@
 
 "use server";
 
-import { prisma, type EmoteKind, EmotePlace } from "@labatory/db";
+import { Prisma, prisma, type EmoteKind, EmotePlace } from "@labatory/db";
 
 import type { PostEmoteDTO } from "@/repository/dto/article";
 import { getPostEmoteSelect } from "@/repository/dto/article";
@@ -36,7 +36,7 @@ export async function ToggleEmote(
     throw new Error(`Invalid EmotePlace: ${postKind}`);
   }
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const existing = await tx.emote.findFirst({
       where:
         postKind === "ARTICLE"

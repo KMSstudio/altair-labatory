@@ -231,7 +231,7 @@ export async function updateSubject(id: bigint, data: Partial<SubjectCreateInput
 export async function mergeSubjects(input: SubjectMergeInput) {
   const { fromId, toId, deactivateFrom } = input;
 
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const from = await tx.subject.findUnique({ where: { id: fromId } });
     const to = await tx.subject.findUnique({ where: { id: toId } });
 

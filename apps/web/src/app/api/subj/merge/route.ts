@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+// @/app/api/subj/merge/route.ts
 
+import { NextResponse } from "next/server";
 import { mergeSubjects, parseMergeInputFromJson } from "@/util/subj.action";
 
 /**

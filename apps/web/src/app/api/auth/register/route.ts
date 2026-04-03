@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       const passwordHash = await passwordHashing(password);
 
       // $transaction: wraps the DB operations below into a single transaction (all-or-nothing). Used for observe ACID.
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const anyCredSameEmail = await tx.userCredential.findFirst({ where: { email } });
 
         let userId: bigint;

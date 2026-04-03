@@ -2,7 +2,7 @@
 
 "use server";
 
-import { prisma } from "@labatory/db";
+import { Prisma, prisma } from "@labatory/db";
 
 import type { Comment_Ctx, Comment_PostInput, Comment_UpdateInput } from "@/types/article";
 import { type CommentDbShape, CommentDTO, getCommentSelect } from "@/repository/dto/article";
@@ -49,7 +49,7 @@ export async function UpdateComment(
   ctx: Comment_Ctx,
   input: Comment_UpdateInput,
 ): Promise<CommentDTO> {
-  const updated = await prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const prev = await tx.comment.findUnique({
       where: { id: commentId },
       select: {

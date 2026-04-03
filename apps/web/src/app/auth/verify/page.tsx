@@ -1,6 +1,6 @@
 // @/app/verify/page.tsx
 
-import { prisma } from "@labatory/db";
+import { Prisma, prisma } from "@labatory/db";
 
 export default async function Page({
   searchParams,
@@ -35,7 +35,7 @@ export default async function Page({
 
     try {
       const id = token.credentialId;
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.userCredential.update({
           where: {
             id,

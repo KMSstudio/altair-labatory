@@ -84,7 +84,7 @@ export const authOptions: NextAuthOptions = {
       if (!email) return false;
 
       try {
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           const existing = await tx.userCredential.findUnique({
             where: { provider_providerUserId: { provider: "google", providerUserId } },
             select: { id: true },

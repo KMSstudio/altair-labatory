@@ -14,7 +14,7 @@ import {
   find_lab_subject_links_by_subject,
   find_subject_first_by_name,
 } from "@/util/subj.action";
-import { prisma } from "@labatory/db";
+import { Prisma, prisma } from "@labatory/db";
 import { CreateTag, UpdateTag } from "@/repository/db/article/tag";
 import { normalizeText } from "@/util/util";
 
@@ -144,7 +144,7 @@ export async function createSubject(formData: FormData) {
   }
 
   try {
-    const created = await prisma.$transaction(async (tx) => {
+    const created = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const created = await create_subject({ ...data, isActive: true }, tx);
       await CreateTag({ kind: "SUBJECT", id: created.id, db: tx });
       return created;
@@ -200,7 +200,7 @@ export async function updateSubject(formData: FormData) {
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updateSubj = await update_subject(id, data);
       const tag = await tx.tag.findUnique({
         where: {
@@ -255,7 +255,7 @@ export async function mergeSubjects(formData: FormData) {
     throw new Error("fromId and toId cannot be the same");
   }
 
-  await with_transaction(async (tx) => {
+  await with_transaction(async (tx: Prisma.TransactionClient) => {
     const [from, to] = await Promise.all([
       find_subject_unique(fromId, tx),
       find_subject_unique(toId, tx),
@@ -311,7 +311,7 @@ export async function updateSubjectLabLinks(formData: FormData) {
     .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
     .map((v) => BigInt(v));
 
-  await with_transaction(async (tx) => {
+  await with_transaction(async (tx: Prisma.TransactionClient) => {
     const current = await find_lab_subject_links_by_subject(subjectId, tx);
 
     const currentSet = new Set(current.map((x) => x.labId.toString()));

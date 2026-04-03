@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
-import { prisma } from "@labatory/db";
+import { Prisma, prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
 import { SerializeLab } from "@/repository/serialize/SerializeLab";
 
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const createdId = await with_transaction(async (tx) => {
+    const createdId = await with_transaction(async (tx: Prisma.TransactionClient) => {
       const lab = await create_lab(
         {
           nameKo: data.nameKo,

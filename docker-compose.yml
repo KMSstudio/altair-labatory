@@ -22,5 +22,23 @@ services:
       retries: 20
     pull_policy: never
 
+  web:
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+    image: altair-community-web:latest
+    container_name: altair-community-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL_IN_CONTAINER}
+    ports:
+      - "3000:3000"
+    pull_policy: never
+
 volumes:
   labatory_pgdata:

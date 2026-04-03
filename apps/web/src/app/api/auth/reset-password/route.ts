@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     try {
       const passwordHash = await passwordHashing(password);
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.userCredential.update({
           where: { id },
           data: {

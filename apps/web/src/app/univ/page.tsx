@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { prisma } from "@labatory/db";
 import { deleteUniversity } from "./actions";

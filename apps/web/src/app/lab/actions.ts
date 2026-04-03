@@ -179,7 +179,7 @@ export async function createLab(formData: FormData) {
   }
 
   try {
-    const created = await with_transaction(async (tx) => {
+    const created = await with_transaction(async (tx: Prisma.TransactionClient) => {
       const lab = await create_lab(
         {
           nameKo: data.nameKo,
@@ -253,7 +253,7 @@ export async function updateLab(formData: FormData) {
   }
 
   try {
-    await with_transaction(async (tx) => {
+    await with_transaction(async (tx: Prisma.TransactionClient) => {
       const updatedLab = await update_lab(
         labId,
         {

@@ -15,7 +15,7 @@ export default async function Page({
 }) {
   if (IGNORE_EMAIL_VERIFY) redirect("/");
 
-  let error = null;
+  let error: string | null = null;
 
   searchParams = await searchParams;
   if (!searchParams.email) {

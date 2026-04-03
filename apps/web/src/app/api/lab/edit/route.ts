@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
-import { prisma } from "@labatory/db";
+import { Prisma, prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
 
 import { SerializeLab } from "@/repository/serialize/SerializeLab";
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await with_transaction(async (tx) => {
+    await with_transaction(async (tx: Prisma.TransactionClient) => {
       await update_lab(
         parsed.id,
         {

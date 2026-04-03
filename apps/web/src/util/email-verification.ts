@@ -44,7 +44,7 @@ export async function EmailVerificationAction(params: { email: string; tokenHash
     try {
       const passwordHash = await passwordHashing(password);
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const anyCredSameEmail = await tx.userCredential.findFirst({
           where: { email },
         });

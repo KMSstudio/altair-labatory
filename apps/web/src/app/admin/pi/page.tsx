@@ -2,9 +2,12 @@
 
 import { PIApplicationStatus, prisma } from "@labatory/db";
 import { PIApplicationListSection } from "./section/PIApplicationListSection";
+import { type PIApplication } from "@labatory/db";
 
 export default async function PIApplicationPage() {
-  const applications = await prisma.pIApplication.findMany({
+  const applications: (PIApplication & {
+    user: { displayName: string };
+  })[] = await prisma.pIApplication.findMany({
     include: {
       user: true,
     },

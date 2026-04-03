@@ -67,7 +67,7 @@ export async function createSubjectCore({
 }: {
   input: Subject_Input;
 }): Promise<SubjectDTO | null> {
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const newSubj = (await tx.subject.create({
       data: {
         nameKo: input.nameKo,
@@ -113,7 +113,7 @@ export async function updateSubjectCore({
   subjectId: bigint;
   input: Subject_Input;
 }): Promise<SubjectDTO | null> {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     try {
       const updatedSubject = await tx.subject.update({
         where: {
@@ -232,7 +232,7 @@ export async function mergeSubjectCore({
   if (sourceSubjectId == destinationSubjectId) {
     throw new Error("You cannot merge same subjects.");
   }
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const fromSubj = await tx.subject.findUnique({
       where: {
         id: sourceSubjectId,

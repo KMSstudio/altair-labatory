@@ -24,9 +24,9 @@ type Body = {
 };
 
 /**
- * Updatee a labatory.
+ * Update a labatory.
  *
- * This endpoint deletes a labatory if user is a PI who is linked to the labatory
+ * This endpoint updates a labatory if user is a PI who is linked to the labatory
  * or an ADMIN user.
  *
 Validation performed here includes:

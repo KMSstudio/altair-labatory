@@ -42,7 +42,7 @@ export async function createPiCore({
   db = prisma,
 }: {
   input: Pi_Input;
-  db: DbClient;
+  db?: DbClient;
 }): Promise<PiDTO> {
   const createdPi = (await db.pI.create({
     data: {
@@ -109,7 +109,7 @@ export async function deletePiCore({
   db = prisma,
 }: {
   piId: bigint;
-  db: DbClient;
+  db?: DbClient;
 }): Promise<PiDTO | null> {
   try {
     const pi = (await db.pI.delete({

@@ -12,7 +12,9 @@ export function mapPermissionError(msg: string) {
   if (msg === "Parent comment does not belong to the article.") {
     return { error: msg, status: 400 };
   }
+  if (msg === "Lab does not exist.") return { error: msg, status: 400 };
   if (msg === "Forbidden.") return { error: msg, status: 403 };
+  if (msg === "User is not PI.") return { error: msg, status: 403 };
   return { error: "Internal server error.", status: 500 };
 }
 
@@ -90,4 +92,37 @@ export async function assertParentCommentInArticle(parentId: bigint, articleId: 
   }
 
   return parent;
+}
+
+export async function assertLabPiOrAdmin(labId: bigint, userId: bigint, role?: string) {
+  const lab = await prisma.lab.findUnique({
+    where: {
+      id: labId,
+      isDeleted: false,
+    },
+    select: {
+      pi: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+  if (!lab) throw new Error("Lab does not exist.");
+  if (role === "ADMIN") {
+    return lab;
+  }
+  const pi = await prisma.pI.findUnique({
+    where: { userId },
+    select: {
+      id: true,
+    },
+  });
+  if (!pi) throw new Error("User is not PI.");
+
+  const isAuthor = lab.pi?.id === pi.id;
+
+  if (!isAuthor) throw new Error("Forbidden.");
+
+  return lab;
 }

@@ -15,6 +15,7 @@ type Body = {
  * @returns
  * - `200` `{ ok: true, lab }` on success
  * - `400` for invaild labId
+ * - `404` when lab does not exist.
  * - `500` for internal server errors
  */
 
@@ -33,7 +34,7 @@ export async function GET(request: Request) {
   }
   try {
     const lab = await getLabCore({ id: labId });
-    if (!lab) throw new Error();
+    if (!lab) return NextResponse.json({ error: "Lab does not exist." }, { status: 404 });
     return NextResponse.json({ ok: true, lab }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

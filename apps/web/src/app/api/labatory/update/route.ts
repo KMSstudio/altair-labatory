@@ -117,9 +117,10 @@ export async function POST(request: Request) {
             });
           }),
         )
-      )
-        .filter((newSubject) => newSubject !== null)
-        .map((newSubject) => BigInt(newSubject.id));
+      ).map((newSubject) => {
+        if (newSubject === null) throw new Error("Fail to create subjects.");
+        return BigInt(newSubject.id);
+      });
       const addedSubjectIds = [...subjectIds, ...newSubjectIds];
       return await updateLabTransaction({
         labId,

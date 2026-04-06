@@ -1,4 +1,4 @@
-// @/app/api/labatory/get/route.ts
+// @/app/api/labatory/search/route.ts
 
 import { NextResponse } from "next/server";
 import { parseEnumValue } from "@/app/api/_util/parse";
@@ -25,10 +25,10 @@ export async function GET(request: Request) {
     query: searchParams.get("query") ?? "",
     searchScope: searchParams.get("searchScope") ?? "",
   };
-  if (!body.query || !body.searchScope)
+  const query = body.query.trim();
+  if (!query || !body.searchScope)
     return NextResponse.json({ error: "Query and search scope are required." }, { status: 400 });
 
-  const query = body.query.trim();
   let searchScope: LabSearchScope;
   try {
     searchScope = parseEnumValue(LabSearchScope, body.searchScope, "lab search scope");

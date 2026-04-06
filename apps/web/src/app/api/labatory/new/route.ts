@@ -157,7 +157,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
     if (e.code === "P2003")
-      return NextResponse.json({ error: "Invalid reference." }, { status: 400 });
+      return NextResponse.json({ error: "Invaild reference." }, { status: 400 });
     if (e.code === "P2002")
       return NextResponse.json({ error: "Duplicate subjects exist." }, { status: 400 });
     return NextResponse.json({ error: "Internal database error." }, { status: 500 });

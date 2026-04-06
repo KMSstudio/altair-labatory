@@ -69,7 +69,6 @@ export async function POST(request: Request) {
 
   try {
     const deletedLab = await deleteLab({ labId });
-    if (!deletedLab) throw new Error();
     return NextResponse.json({ ok: true, lab: deletedLab }, { status: 200 });
   } catch (e) {
     if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {

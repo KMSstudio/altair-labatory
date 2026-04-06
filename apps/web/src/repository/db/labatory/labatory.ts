@@ -225,11 +225,8 @@ export async function createLabTransaction({
         labId: newLab.id,
       },
     });
-    if (pi.count === 0) {
-      throw new Error("Invaild PI id.");
-    }
     if (pi.count !== 1) {
-      throw new Error("PI already has its lab.");
+      throw new Error("Invaild PI id.");
     }
   }
   await updateLabSubjects({ labId: newLab.id, subjIds, db });
@@ -311,7 +308,7 @@ export async function updateLab({
     return await getLabCore({ id: updatedLab.id, db });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
-      throw new Error("Lab does not exist");
+      throw new Error("Lab does not exist.");
     } else {
       throw e;
     }

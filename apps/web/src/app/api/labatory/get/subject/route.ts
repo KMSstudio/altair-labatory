@@ -1,4 +1,4 @@
-// @/app/api/labatory/get/route.ts
+// @/app/api/labatory/get/subject/route.ts
 
 import { NextResponse } from "next/server";
 import { parseBigInt } from "@/app/api/_util/parse";

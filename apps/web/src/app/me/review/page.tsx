@@ -1,6 +1,6 @@
 // src/app/me/review/page.tsx
 
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getMyReviews } from "@/app/lab/[lab_id]/review/actions";

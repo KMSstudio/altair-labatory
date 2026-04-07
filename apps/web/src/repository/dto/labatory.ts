@@ -147,6 +147,9 @@ export type LabReviewDbShape = {
   paper: number;
   salry: number;
   persn: number;
+  guidance: number | null;
+  meetfreq: number | null;
+  externok: number | null;
   visib: Visibility;
   createdAt: Date;
   updatedAt: Date;
@@ -163,10 +166,13 @@ export const getLabReviewSelect = {
   paper: true,
   salry: true,
   persn: true,
+  guidance: true,
+  meetfreq: true,
+  externok: true,
   visib: true,
   createdAt: true,
   updatedAt: true,
-};
+} as const;
 
 export type LabReviewDTO = {
   id: string;
@@ -179,7 +185,25 @@ export type LabReviewDTO = {
   paper: number;
   salry: number;
   persn: number;
+  guidance: number | null;
+  meetfreq: number | null;
+  externok: number | null;
   visib: Visibility;
   createdAt: string;
   updatedAt: string;
 };
+
+export type CreateLabReviewInput = {
+  content: string;
+  recommend: boolean;
+  atmos: number;
+  lectr: number;
+  paper: number;
+  salry: number;
+  persn: number;
+  guidance?: number | null;
+  meetfreq?: number | null;
+  externok?: number | null;
+};
+
+export type UpdateLabReviewInput = Partial<CreateLabReviewInput>;

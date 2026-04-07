@@ -250,6 +250,10 @@ model LabReview {
   salry     Int @map("salry")   // 실질 인건비
   persn     Int @map("persn")   // 인품
 
+  guidance  Float?  @map("guidance") // 지도 개입 정도
+  meetfreq  Float?  @map("meetfreq") // 미팅 주기
+  externok  Float?  @map("externok") // 외부 활동 허용
+
   visib     Visibility @default(PUBLIC)
   reports   LabReviewReport[]
 

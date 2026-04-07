@@ -3,14 +3,12 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
-import { prisma, Prisma } from "@labatory/db";
+import { Prisma } from "@labatory/db";
 import { authOptions } from "@/lib/auth";
 
 import { assertLabPiOrAdmin, mapPermissionError } from "@/app/api/_util/assertPermission";
 import { parseBigInt } from "@/app/api/_util/parse";
-import { updateLabTransaction } from "@/repository/db/labatory/labatory";
-import type { Subject_Input } from "@/types/labatory";
-import { createSubjectTransaction } from "@/repository/db/labatory/subject";
+import { updateLabCore } from "@/repository/db/labatory/labatory";
 
 type Body = {
   labId: string;
@@ -20,7 +18,6 @@ type Body = {
   description?: string;
   universityId?: string;
   subjectIds?: string[];
-  newSubjects?: Subject_Input[];
 };
 
 /**
@@ -82,7 +79,6 @@ export async function POST(request: Request) {
   const description = body.description ?? "";
   const trimmedUniversityIdRaw = body.universityId?.trim();
   const subjectIdRaw = Array.isArray(body.subjectIds) ? body.subjectIds : [];
-  const newSubjectsRaw = body.newSubjects ?? [];
 
   let subjectIds: bigint[];
   try {
@@ -103,31 +99,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const updatedLab = await prisma.$transaction(async (tx) => {
-      const newSubjectIds = (
-        await Promise.all(
-          newSubjectsRaw.map(async (newSubject) => {
-            return await createSubjectTransaction({
-              input: {
-                nameKo: newSubject.nameKo,
-                nameEn: newSubject.nameEn,
-                description: newSubject.description,
-              },
-              db: tx,
-            });
-          }),
-        )
-      ).map((newSubject) => {
-        if (newSubject === null) throw new Error("Fail to create subjects.");
-        return BigInt(newSubject.id);
-      });
-      const addedSubjectIds = [...subjectIds, ...newSubjectIds];
-      return await updateLabTransaction({
-        labId,
-        input: { nameKo, nameEn, websiteUrl, description, universityId },
-        subjIds: addedSubjectIds,
-        db: tx,
-      });
+    const updatedLab = await updateLabCore({
+      labId,
+      input: { nameKo, nameEn, websiteUrl, description, universityId },
+      subjIds: subjectIds,
     });
     if (!updatedLab) throw new Error();
     return NextResponse.json({ ok: true, lab: updatedLab }, { status: 200 });

@@ -4,6 +4,7 @@ import type { DbClient } from "@/types/db";
 import { serializeLab } from "@/repository/serialize/labatory";
 import type { Labatory_Input, Labatory_Update_Input } from "@/types/labatory";
 import { CreateTag, UpdateTag } from "../article/tag";
+
 export enum LabSearchScope {
   ALL = "ALL",
   UNIV = "UNIV",
@@ -57,55 +58,45 @@ export async function getLabsCore({ db = prisma }: { db?: DbClient }): Promise<L
 }
 
 /**
- * Retrieve a list of (not deleted) labatory by university.
+ * Retrieves a list of non-deleted labatory entries filtered by university, subject, or both.
+ * If both `univId` and `subjId` are provided, only labatory entries that satisfy both conditions are returned.
  *
- * This is a DB-only function. No authentication/authorization is performed here.
+ * This is a DB-only function. No authentication or authorization is performed.
  *
- * @param univId - Target university id.
- * @param db - Client where query will be performed. Default is prisma.
- * @returns list of labatory DTO.
+ * @param univId - The target university ID.
+ * @param subjId - The target subject ID.
+ * @param db - The database client used to perform the query. Default is prisma.
+ * @throws If neither `univId` nor `subjId` is provided.
+ * @returns A list of labatory DTOs.
  */
-export async function getLabsByUniversity({
+export async function getLabList({
   univId,
-  db = prisma,
-}: {
-  univId: bigint;
-  db?: DbClient;
-}): Promise<LabDTO[]> {
-  const labs = await db.lab.findMany({
-    where: {
-      isDeleted: false,
-      universityId: univId,
-    },
-    select: getLabselect,
-  });
-  return labs.map(serializeLab);
-}
-
-/**
- * Retrieve a list of (not deleted) labatory by subject.
- *
- * This is a DB-only function. No authentication/authorization is performed here.
- *
- * @param univId - Target subject id.
- * @param db - Client where query will be performed. Default is prisma.
- * @returns list of labatory DTO.
- */
-export async function getLabsBySubject({
   subjId,
   db = prisma,
 }: {
-  subjId: bigint;
+  univId?: bigint;
+  subjId?: bigint;
   db?: DbClient;
-}): Promise<LabDTO[]> {
-  const labs = await db.lab.findMany({
-    where: {
-      isDeleted: false,
+}) {
+  if (!univId && !subjId) throw new Error("Either univId or subjId is needed");
+  const andConditions: Prisma.LabWhereInput[] = [{ isDeleted: false }];
+  if (univId) {
+    andConditions.push({
+      universityId: univId,
+    });
+  }
+  if (subjId) {
+    andConditions.push({
       subjects: {
         some: {
           subjectId: subjId,
         },
       },
+    });
+  }
+  const labs = await db.lab.findMany({
+    where: {
+      AND: andConditions,
     },
     select: getLabselect,
   });
@@ -118,6 +109,7 @@ export async function getLabsBySubject({
  * itself's english name or korean name (LAB)
  * it's subject's english name or korean name (SUBJ)
  * it's university's english name or korean name (SUBJ)
+ * If the query is empty, return list of all (not delete) labs.
  *
  * This is a DB-only function. No authentication/authorization is performed here.
  *
@@ -135,7 +127,9 @@ export async function searchLab({
   query: string;
   db?: DbClient;
 }): Promise<LabDTO[]> {
-  const where: Prisma.LabWhereInput = {};
+  const where: Prisma.LabWhereInput = {
+    AND: [{ isDeleted: false }],
+  };
 
   if (query.length) {
     const prismaQuery = (value: string) =>
@@ -166,7 +160,6 @@ export async function searchLab({
     };
     where.OR = map[searchScope];
   }
-  where.isDeleted = false;
   const labs = await db.lab.findMany({
     where,
     orderBy: [{ createdAt: "desc" }],
@@ -195,28 +188,26 @@ export async function searchLab({
  * @throws If pi id is invalid.
  * @returns labatory DTO of created labatory.
  */
-export async function createLabTransaction({
+export async function createLabCore({
   input,
   subjIds,
-  db,
 }: {
   input: Labatory_Input;
   subjIds: bigint[];
-  db: DbClient;
 }): Promise<LabDTO | null> {
-  const newLab = (await db.lab.create({
-    data: {
-      nameKo: input.nameKo,
-      nameEn: input.nameEn,
-      description: input.description,
-      websiteUrl: input.websiteUrl,
-      universityId: input.universityId,
-    },
-    select: getLabselect,
-  })) as LabDbShape;
+  return await prisma.$transaction(async (tx) => {
+    const newLab = (await tx.lab.create({
+      data: {
+        nameKo: input.nameKo,
+        nameEn: input.nameEn,
+        description: input.description,
+        websiteUrl: input.websiteUrl,
+        universityId: input.universityId,
+      },
+      select: getLabselect,
+    })) as LabDbShape;
 
-  if (input.piId) {
-    const pi = await db.pI.updateMany({
+    const pi = await tx.pI.updateMany({
       where: {
         id: input.piId,
         labId: null,
@@ -228,10 +219,16 @@ export async function createLabTransaction({
     if (pi.count !== 1) {
       throw new Error("Invaild PI id.");
     }
-  }
-  await updateLabSubjects({ labId: newLab.id, subjIds, db });
-  await CreateTag({ kind: "LAB", id: newLab.id, db });
-  return await getLabCore({ id: newLab.id, db });
+    const data: Prisma.LabSubjectCreateManyInput[] = subjIds.map((subjectId) => ({
+      labId: newLab.id,
+      subjectId,
+    }));
+    await tx.labSubject.createMany({
+      data,
+    });
+    await CreateTag({ kind: "LAB", id: newLab.id, db: tx });
+    return await getLabCore({ id: newLab.id, db: tx });
+  });
 }
 
 /**
@@ -247,140 +244,59 @@ export async function createLabTransaction({
  * @throw if lab id or subject id is invaild.
  * @returns labatory DTO of updated labatory.
  */
-export async function updateLabTransaction({
+export async function updateLabCore({
   labId,
   input,
   subjIds,
-  db,
 }: {
   labId: bigint;
   input: Labatory_Update_Input;
   subjIds: bigint[];
-  db: DbClient;
 }): Promise<LabDTO | null> {
-  const updatedLab = await updateLab({ input, labId, db });
-  if (!updatedLab) throw new Error("Invaild lab id.");
-  await updateLabSubjects({ labId, subjIds, db });
-  return await getLabCore({ id: labId, db });
-}
-
-/**
- * Update labatory's korean name, english name, websiteUrl, description, and its tag relation.
- *
- * This is a DB-only function. No authentication/authorization is performed here.
- *
- * @param labId - Id of labatory being updated.
- * @param input - Labatory data payload (nameKo, nameEn, websiteUrl, description, universityId)
- * @param db - Client where query will be performed. Default is prisma.
- * @returns labatory DTO of updated labatory. If labatory was deleted during update, return null.
- */
-export async function updateLab({
-  labId,
-  input,
-  db = prisma,
-}: {
-  labId: bigint;
-  input: Labatory_Update_Input;
-  db?: DbClient;
-}): Promise<LabDTO | null> {
-  try {
-    const updatedLab = await db.lab.update({
-      where: {
-        id: labId,
-        isDeleted: false,
-      },
-      data: {
-        nameKo: input.nameKo,
-        nameEn: input.nameEn,
-        description: input.description,
-        websiteUrl: input.websiteUrl,
-        universityId: input.universityId,
-      },
-      select: {
-        id: true,
-        tag: {
-          select: { id: true },
+  return await prisma.$transaction(async (tx) => {
+    try {
+      const updatedLab = await tx.lab.update({
+        where: {
+          id: labId,
+          isDeleted: false,
         },
-      },
-    });
-    if (updatedLab.tag) await UpdateTag({ tagId: updatedLab.tag.id, db });
-    else await CreateTag({ id: updatedLab.id, kind: "LAB", db });
-    return await getLabCore({ id: updatedLab.id, db });
-  } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
-      throw new Error("Lab does not exist.");
-    } else {
-      throw e;
+        data: {
+          nameKo: input.nameKo,
+          nameEn: input.nameEn,
+          description: input.description,
+          websiteUrl: input.websiteUrl,
+          universityId: input.universityId,
+        },
+        select: {
+          id: true,
+          tag: {
+            select: { id: true },
+          },
+        },
+      });
+      if (updatedLab.tag) await UpdateTag({ tagId: updatedLab.tag.id, db: tx });
+      else await CreateTag({ id: updatedLab.id, kind: "LAB", db: tx });
+      if (!updatedLab) throw new Error("Invaild lab id.");
+      await tx.labSubject.deleteMany({
+        where: {
+          labId,
+        },
+      });
+      const data: Prisma.LabSubjectCreateManyInput[] = subjIds.map((subjectId) => ({
+        labId,
+        subjectId,
+      }));
+      await tx.labSubject.createMany({
+        data,
+      });
+      return await getLabCore({ id: labId, db: tx });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
+        throw new Error("Lab does not exist.");
+      } else {
+        throw e;
+      }
     }
-  }
-}
-
-/**
- * Update new lab, its tag relations, and its subject relations in the database.
- *
- * This is a DB-only function. No authentication/authorization is performed here.
- *
- * @param labId - Id of labatory being updated.
- * @param univId - Id of university being updated into labatory.
- * @param db - Client where query will be performed. Default is prisma.
- * @returns labatory DTO of updated labatory.
- */
-export async function updateLabUniversity({
-  labId,
-  univId,
-  db = prisma,
-}: {
-  labId: bigint;
-  univId: bigint | null;
-  db?: DbClient;
-}): Promise<LabDTO> {
-  try {
-    const updatedLab = await db.lab.update({
-      where: {
-        id: labId,
-        isDeleted: false,
-      },
-      data: {
-        universityId: univId,
-      },
-      select: getLabselect,
-    });
-    return serializeLab(updatedLab);
-  } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2025") {
-      throw new Error("Lab does not exist");
-    } else {
-      throw e;
-    }
-  }
-}
-
-/**
- * Delete all labSubject and create new ones based on input.
- * @param labId - id of labatory whose subjects will be changed.
- * @param subjIds - list of id of subjects who will be linked with the lab.
- * @param db - Client where query will be performed. Default is prisma.
- */
-export async function updateLabSubjects({
-  labId,
-  subjIds,
-  db = prisma,
-}: {
-  labId: bigint;
-  subjIds: bigint[];
-  db?: DbClient;
-}): Promise<void> {
-  await db.labSubject.deleteMany({
-    where: {
-      labId,
-    },
-  });
-  const data: Prisma.LabSubjectCreateManyInput[] = subjIds.map((subjectId) => ({
-    labId,
-    subjectId,
-  }));
-  await db.labSubject.createMany({
-    data,
   });
 }
 

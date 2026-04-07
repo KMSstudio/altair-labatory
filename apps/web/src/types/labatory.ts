@@ -36,8 +36,9 @@ export type Labatory_Input = {
   websiteUrl: string | null;
   description: string | null;
   universityId: bigint | null;
-  piId?: bigint | null;
+  piId: bigint;
 };
+
 export type Labatory_Update_Input = {
   nameKo: string;
   nameEn: string;

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { parseBigInt } from "@/app/api/_util/parse";
 import { getLabCore } from "@/repository/db/labatory/labatory";
 
-type Body = {
+type Params = {
   labId: string;
 };
 
@@ -21,14 +21,14 @@ type Body = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const body: Body = {
+  const params: Params = {
     labId: searchParams.get("labId") ?? "",
   };
-  if (!body.labId) return NextResponse.json({ error: "Lab id is required." }, { status: 400 });
+  if (!params.labId) return NextResponse.json({ error: "Lab id is required." }, { status: 400 });
 
   let labId: bigint;
   try {
-    labId = parseBigInt(body.labId, "lab id");
+    labId = parseBigInt(params.labId, "lab id");
   } catch (e) {
     return NextResponse.json({ error: `${e}` }, { status: 400 });
   }

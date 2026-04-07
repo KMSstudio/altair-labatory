@@ -2,9 +2,9 @@
 
 import { NextResponse } from "next/server";
 import { parseBigInt } from "@/app/api/_util/parse";
-import { getLabsByUniversity } from "@/repository/db/labatory/labatory";
+import { getLabList } from "@/repository/db/labatory/labatory";
 
-type Body = {
+type Params = {
   universityId: string;
 };
 
@@ -20,20 +20,20 @@ type Body = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const body: Body = {
+  const param: Params = {
     universityId: searchParams.get("universityId") ?? "",
   };
-  if (!body.universityId)
+  if (!param.universityId)
     return NextResponse.json({ error: "university id is required." }, { status: 400 });
 
   let universityId: bigint;
   try {
-    universityId = parseBigInt(body.universityId, "university id");
+    universityId = parseBigInt(param.universityId, "university id");
   } catch (e) {
     return NextResponse.json({ error: `${e}` }, { status: 400 });
   }
   try {
-    const labs = await getLabsByUniversity({ univId: universityId });
+    const labs = await getLabList({ univId: universityId });
     return NextResponse.json({ ok: true, labs }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

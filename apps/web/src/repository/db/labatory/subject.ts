@@ -68,40 +68,19 @@ export async function createSubjectCore({
   input: Subject_Input;
 }): Promise<SubjectDTO | null> {
   return await prisma.$transaction(async (tx) => {
-    return await createSubjectTransaction({ input, db: tx });
+    const newSubj = (await tx.subject.create({
+      data: {
+        nameKo: input.nameKo,
+        nameEn: input.nameEn,
+        description: input.description,
+      },
+      select: {
+        id: true,
+      },
+    })) as SubjectDbShape;
+    await CreateTag({ kind: "SUBJECT", id: newSubj.id, db: tx });
+    return await getSubjectCore({ subjectId: newSubj.id, db: tx });
   });
-}
-
-/**
- * Create new Subject.
- *
- * This function MUST BE CALLED inside of prisma transaction.
- * 1) Create subject.
- * 2) Create tag associated with that subject.
- *
- * @param input - korean name, english name, and description of new subject.
- * @param db - Client where query will be performed.
- * @returns Subject DTO of new subject.
- */
-export async function createSubjectTransaction({
-  input,
-  db,
-}: {
-  input: Subject_Input;
-  db: DbClient;
-}): Promise<SubjectDTO | null> {
-  const newSubj = (await db.subject.create({
-    data: {
-      nameKo: input.nameKo,
-      nameEn: input.nameEn,
-      description: input.description,
-    },
-    select: {
-      id: true,
-    },
-  })) as SubjectDbShape;
-  await CreateTag({ kind: "SUBJECT", id: newSubj.id, db });
-  return await getSubjectCore({ subjectId: newSubj.id, db });
 }
 
 /**

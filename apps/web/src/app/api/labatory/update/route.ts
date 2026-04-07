@@ -31,7 +31,7 @@ Validation performed here includes:
  * - Request body validation
  *
  * If validation succeeds, the endpoint calls `updateLabCore`
- * to create the lab and returns the updated labDTO.
+ * to update the lab and returns the updated labDTO.
  *
  * @param request - Incoming HTTP request containing a JSON body.
  *

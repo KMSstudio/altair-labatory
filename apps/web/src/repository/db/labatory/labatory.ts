@@ -172,7 +172,6 @@ export async function searchLab({
  * Create new lab, its tag relations, and its subject relations in the database.
  *
  * This is a DB-only function. No authentication/authorization is performed here.
- * This MUST BE called inside of prisma transaction.
  *
  * The function inserts a new lab row and creates
  * corresponding entries in `labSubject` and tag using a single transaction.
@@ -183,8 +182,7 @@ export async function searchLab({
  * affect zero rows and an error will be thrown.
  *
  * @param input - Labatory data payload (nameKo, nameEn, websiteUrl, description, universityId, piId)
- * @param subjIds - list of subject ids who will be linked with created lab
- * @param db - Client where query will be performed.
+ * @param subjIds - list of subject ids who will be linked with created lab.
  * @throws If pi id is invalid.
  * @returns labatory DTO of created labatory.
  */
@@ -235,12 +233,10 @@ export async function createLabCore({
  * Update new lab, its tag relations, and its subject relations in the database.
  *
  * This is a DB-only function. No authentication/authorization is performed here.
- * This MUST BE called inside of prisma transaction.
  *
  * @param labId - Id of labatory being updated.
  * @param input - Labatory data payload (nameKo, nameEn, websiteUrl, description, universityId)
- * @param subjIds - list of subject ids who will be linked with updated lab
- * @param db - Client where query will be performed.
+ * @param subjIds - list of subject ids who will be linked with updated lab.
  * @throw if lab id or subject id is invaild.
  * @returns labatory DTO of updated labatory.
  */

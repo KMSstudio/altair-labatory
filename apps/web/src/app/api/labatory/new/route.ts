@@ -98,8 +98,11 @@ export async function POST(request: Request) {
   }
   piId = pi.id;
 
-  const nameKo = body.nameKo;
-  const nameEn = body.nameEn;
+  const nameKo = body.nameKo.trim();
+  const nameEn = body.nameEn.trim();
+  if (!nameKo || !nameEn) {
+    return NextResponse.json({ error: "nameKo and nameEn are required." }, { status: 400 });
+  }
   const websiteUrl = body.websiteUrl?.trim() ?? "";
   const description = body.description ?? "";
   const UniversityIdRaw = body.universityId ?? null;

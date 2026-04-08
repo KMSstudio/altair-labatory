@@ -4,7 +4,7 @@ import { useState } from "react";
 import { submitPIApplicationAction } from "../actions";
 import { useRouter } from "next/navigation";
 import { LabPicker } from "../LabPicker";
-import styles from '../pi.module.css'
+import styles from "../pi.module.css";
 
 export function PIApplicationForm() {
   const [submitting, setSubmitting] = useState(false);

@@ -39,7 +39,11 @@ export default function LoginPage() {
   return (
     <main className={styles.authShell}>
       <h1 className={styles.pageTitle}>Log in</h1>
-      <button type="button" className={styles.googleBtn} onClick={() => signIn("google", { callbackUrl: "/" })}>
+      <button
+        type="button"
+        className={styles.googleBtn}
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+      >
         Continue with Google
       </button>
       <form onSubmit={handleSubmit} className={styles.formPanel}>
@@ -55,11 +59,14 @@ export default function LoginPage() {
           {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
-      {error ? <p role="alert" className={styles.errorNote}>
-        {error}
-      </p> : null}
+      {error ? (
+        <p role="alert" className={styles.errorNote}>
+          {error}
+        </p>
+      ) : null}
       <p className={styles.footNote}>
-        New here? <a href="/auth/register" className={styles.ghost}>
+        New here?{" "}
+        <a href="/auth/register" className={styles.ghost}>
           Create an account
         </a>
       </p>

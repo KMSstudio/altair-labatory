@@ -49,7 +49,8 @@ export function WriterSection({ articleId, boardId }: { articleId: bigint; board
         <Link
           href={`/article/${articleId.toString()}/update`}
           aria-disabled={loadingDelete}
-          className={`${styles.ghost} ${loadingDelete ? styles.disabled : ""}`}        >
+          className={`${styles.ghost} ${loadingDelete ? styles.disabled : ""}`}
+        >
           Edit
         </Link>
       </div>

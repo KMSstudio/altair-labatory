@@ -8,7 +8,7 @@ import { useState } from "react";
 import { TagSelector } from "@/app/board/TagSelector";
 import type { ArticleDTO, TagDTO } from "@/repository/dto/article";
 
-import styles from '../article.module.css'
+import styles from "../article.module.css";
 
 type ApiOk = { ok: true; article: ArticleDTO };
 type ApiErr = { error: string };

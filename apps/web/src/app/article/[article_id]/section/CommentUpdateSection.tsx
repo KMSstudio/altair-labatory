@@ -125,11 +125,7 @@ export function CommentUpdateSection({
             />
 
             <div className={styles.formActions}>
-              <button
-                type="submit"
-                disabled={isBusy || !text.trim()}
-                className={styles.primary}
-              >
+              <button type="submit" disabled={isBusy || !text.trim()} className={styles.primary}>
                 Edit
               </button>
             </div>
@@ -137,11 +133,7 @@ export function CommentUpdateSection({
         </div>
       )}
 
-      <button
-        onClick={handleDelete}
-        disabled={isBusy}
-        className={styles.danger}
-      >
+      <button onClick={handleDelete} disabled={isBusy} className={styles.danger}>
         Delete
       </button>
     </div>

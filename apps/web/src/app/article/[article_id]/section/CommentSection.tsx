@@ -8,7 +8,6 @@ import { EmoteSection } from "./EmoteSection";
 import { ReplySection } from "./ReplySection";
 import styles from "../article.module.css";
 
-
 function CommentComponent({
   comment,
   depth,

@@ -2,7 +2,7 @@
 
 import { prisma } from "@labatory/db";
 import { ResetPassword } from "./ResetPassword";
-import styles from '../auth.module.css'
+import styles from "../auth.module.css";
 
 export default async function Page({
   searchParams,

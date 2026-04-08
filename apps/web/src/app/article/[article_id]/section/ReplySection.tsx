@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import styles from '../article.module.css';
+import styles from "../article.module.css";
 
 async function requestPostComment(articleId: bigint, parentId: bigint | null, content: string) {
   const res = await fetch("/api/article/comment/new", {

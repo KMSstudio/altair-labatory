@@ -48,7 +48,7 @@ export function CommentForm({ articleId }: { articleId: bigint }) {
 
   return (
     <div className={styles.commentFormWrap}>
-      <form  className={styles.commentForm} id="comment-form" onSubmit={handleSubmit}>
+      <form className={styles.commentForm} id="comment-form" onSubmit={handleSubmit}>
         <textarea
           name="content"
           value={text}

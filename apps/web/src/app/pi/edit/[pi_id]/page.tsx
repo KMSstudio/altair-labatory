@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { PIEditFormClient } from "./PIEditForm";
 import { GetLab, GetPI } from "../../actions";
-import styles from '../../pi.module.css'
+import styles from "../../pi.module.css";
 
 export default async function EditUserPage({ params }: { params: { pi_id: string } }) {
   params = await params;
@@ -17,10 +17,8 @@ export default async function EditUserPage({ params }: { params: { pi_id: string
 
   const pi = await GetPI(pi_id);
   const session = await getServerSession(authOptions);
-  // if (!session || !pi || !pi.userId) redirect("/");
-  // if (session.user.id !== pi.userId.toString()) redirect("/");
-
-  if (!pi || !pi.userId) notFound();
+  if (!session || !pi || !pi.userId) redirect("/");
+  if (session.user.id !== pi.userId.toString()) redirect("/");
 
   const lab = pi.labId ? await GetLab(pi.labId) : null;
 

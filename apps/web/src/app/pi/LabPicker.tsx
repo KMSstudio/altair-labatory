@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { GetLabResult, SearchLabs } from "./actions";
-import styles from './pi.module.css'
+import styles from "./pi.module.css";
 
 export function LabPicker({
   selectedLab,
@@ -74,7 +74,13 @@ export function LabPicker({
             className={styles.searchInput}
             placeholder="type http(s)://... to search from Url"
           />
-          <button type="button" disabled={loading} onClick={() => SearchLab()} formNoValidate className={styles.ghost}>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => SearchLab()}
+            formNoValidate
+            className={styles.ghost}
+          >
             {loading ? "Searching..." : "Search"}
           </button>
         </div>
@@ -95,7 +101,7 @@ export default function LabSearchList({
 }) {
   if (!labs) return <p className={styles.searchHint}>Please input Lab name</p>;
   if (labs.length === 0) return <p className={styles.searchHint}>No search result.</p>;
-  
+
   return (
     <ul className={styles.labList}>
       {labs.map((lab) => (

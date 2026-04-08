@@ -54,7 +54,7 @@ export default async function Page({ params }: { params: { article_id: string } 
       <header className={styles.articleHeader}>
         <div>
           <Link href={`/board/${article.boardId}/list`} className={styles.backLink}>
-          Return to board.
+            Return to board.
           </Link>
         </div>
 
@@ -113,7 +113,9 @@ export default async function Page({ params }: { params: { article_id: string } 
         {article.tags.length ? (
           <ol className={styles.tagList}>
             {article.tags.map((articleTag) => (
-              <li className={styles.emptyNote} key={articleTag.id}>{articleTag.text ?? articleTag.id}</li>
+              <li className={styles.emptyNote} key={articleTag.id}>
+                {articleTag.text ?? articleTag.id}
+              </li>
             ))}
           </ol>
         ) : (

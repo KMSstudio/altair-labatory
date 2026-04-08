@@ -4,7 +4,7 @@ import { prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import styles from '../auth.module.css'
+import styles from "../auth.module.css";
 
 async function getCurrentUser(userId: bigint) {
   return prisma.user.findUnique({

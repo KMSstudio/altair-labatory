@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import styles from "../auth.module.css"
+import styles from "../auth.module.css";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,11 @@ export default function RegisterPage() {
   return (
     <main className={styles.authShell}>
       <h1 className={styles.pageTitle}>Create account</h1>
-      <button type="button" className={styles.googleBtn} onClick={() => signIn("google", { callbackUrl: "/" })}>
+      <button
+        type="button"
+        className={styles.googleBtn}
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+      >
         Continue with Google
       </button>
       <form onSubmit={handleSubmit} className={styles.formPanel}>
@@ -60,11 +64,14 @@ export default function RegisterPage() {
           {loading ? "Creating account..." : "Create account"}
         </button>
       </form>
-      {error ? <p role="alert" className={styles.errorNote}>
-        {error}
-      </p> : null}
+      {error ? (
+        <p role="alert" className={styles.errorNote}>
+          {error}
+        </p>
+      ) : null}
       <p className={styles.footNote}>
-        Already have an account? <a href="/auth/login" className={styles.ghost}>
+        Already have an account?{" "}
+        <a href="/auth/login" className={styles.ghost}>
           Log in
         </a>
       </p>

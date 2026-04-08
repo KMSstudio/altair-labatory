@@ -3,7 +3,7 @@
 import { EmailVerificationAction } from "@/util/email-verification";
 import { redirect } from "next/navigation";
 import { submitAction } from "./action";
-import styles from '../auth.module.css'
+import styles from "../auth.module.css";
 
 const IGNORE_EMAIL_VERIFY_string = process.env.IGNORE_EMAIL_VERIFY ?? "";
 const IGNORE_EMAIL_VERIFY =
@@ -43,7 +43,13 @@ export default async function Page({
       <h1 className={styles.pageTitle}>Email verification</h1>
       {error ? <p className={styles.errorNote}>{error}</p> : null}
       <form action={submitAction.bind(null, email)} className={styles.formPanel}>
-        <input name="tokenHash" placeholder="XXXXX" required={true} maxLength={5} className={styles.input} />
+        <input
+          name="tokenHash"
+          placeholder="XXXXX"
+          required={true}
+          maxLength={5}
+          className={styles.input}
+        />
         <button type="submit" className={styles.primary}>
           Submit
         </button>

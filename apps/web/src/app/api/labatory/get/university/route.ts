@@ -30,7 +30,8 @@ export async function GET(request: Request) {
   try {
     universityId = parseBigInt(param.universityId, "university id");
   } catch (e) {
-    return NextResponse.json({ error: `${e}` }, { status: 400 });
+    const msg = e instanceof Error ? e.message : "Invalid parameter.";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
   try {
     const labs = await getLabList({ univId: universityId });

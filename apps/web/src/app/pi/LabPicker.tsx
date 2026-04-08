@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { GetLabResult, SearchLabs } from "./actions";
+import styles from './pi.module.css'
 
 export function LabPicker({
   selectedLab,
@@ -50,32 +51,35 @@ export function LabPicker({
   }
 
   return (
-    <section>
-      <label>
-        <div>Lab</div>
-        Search by name(korean)
-        <input
-          name="query"
-          value={query}
-          onCompositionStart={() => {
-            isComposing.current = true;
-          }}
-          onCompositionEnd={(e) => {
-            isComposing.current = false;
-            setQuery(e.currentTarget.value);
-          }}
-          onChange={(e) => {
-            if (!isComposing.current) {
+    <section className={styles.pickerSection}>
+      <label className={styles.searchLabel}>
+        <div className={styles.labelTitle}>Lab</div>
+        <span className={styles.labelHint}>Search by name(korean)</span>
+        <div className={styles.searchRow}>
+          <input
+            name="query"
+            value={query}
+            onCompositionStart={() => {
+              isComposing.current = true;
+            }}
+            onCompositionEnd={(e) => {
+              isComposing.current = false;
               setQuery(e.currentTarget.value);
-            }
-          }}
-          placeholder="type http(s)://... to search from Url"
-        />
-        <button type="button" disabled={loading} onClick={() => SearchLab()} formNoValidate>
-          {loading ? "Searching..." : "Search"}
-        </button>
+            }}
+            onChange={(e) => {
+              if (!isComposing.current) {
+                setQuery(e.currentTarget.value);
+              }
+            }}
+            className={styles.searchInput}
+            placeholder="type http(s)://... to search from Url"
+          />
+          <button type="button" disabled={loading} onClick={() => SearchLab()} formNoValidate className={styles.ghost}>
+            {loading ? "Searching..." : "Search"}
+          </button>
+        </div>
       </label>
-      {error ? <p>{error}</p> : null}
+      {error ? <p className={styles.errorNote}>{error}</p> : null}
       <LabSearchItem lab={selectedLabs} onSelect={(selectedLabs) => onSelect(selectedLabs)} />
       <LabSearchList labs={labs} onSelect={(lab) => onSelect(lab)} />
     </section>
@@ -89,11 +93,11 @@ export default function LabSearchList({
   labs: GetLabResult[] | null;
   onSelect: (lab: GetLabResult) => void;
 }) {
-  if (!labs) return <p>Please input Lab name</p>;
-  if (labs.length === 0) return <p>No search result.</p>;
-
+  if (!labs) return <p className={styles.searchHint}>Please input Lab name</p>;
+  if (labs.length === 0) return <p className={styles.searchHint}>No search result.</p>;
+  
   return (
-    <ul>
+    <ul className={styles.labList}>
       {labs.map((lab) => (
         <li key={lab.id.toString()}>
           <LabSearchItem lab={lab} onSelect={onSelect} />
@@ -110,21 +114,22 @@ function LabSearchItem(params: {
   if (!params.lab) return <></>;
   const lab = params.lab;
   return (
-    <>
-      <div>
-        <strong>{lab.nameKo}</strong>
-        {lab.nameEn ? <div>{lab.nameEn}</div> : null}
-        {lab.websiteUrl ? <div>{lab.websiteUrl}</div> : null}
-        {lab.description ? <div>{lab.description}</div> : null}
+    <div className={styles.labCard}>
+      <div className={styles.labInfo}>
+        <div className={styles.labNameKo}>{lab.nameKo}</div>
+        {lab.nameEn ? <div className={styles.labNameEn}>{lab.nameEn}</div> : null}
+        {lab.websiteUrl ? <div className={styles.labUrl}>{lab.websiteUrl}</div> : null}
+        {lab.description ? <div className={styles.labDesc}>{lab.description}</div> : null}
       </div>
       <button
         type="button"
         onClick={() => {
           params.onSelect(lab);
         }}
+        className={styles.ghost}
       >
         Select
       </button>
-    </>
+    </div>
   );
 }

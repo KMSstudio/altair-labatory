@@ -1,0 +1,217 @@
+.authShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1rem 2rem 3rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.meShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1rem 2rem 3rem;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.formPanel {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.formPanel label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.formPanel label > input {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.formPanel label > input:focus {
+  outline: 2px solid #111827;
+  border-color: #111827;
+}
+.input {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.input:focus {
+  outline: 2px solid #111827;
+  border-color: #111827;
+}
+
+.formActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.rowLabel {
+  font-weight: 600;
+  color: #5f6b7a;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.rowValue {
+  color: #111827;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.emptyNote {
+  margin: 0;
+  color: #6b7280;
+}
+
+.googleBtn {
+  width: 100%;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.googleBtn:hover {
+  border-color: #111827;
+  background: #ffffff;
+}
+
+.primary,
+.ghost {
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.primary {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  width: 100%;
+  justify-content: center;
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ghost {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorNote {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+}
+
+.footNote {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.footNote a {
+  color: #111827;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.resetShell {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 2rem 3rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.resetTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+@media (max-width: 700px) {
+  .authShell,
+  .meShell,
+  .resultShell {
+    padding: 1.5rem 0 2rem;
+  }
+}

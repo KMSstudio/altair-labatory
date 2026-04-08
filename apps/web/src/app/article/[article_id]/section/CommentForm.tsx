@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import styles from "../article.module.css";
 
 export function CommentForm({ articleId }: { articleId: bigint }) {
   const [text, setText] = useState("");
@@ -46,18 +47,19 @@ export function CommentForm({ articleId }: { articleId: bigint }) {
   };
 
   return (
-    <div>
-      <form id="comment-form" onSubmit={handleSubmit}>
+    <div className={styles.commentFormWrap}>
+      <form  className={styles.commentForm} id="comment-form" onSubmit={handleSubmit}>
         <textarea
           name="content"
           value={text}
           disabled={isSubmitting}
           onChange={(e) => setText(e.target.value)}
           placeholder="Input comment."
+          className={styles.textarea}
         />
 
-        <div>
-          <button type="submit" id="submit-btn" disabled={isSubmitting}>
+        <div className={styles.formActions}>
+          <button className={styles.primary} type="submit" id="submit-btn" disabled={isSubmitting}>
             {isSubmitting ? "submitting..." : "submit"}
           </button>
         </div>

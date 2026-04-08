@@ -4,6 +4,7 @@ import { useState } from "react";
 import { submitPIApplicationAction } from "../actions";
 import { useRouter } from "next/navigation";
 import { LabPicker } from "../LabPicker";
+import styles from '../pi.module.css'
 
 export function PIApplicationForm() {
   const [submitting, setSubmitting] = useState(false);
@@ -29,19 +30,19 @@ export function PIApplicationForm() {
   }
 
   return (
-    <form onSubmit={onSubmit}>
-      <div>
-        <label>Requested Name</label>
+    <form onSubmit={onSubmit} className={styles.formPanel}>
+      <label>
+        Requested Name
         <input
           name="requestedName"
           value={requestedName}
           onChange={(e) => SetRequestedName(e.target.value)}
           required
         />
-      </div>
+      </label>
       <LabPicker setLabId={SetLabId} />
-      <div>
-        <label>Scholar URL</label>
+      <label>
+        Scholar URL
         <input
           name="scholarUrl"
           value={scholarUrl}
@@ -49,14 +50,16 @@ export function PIApplicationForm() {
           placeholder="https://scholar.google.com/..."
           required
         />
-      </div>
-      <div>
-        <label>Note (optional)</label>
+      </label>
+      <label>
+        Note (optional)
         <textarea name="note" value={note} onChange={(e) => SetNote(e.target.value)} />
+      </label>
+      <div className={styles.formActions}>
+        <button type="submit" disabled={submitting} className={styles.primary}>
+          {submitting ? "Submitting..." : "Submit"}
+        </button>
       </div>
-      <button type="submit" disabled={submitting}>
-        {submitting ? "Submitting..." : "Submit"}
-      </button>
     </form>
   );
 }

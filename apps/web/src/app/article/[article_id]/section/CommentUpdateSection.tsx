@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import styles from "../article.module.css";
 
 async function requestCommentUpdate(commentId: bigint, content: string) {
   const res = await fetch("/api/article/comment/update", {
@@ -102,30 +103,32 @@ export function CommentUpdateSection({
   };
 
   return (
-    <div>
+    <div className={styles.writerActions}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{ opacity: open ? 0.6 : 1 }}
         disabled={isBusy}
+        className={styles.ghost}
       >
         Edit
       </button>
 
       {open && (
-        <div>
+        <div className={styles.updateForm}>
           <form onSubmit={handleUpdate}>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Input reply"
               disabled={isBusy}
+              className={styles.textarea}
             />
 
-            <div>
+            <div className={styles.formActions}>
               <button
                 type="submit"
                 disabled={isBusy || !text.trim()}
-                className={`btn-edit ${loadingUpdate ? "loading" : ""}`}
+                className={styles.primary}
               >
                 Edit
               </button>
@@ -137,7 +140,7 @@ export function CommentUpdateSection({
       <button
         onClick={handleDelete}
         disabled={isBusy}
-        className={`btn-delete ${loadingDelete ? "loading" : ""}`}
+        className={styles.danger}
       >
         Delete
       </button>

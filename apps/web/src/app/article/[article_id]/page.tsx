@@ -14,6 +14,8 @@ import { CommentForm } from "./section/CommentForm";
 import { WriterSection } from "./section/WriterSection";
 import { ViewCounter } from "./ViewCounter";
 
+import styles from "./article.module.css";
+
 function ParseArticleId(articleIdRaw: string): bigint {
   try {
     return BigInt(articleIdRaw);
@@ -47,20 +49,22 @@ export default async function Page({ params }: { params: { article_id: string } 
   const emoteDisplayState = BuildEmoteDisplayState(article.emotes, sessionId);
 
   return (
-    <article>
+    <article className={styles.articleShell}>
       <ViewCounter articleId={article.id} />
-      <header>
+      <header className={styles.articleHeader}>
         <div>
-          <Link href={`/board/${article.boardId}/list`}>Return to board.</Link>
+          <Link href={`/board/${article.boardId}/list`} className={styles.backLink}>
+          Return to board.
+          </Link>
         </div>
 
-        <h1>{article.title}</h1>
+        <h1 className={styles.articleTitle}>{article.title}</h1>
 
         <div>
-          <p>{article.author?.displayName ?? "anonymous"}</p>
+          <p className={styles.authorLine}>{article.author?.displayName ?? "anonymous"}</p>
         </div>
 
-        <div>
+        <div className={styles.metaBar}>
           <time dateTime={article.createdAt}>{new Date(article.createdAt).toLocaleString()}</time>
 
           {article.updatedAt !== article.createdAt && (
@@ -78,25 +82,25 @@ export default async function Page({ params }: { params: { article_id: string } 
         </div>
       </header>
 
-      <section>
-        <dl>
-          <div>
-            <dt>view</dt>
-            <dd>{article.viewCount}</dd>
+      <section className={styles.statsPanel}>
+        <dl className={styles.statsList}>
+          <div className={styles.statsRow}>
+            <dt className={styles.statsDt}>view</dt>
+            <dd className={styles.statsDd}>{article.viewCount}</dd>
           </div>
-          <div>
-            <dt>comments</dt>
-            <dd>{article.commentCount}</dd>
+          <div className={styles.statsRow}>
+            <dt className={styles.statsDt}>comments</dt>
+            <dd className={styles.statsDd}>{article.commentCount}</dd>
           </div>
         </dl>
       </section>
 
-      <section>
-        <div>{article.content}</div>
+      <section className={styles.section}>
+        <div className={styles.bodyContent}>{article.content}</div>
       </section>
 
-      <section>
-        <h2>Emote</h2>
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Emote</h2>
         <EmoteSection
           emoteState={emoteDisplayState}
           postId={BigInt(article.id)}
@@ -104,26 +108,26 @@ export default async function Page({ params }: { params: { article_id: string } 
         />
       </section>
 
-      <section>
-        <h2>Tags</h2>
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Tags</h2>
         {article.tags.length ? (
-          <ol>
+          <ol className={styles.tagList}>
             {article.tags.map((articleTag) => (
-              <li key={articleTag.id}>{articleTag.text ?? articleTag.id}</li>
+              <li className={styles.emptyNote} key={articleTag.id}>{articleTag.text ?? articleTag.id}</li>
             ))}
           </ol>
         ) : (
-          <p>No tag.</p>
+          <p className={styles.emptyNote}>No tag.</p>
         )}
       </section>
 
-      <section>
-        <h2>Comment {article.commentCount}</h2>
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Comment {article.commentCount}</h2>
 
         {article.commentCount ? (
           <CommentSection comments={commentDisplayTree} depth={0} viewerId={sessionId} />
         ) : (
-          <p>No comment.</p>
+          <p className={styles.emptyNote}>No comment.</p>
         )}
 
         <CommentForm articleId={BigInt(article.id)} />

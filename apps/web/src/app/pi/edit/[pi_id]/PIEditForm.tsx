@@ -4,6 +4,8 @@ import { useState } from "react";
 import { type GetLabResult, type GetPIResult, UpdatePI } from "../../actions";
 import { LabPicker } from "../../LabPicker";
 import { useRouter } from "next/navigation";
+import styles from '../../pi.module.css'
+
 export function PIEditFormClient({ pi, lab }: { pi: GetPIResult; lab: GetLabResult | null }) {
   const [name, setName] = useState(pi.name);
   const [email, setEmail] = useState(pi.email);
@@ -30,7 +32,7 @@ export function PIEditFormClient({ pi, lab }: { pi: GetPIResult; lab: GetLabResu
     router.push(`/pi/${pi.id}`);
   }
   return (
-    <form onSubmit={TryUpdatePI}>
+    <form onSubmit={TryUpdatePI}  className={styles.formPanel}>
       <label>
         Name *
         <input name="name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -57,10 +59,10 @@ export function PIEditFormClient({ pi, lab }: { pi: GetPIResult; lab: GetLabResu
         />
       </label>
       <LabPicker selectedLab={lab} setLabId={setLabId} />
-      <div>
-        <button type="submit">Save changes</button>
+      <div className={styles.formActions}>
+        <button type="submit"  className={styles.primary}>Save changes</button>
       </div>
-      <div>{error ? <p>{error}</p> : <></>}</div>
+      <div>{error ? <p  className={styles.errorNote}>{error}</p> : <></>}</div>
     </form>
   );
 }

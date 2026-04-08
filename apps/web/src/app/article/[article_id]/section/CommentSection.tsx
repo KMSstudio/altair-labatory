@@ -6,6 +6,8 @@ import { BuildEmoteDisplayState } from "../article.transform";
 import { CommentUpdateSection } from "./CommentUpdateSection";
 import { EmoteSection } from "./EmoteSection";
 import { ReplySection } from "./ReplySection";
+import styles from "../article.module.css";
+
 
 function CommentComponent({
   comment,
@@ -43,16 +45,16 @@ function CommentComponent({
   const emoteState = BuildEmoteDisplayState(comment.emotes, viewerId);
 
   return (
-    <div>
-      <div>
-        <h3>{comment.author?.displayName ?? "anonymous"}</h3>
+    <div className={styles.commentCard}>
+      <div className={styles.commentHeader}>
+        <h3 className={styles.commentAuthor}>{comment.author?.displayName ?? "anonymous"}</h3>
       </div>
 
       {isOwner && !comment.isHidden && (
         <CommentUpdateSection commentId={commentId} content={comment.content} />
       )}
 
-      <div>
+      <div className={styles.commentMeta}>
         {createdAt.toDateString()}
         {isEdited && !comment.isHidden ? (
           <span>
@@ -63,10 +65,10 @@ function CommentComponent({
       </div>
 
       {comment.isHidden ? (
-        <div>This Comment is hidden.</div>
+        <div className={styles.commentHidden}>This Comment is hidden.</div>
       ) : (
         <div>
-          <div>{comment.content}</div>
+          <div className={styles.commentBody}>{comment.content}</div>
           <EmoteSection postId={commentId} postKind="COMMENT" emoteState={emoteState} />
         </div>
       )}
@@ -74,7 +76,7 @@ function CommentComponent({
       <ReplySection parentId={commentId} articleId={articleId} />
 
       {comment.children.length > 0 && (
-        <div>
+        <div className={styles.childComment}>
           {comment.children.map((child) => (
             <CommentComponent
               key={child.id}
@@ -99,7 +101,7 @@ export function CommentSection({
   viewerId: string | null;
 }) {
   return (
-    <div>
+    <div className={styles.commentList}>
       {comments.map((comment) => (
         <CommentComponent key={comment.id} comment={comment} depth={depth} viewerId={viewerId} />
       ))}

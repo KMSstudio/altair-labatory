@@ -8,6 +8,8 @@ import { useState } from "react";
 import { TagSelector } from "@/app/board/TagSelector";
 import type { ArticleDTO, TagDTO } from "@/repository/dto/article";
 
+import styles from '../article.module.css'
+
 type ApiOk = { ok: true; article: ArticleDTO };
 type ApiErr = { error: string };
 
@@ -56,10 +58,10 @@ export function ArticleUpdateForm({ article }: { article: ArticleDTO }) {
   }
 
   return (
-    <form onSubmit={onSubmit} id="target-form">
+    <form onSubmit={onSubmit} id="target-form" className={styles.updateFormPanel}>
       <input type="hidden" name="articleId" value={article.id.toString()} />
 
-      <div>
+      <div className={styles.fieldGroup}>
         <label htmlFor="title">title</label>
         <input id="title" name="title" type="text" required defaultValue={article.title} />
       </div>
@@ -71,9 +73,11 @@ export function ArticleUpdateForm({ article }: { article: ArticleDTO }) {
 
       <TagSelector SelectedTags={selectedTags} />
 
-      <button id="submit-btn" type="submit" disabled={submitting}>
-        {submitting ? "submitting..." : "submit"}
-      </button>
+      <div className={styles.formActions}>
+        <button id="submit-btn" type="submit" disabled={submitting} className={styles.primary}>
+          {submitting ? "submitting..." : "submit"}
+        </button>
+      </div>
     </form>
   );
 }

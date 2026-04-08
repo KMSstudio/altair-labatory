@@ -14,7 +14,7 @@ type Params = {
  * @param request - HTTP request containing URL. URL contains subjectId.
  * @returns
  * - `200` `{ ok: true, labs }` on success
- * - `400` for invaild subjectId
+ * - `400` for invalid subjectId
  * - `500` for internal server errors
  */
 

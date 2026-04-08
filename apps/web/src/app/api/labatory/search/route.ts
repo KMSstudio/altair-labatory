@@ -21,7 +21,7 @@ type Params = {
  * - "ALL": Returns labs matching any of the above conditions.
  * @returns
  * - `200` `{ ok: true, labs }` on success
- * - `400` for invaild query or searchScope
+ * - `400` for Invalid query or searchScope
  * - `500` for internal server errors
  */
 

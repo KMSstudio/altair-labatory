@@ -215,7 +215,7 @@ export async function createLabCore({
       },
     });
     if (pi.count !== 1) {
-      throw new Error("Invaild PI id.");
+      throw new Error("Invalid PI id.");
     }
     const data: Prisma.LabSubjectCreateManyInput[] = subjIds.map((subjectId) => ({
       labId: newLab.id,
@@ -237,7 +237,7 @@ export async function createLabCore({
  * @param labId - Id of labatory being updated.
  * @param input - Labatory data payload (nameKo, nameEn, websiteUrl, description, universityId)
  * @param subjIds - list of subject ids who will be linked with updated lab.
- * @throw if lab id or subject id is invaild.
+ * @throw if lab id or subject id is invalid.
  * @returns labatory DTO of updated labatory.
  */
 export async function updateLabCore({
@@ -272,7 +272,7 @@ export async function updateLabCore({
       });
       if (updatedLab.tag) await UpdateTag({ tagId: updatedLab.tag.id, db: tx });
       else await CreateTag({ id: updatedLab.id, kind: "LAB", db: tx });
-      if (!updatedLab) throw new Error("Invaild lab id.");
+      if (!updatedLab) throw new Error("Invalid lab id.");
       await tx.labSubject.deleteMany({
         where: {
           labId,

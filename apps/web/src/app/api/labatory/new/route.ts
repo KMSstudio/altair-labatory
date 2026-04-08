@@ -23,7 +23,7 @@ type Body = {
  * Handle lab creation requests.
  *
  * This API endpoint performs all **server-side validation** before
- * delegating the actual database write operation to `CreateArticleCore`.
+ * delegating the actual database write operation to `CreateLabCore`.
  *
  * Validation performed here includes:
  * - User authentication via NextAuth session(only PI and ADMIN can create a new lab)
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       labId: true,
     },
   });
-  if (!pi || pi.labId) return NextResponse.json({ error: "Invaild PI" }, { status: 403 });
+  if (!pi || pi.labId) return NextResponse.json({ error: "Invalid PI" }, { status: 403 });
   if (role === "PI") {
     let userId: bigint;
     try {
@@ -134,7 +134,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Internal server error." }, { status: 500 });
     }
     if (e.code === "P2003")
-      return NextResponse.json({ error: "Invaild reference." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid reference." }, { status: 400 });
     if (e.code === "P2002")
       return NextResponse.json({ error: "Duplicate subjects exist." }, { status: 400 });
     return NextResponse.json({ error: "Internal database error." }, { status: 500 });

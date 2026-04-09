@@ -67,7 +67,7 @@ export async function createSubjectCore({
 }: {
   input: Subject_Input;
 }): Promise<SubjectDTO | null> {
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return await prisma.$transaction(async (tx) => {
     const newSubj = (await tx.subject.create({
       data: {
         nameKo: input.nameKo,

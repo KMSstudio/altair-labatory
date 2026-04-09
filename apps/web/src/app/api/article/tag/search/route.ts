@@ -14,7 +14,7 @@ type Body = {
  * @param request - HTTP request containing URL. URL contains searchQuery and tagKind.
  * @returns
  * - `200` `{ ok: true, tags }` on success
- * - `400` for invaild query or tagKind
+ * - `400` for invalid query or tagKind
  * - `500` for internal server errors
  */
 

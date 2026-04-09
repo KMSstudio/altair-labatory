@@ -96,9 +96,11 @@ CREATE TABLE "labs" (
     "name_en" VARCHAR(200),
     "website_url" VARCHAR(1024),
     "description" TEXT,
+    "is_deleted" BOOLEAN NOT NULL DEFAULT false,
     "university_id" BIGINT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "labs_pkey" PRIMARY KEY ("id")
 );
@@ -205,7 +207,6 @@ CREATE TABLE "articles" (
     "board_id" BIGINT NOT NULL,
     "title" VARCHAR(200) NOT NULL,
     "content" TEXT NOT NULL,
-    "view_count" INTEGER NOT NULL DEFAULT 0,
     "author_id" BIGINT,
     "author_ip" VARCHAR(45) NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -215,6 +216,17 @@ CREATE TABLE "articles" (
     "is_hidden" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "articles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "article_view_log" (
+    "id" BIGSERIAL NOT NULL,
+    "article_id" BIGINT NOT NULL,
+    "user_id" BIGINT,
+    "ip" VARCHAR(45) NOT NULL,
+    "viewed_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "article_view_log_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -377,6 +389,15 @@ CREATE UNIQUE INDEX "uq_board_acls_board_id_action_role" ON "board_acls"("board_
 CREATE INDEX "idx_articles_created_at" ON "articles"("created_at");
 
 -- CreateIndex
+CREATE INDEX "idx_article_view_log_article_id" ON "article_view_log"("article_id");
+
+-- CreateIndex
+CREATE INDEX "idx_article_view_log_viewed_at" ON "article_view_log"("viewed_at");
+
+-- CreateIndex
+CREATE INDEX "idx_article_view_log_user_id" ON "article_view_log"("user_id");
+
+-- CreateIndex
 CREATE INDEX "idx_comments_article_id_created_at" ON "comments"("article_id", "created_at");
 
 -- CreateIndex
@@ -462,6 +483,12 @@ ALTER TABLE "articles" ADD CONSTRAINT "articles_board_id_fkey" FOREIGN KEY ("boa
 
 -- AddForeignKey
 ALTER TABLE "articles" ADD CONSTRAINT "articles_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "article_view_log" ADD CONSTRAINT "article_view_log_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "article_view_log" ADD CONSTRAINT "article_view_log_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ArticleHistory" ADD CONSTRAINT "ArticleHistory_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles"("id") ON DELETE CASCADE ON UPDATE CASCADE;

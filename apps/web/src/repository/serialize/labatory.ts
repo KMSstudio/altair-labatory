@@ -5,6 +5,7 @@ import type { SubjectDbShape, SubjectDTO } from "@/repository/dto/labatory";
 import type { PiDbShape, PiDTO } from "@/repository/dto/labatory";
 import type { PiApplicationDbShape, PiApplicationDTO } from "@/repository/dto/labatory";
 import type { LabReviewDbShape, LabReviewDTO } from "@/repository/dto/labatory";
+import type { LabDbShape, LabDTO } from "@/repository/dto/labatory";
 
 export function serializeUniversity(univ: UniversityDbShape): UniversityDTO {
   return {
@@ -72,5 +73,19 @@ export function serializeLabReview(labReview: LabReviewDbShape): LabReviewDTO {
     visib: labReview.visib,
     createdAt: labReview.createdAt.toISOString(),
     updatedAt: labReview.updatedAt.toISOString(),
+  };
+}
+
+export function serializeLab(lab: LabDbShape): LabDTO {
+  return {
+    id: lab.id.toString(),
+    nameKo: lab.nameKo,
+    nameEn: lab.nameEn,
+    websiteUrl: lab.websiteUrl,
+    description: lab.description,
+    createdAt: lab.createdAt.toISOString(),
+    university: lab.university ? serializeUniversity(lab.university) : null,
+    pi: lab.pi ? serializePi(lab.pi) : null,
+    subjects: lab.subjects.map(serializeSubject),
   };
 }

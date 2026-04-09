@@ -4,6 +4,7 @@ import { prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import styles from "../auth.module.css";
 
 async function getCurrentUser(userId: bigint) {
   return prisma.user.findUnique({
@@ -38,44 +39,52 @@ export default async function Page() {
   if (!user) return <div>존재하지 않는 유저 세션입니다.</div>;
 
   return (
-    <main>
+    <main className={styles.meShell}>
       <header></header>
 
-      <section>
-        <div>
-          <strong>Name:</strong> <span>{user.displayName}</span>
+      <section className={styles.panel}>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Name:</span>
+          <span className={styles.rowValue}>{user.displayName}</span>
         </div>
-        <div>
-          <strong>Role:</strong> <span>{user.role}</span>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Role:</span>
+          <span className={styles.rowValue}>{user.role}</span>
         </div>
-        <div>
-          <strong>Primary Email:</strong> <span>{user.primaryEmail ?? "No email"}</span>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Primary Email:</span>
+          <span className={styles.rowValue}>{user.primaryEmail ?? "No email"}</span>
         </div>
-        <div>
-          <strong>Created:</strong> <span>{user.createdAt.toDateString()}</span>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Created:</span>
+          <span className={styles.rowValue}>{user.createdAt.toDateString()}</span>
         </div>
-        <div>
-          <strong>PI:</strong> <span>{user.pi ? "Linked" : "Not linked"}</span>
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>PI:</span>
+          <span className={styles.rowValue}>{user.pi ? "Linked" : "Not linked"}</span>
         </div>
       </section>
 
-      <section>
+      <section className={styles.panel}>
         <header>
-          <h3>PI info</h3>
+          <h3 className={styles.panelTitle}>PI info</h3>
         </header>
 
         {!user.pi ? (
-          <p>Not PI user.</p>
+          <p className={styles.emptyNote}>Not PI user.</p>
         ) : (
           <>
-            <div>
-              <strong>Name:</strong> <span>{user.pi.name}</span>
+            <div className={styles.row}>
+              <span className={styles.rowLabel}>Name:</span>
+              <span className={styles.rowValue}>{user.pi.name}</span>
             </div>
-            <div>
-              <strong>Email:</strong> <span>{user.pi.email}</span>
+            <div className={styles.row}>
+              <span className={styles.rowLabel}>Email:</span>
+              <span className={styles.rowValue}>{user.pi.email}</span>
             </div>
-            <div>
-              <strong>ScholarUrl:</strong> <span>{user.pi.scholarUrl}</span>
+            <div className={styles.row}>
+              <span className={styles.rowLabel}>ScholarUrl:</span>
+              <span className={styles.rowValue}>{user.pi.scholarUrl}</span>
             </div>
           </>
         )}

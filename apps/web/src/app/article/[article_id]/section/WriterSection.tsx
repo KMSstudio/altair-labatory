@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import styles from "../article.module.css";
 
 async function requestDeleteArticle(articleId: bigint) {
   const res = await fetch("/api/article/delete", {
@@ -43,12 +44,12 @@ export function WriterSection({ articleId, boardId }: { articleId: bigint; board
   };
 
   return (
-    <div>
+    <div className={styles.writerActions}>
       <div>
         <Link
           href={`/article/${articleId.toString()}/update`}
           aria-disabled={loadingDelete}
-          className={loadingDelete ? "writer-link disabled" : "writer-link"}
+          className={`${styles.ghost} ${loadingDelete ? styles.disabled : ""}`}
         >
           Edit
         </Link>
@@ -59,7 +60,7 @@ export function WriterSection({ articleId, boardId }: { articleId: bigint; board
           type="button"
           onClick={handleDelete}
           disabled={loadingDelete}
-          className={loadingDelete ? "writer-delete loading" : "writer-delete"}
+          className={styles.danger}
         >
           Delete
         </button>

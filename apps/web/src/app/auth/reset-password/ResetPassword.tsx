@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "../auth.module.css";
+
 export function ResetPassword({ token, email }: { token: string; email: string }) {
   async function onSubmit(formData: FormData) {
     const password = formData.get("password");
@@ -28,10 +30,15 @@ export function ResetPassword({ token, email }: { token: string; email: string }
   }
 
   return (
-    <form action={onSubmit}>
-      <input type="password" name="password" placeholder="new password" />
-      <input type="password" name="passwordCheck" placeholder="new password check" />
-      <button>변경</button>
+    <form action={onSubmit} className={styles.formPanel}>
+      <input type="password" name="password" placeholder="new password" className={styles.input} />
+      <input
+        type="password"
+        name="passwordCheck"
+        placeholder="new password check"
+        className={styles.input}
+      />
+      <button className={styles.primary}>변경</button>
     </form>
   );
 }

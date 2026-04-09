@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import styles from "../article.module.css";
 
 async function requestPostComment(articleId: bigint, parentId: bigint | null, content: string) {
   const res = await fetch("/api/article/comment/new", {
@@ -54,31 +55,31 @@ export function ReplySection({ articleId, parentId }: { articleId: bigint; paren
   };
 
   return (
-    <div>
+    <div className={styles.commentFormWrap}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{ opacity: open ? 0.6 : 1 }}
         disabled={loadingSubmit}
-        className={loadingSubmit ? "reply-toggle loading" : "reply-toggle"}
+        className={styles.ghost}
       >
         Write reply
       </button>
 
       {open && (
-        <div>
+        <div className={styles.replyForm}>
           <form onSubmit={handleSubmit}>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="input reply"
               disabled={loadingSubmit}
-              className={loadingSubmit ? "reply-textarea loading" : "reply-textarea"}
+              className={styles.textarea}
             />
-            <div>
+            <div className={styles.formActions}>
               <button
                 type="submit"
                 disabled={loadingSubmit || !text.trim()}
-                className={loadingSubmit ? "reply-submit loading" : "reply-submit"}
+                className={styles.primary}
               >
                 submit
               </button>

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { PIApplicationForm } from "./PIApplicationForm";
+import styles from "../pi.module.css";
 
 export default async function PIApplicationApplyPage() {
   const session = await getServerSession(authOptions);
@@ -10,8 +11,8 @@ export default async function PIApplicationApplyPage() {
     redirect("/");
   }
   return (
-    <main>
-      <h1>Apply as PI</h1>
+    <main className={styles.piShell}>
+      <h1 className={styles.panelTitle}>Apply as PI</h1>
       <PIApplicationForm />
     </main>
   );

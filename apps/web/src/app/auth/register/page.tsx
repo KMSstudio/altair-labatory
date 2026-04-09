@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import styles from "../auth.module.css";
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
@@ -37,12 +38,16 @@ export default function RegisterPage() {
   }
 
   return (
-    <main>
-      <h1>Create account</h1>
-      <button type="button" onClick={() => signIn("google", { callbackUrl: "/" })}>
+    <main className={styles.authShell}>
+      <h1 className={styles.pageTitle}>Create account</h1>
+      <button
+        type="button"
+        className={styles.googleBtn}
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+      >
         Continue with Google
       </button>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={styles.formPanel}>
         <label>
           Display name
           <input name="displayName" type="text" autoComplete="name" required />
@@ -55,13 +60,20 @@ export default function RegisterPage() {
           Password
           <input name="password" type="password" autoComplete="new-password" required />
         </label>
-        <button type="submit" disabled={loading}>
+        <button type="submit" disabled={loading} className={styles.primary}>
           {loading ? "Creating account..." : "Create account"}
         </button>
       </form>
-      {error ? <p role="alert">{error}</p> : null}
-      <p>
-        Already have an account? <a href="/auth/login">Log in</a>
+      {error ? (
+        <p role="alert" className={styles.errorNote}>
+          {error}
+        </p>
+      ) : null}
+      <p className={styles.footNote}>
+        Already have an account?{" "}
+        <a href="/auth/login" className={styles.ghost}>
+          Log in
+        </a>
       </p>
     </main>
   );

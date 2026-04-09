@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { PIEditFormClient } from "./PIEditForm";
 import { GetLab, GetPI } from "../../actions";
+import styles from "../../pi.module.css";
 
 export default async function EditUserPage({ params }: { params: { pi_id: string } }) {
   params = await params;
@@ -22,7 +23,7 @@ export default async function EditUserPage({ params }: { params: { pi_id: string
   const lab = pi.labId ? await GetLab(pi.labId) : null;
 
   return (
-    <main>
+    <main className={styles.piShell}>
       <PIEditFormClient pi={pi} lab={lab} />
     </main>
   );

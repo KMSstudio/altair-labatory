@@ -1,0 +1,419 @@
+.articleShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1rem 2rem 3rem;
+}
+
+.articleHeader {
+  display: grid;
+  gap: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.backLink {
+  text-decoration: none;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.backLink:hover {
+  color: #111827;
+}
+
+.articleTitle {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.25;
+}
+
+.authorLine {
+  margin: 0;
+  color: #4a5563;
+  font-weight: 600;
+}
+
+.metaBar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.writerActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: auto;
+}
+
+.statsPanel {
+  background: #f9fafb;
+  border: 1px solid #e6e9ef;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+}
+
+.statsList {
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  list-style: none;
+  padding: 0;
+}
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.statsDt {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: #5f6b7a;
+  margin: 0;
+}
+
+.statsDd {
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.bodySection {
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.bodyContent {
+  color: #374151;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.section {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.emptyNote {
+  margin: 0;
+  color: #6b7280;
+}
+
+.emoteSection {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.emoteBtn {
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  color: #374151;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.emoteBtn:hover:not(:disabled) {
+  border-color: #111827;
+  background: #ffffff;
+}
+
+.emoteBtnActive {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+  opacity: 0.85;
+}
+
+.emoteBtnActive:hover:not(:disabled) {
+  background: #1f2937;
+  border-color: #1f2937;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tagItem {
+  background: #111827;
+  color: #ffffff;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.commentList {
+  display: grid;
+  gap: 1rem;
+}
+
+.commentCard {
+  display: grid;
+  gap: 0.5rem;
+  background: #f9fafb;
+  border: 1px solid #e6e9ef;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.commentAuthor {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.commentMeta {
+  font-size: 0.8rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.commentBody {
+  color: #374151;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.commentHidden {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.commentFooter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.childComments {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-left: 1.25rem;
+  border-left: 2px solid #e0e4ea;
+}
+
+.commentFormWrap {
+  margin-top: 0.5rem;
+}
+
+.commentForm,
+.replyForm,
+.updateForm {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.textarea:focus {
+  outline: 2px solid #111827;
+  border-color: #111827;
+}
+
+.textarea:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.formActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.updateShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1rem 2rem 3rem;
+}
+
+.updateFormPanel {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  padding: 1.5rem;
+}
+
+.updateFormPanel label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.updateFormPanel input[type="text"],
+.updateFormPanel textarea {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.updateFormPanel input[type="text"]:focus,
+.updateFormPanel textarea:focus {
+  outline: 2px solid #111827;
+  border-color: #111827;
+}
+
+.updateFormPanel textarea {
+  resize: vertical;
+  min-height: 160px;
+  line-height: 1.6;
+}
+
+.fieldGroup {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.errorBanner {
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.primary,
+.ghost,
+.danger {
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.primary {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ghost {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.danger {
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+}
+
+.danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .articleShell,
+  .updateShell {
+    padding: 1.5rem 0 2rem;
+  }
+
+  .metaBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .writerActions {
+    margin-left: 0;
+  }
+
+  .statsList {
+    gap: 1rem;
+  }
+}

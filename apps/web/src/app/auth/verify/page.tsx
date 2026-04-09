@@ -1,6 +1,7 @@
 // @/app/verify/page.tsx
 
 import { Prisma, prisma } from "@labatory/db";
+import styles from "../auth.module.css";
 
 export default async function Page({
   searchParams,
@@ -21,16 +22,16 @@ export default async function Page({
     if (token.sendEmail !== tokenParams.email) continue;
 
     if (!token) {
-      return <div>유효하지 않은 접근입니다.</div>;
+      return <div className={styles.errorNote}>유효하지 않은 접근입니다.</div>;
     }
     if (token.expireAt < now) {
-      return <div>메일이 만료되었습니다.</div>;
+      return <div className={styles.errorNote}>메일이 만료되었습니다.</div>;
     }
     if (token.usedAt !== null) {
-      return <div>이미 이메일을 인증하였습니다.</div>;
+      return <div className={styles.errorNote}>이미 이메일을 인증하였습니다.</div>;
     }
     if (!token.credentialId) {
-      return <div>무언가 잘못되었습니다.</div>;
+      return <div className={styles.errorNote}>무언가 잘못되었습니다.</div>;
     }
 
     try {
@@ -54,18 +55,18 @@ export default async function Page({
       });
     } catch {
       return (
-        <main>
-          <h1>이메일 검증에 실패했습니다.</h1>
+        <main className={styles.authShell}>
+          <h1 className={styles.pageTitle}>이메일 검증에 실패했습니다.</h1>
         </main>
       );
     }
 
     return (
-      <main>
-        <h1>이메일 검증이 완료되었습니다.</h1>
+      <main className={styles.authShell}>
+        <h1 className={styles.pageTitle}>이메일 검증이 완료되었습니다.</h1>
       </main>
     );
   }
 
-  return <div>잘못된 접근입니다.</div>;
+  return <div className={styles.errorNote}>잘못된 접근입니다.</div>;
 }

@@ -2,6 +2,7 @@
 
 import { prisma } from "@labatory/db";
 import { ResetPassword } from "./ResetPassword";
+import styles from "../auth.module.css";
 
 export default async function Page({
   searchParams,
@@ -12,7 +13,7 @@ export default async function Page({
   const now = new Date();
 
   if (!tokenparams.token || !tokenparams.email) {
-    return <div>유효하지 않은 접근입니다.</div>;
+    return <div className={styles.resultNote}>유효하지 않은 접근입니다.</div>;
   }
 
   const tokens = await prisma.verificationToken.findMany({
@@ -28,22 +29,22 @@ export default async function Page({
     if (token.sendEmail !== tokenparams.email) continue;
 
     if (token.expireAt < now) {
-      return <div>메일이 만료되었습니다.</div>;
+      return <div className={styles.errorNote}>메일이 만료되었습니다.</div>;
     }
     if (token.usedAt !== null) {
-      return <div>이미 비밀번호를 변경하였습니다.</div>;
+      return <div className={styles.errorNote}>이미 비밀번호를 변경하였습니다.</div>;
     }
     if (!token.credentialId) {
-      return <div>무언가 잘못되었습니다.</div>;
+      return <div className={styles.errorNote}>무언가 잘못되었습니다.</div>;
     }
 
     return (
-      <main>
-        <h1>비밀번호 변경</h1>
+      <main className={styles.resetShell}>
+        <h1 className={styles.resetTitle}>비밀번호 변경</h1>
         <ResetPassword token={token.tokenHash} email={token.sendEmail} />
       </main>
     );
   }
 
-  return <div>잘못된 접근입니다.</div>;
+  return <div className={styles.errorNote}>잘못된 접근입니다.</div>;
 }

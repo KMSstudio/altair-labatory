@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { type EmoteKind } from "@labatory/db";
 import type { EmoteDisplayState } from "@/repository/dto/article";
+import styles from "../article.module.css";
 
 const EMOTE_KINDS: EmoteKind[] = ["CHEER", "EMPATHY", "LIKE", "QUESTION", "BAD"];
 
@@ -78,14 +79,14 @@ export function EmoteSection({
   }
 
   return (
-    <div>
+    <div className={styles.emoteSection}>
       {EMOTE_KINDS.map((emoteKind) => (
         <div key={emoteKind}>
           <button
             type="button"
             onClick={() => onClick(emoteKind)}
             disabled={isSubmitting}
-            style={{ opacity: isPressed[emoteKind] ? 0.6 : 1 }}
+            className={`${styles.emoteBtn} ${isPressed[emoteKind] ? styles.emoteBtnActive : ""}`}
           >
             {emoteKind} {counts[emoteKind] ?? 0}
           </button>

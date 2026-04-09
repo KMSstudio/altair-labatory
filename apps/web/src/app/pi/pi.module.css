@@ -1,0 +1,272 @@
+.piShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1rem 2rem 3rem;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.rowLabel {
+  font-weight: 600;
+  color: #5f6b7a;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.rowValue {
+  color: #111827;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.emptyNote {
+  margin: 0;
+  color: #6b7280;
+}
+
+.formPanel {
+  display: grid;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.formPanel > label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.formPanel > label > input {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.formPanel > input:focus {
+  outline: 2px solid #111827;
+  border-color: #111827;
+}
+
+.formPanel > label > textarea {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 100px;
+  box-sizing: border-box;
+  width: 100%;
+  line-height: 1.6;
+}
+
+.formPanel > label > textarea:focus {
+  outline: 2px solid #111827;
+  border-color: #111827;
+}
+
+.fieldGroup {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.errorNote {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.pickerSection {
+  display: grid;
+  gap: 1rem;
+  background: #f9fafb;
+  border: 1px solid #e6e9ef;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.searchLabel {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.labelTitle {
+  font-weight: 700;
+  color: #111827;
+}
+
+.labelHint {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.searchRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.searchInput:focus {
+  outline: 2px solid #111827;
+  border-color: #111827;
+}
+
+.searchHint {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.labList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.labCard {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e6e9ef;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.labInfo {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.labNameKo {
+  font-weight: 700;
+  color: #111827;
+  font-size: 1rem;
+}
+
+.labNameEn {
+  color: #4a5563;
+  font-size: 0.875rem;
+}
+
+.labUrl {
+  color: #6b7280;
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.labDesc {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.primary,
+.ghost {
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.primary {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ghost {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .piShell {
+    padding: 1.5rem 0 2rem;
+  }
+
+  .labCard {
+    flex-direction: column;
+  }
+
+  .searchRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .formActions {
+    justify-content: flex-start;
+  }
+}

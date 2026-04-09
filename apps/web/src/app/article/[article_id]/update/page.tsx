@@ -7,6 +7,8 @@ import { notFound, redirect } from "next/navigation";
 import { GetArticleCore } from "@/repository/db/article/article";
 import { ArticleUpdateForm } from "./ArticleUpdateForm";
 
+import styles from "../article.module.css";
+
 export default async function Page({
   params,
   searchParams,
@@ -43,8 +45,10 @@ export default async function Page({
   }
 
   return (
-    <div>
-      {searchParams?.error && <p>{decodeURIComponent(searchParams.error)}</p>}
+    <div className={styles.UpdateShell}>
+      {searchParams?.error && (
+        <p className={styles.errorBanner}>{decodeURIComponent(searchParams.error)}</p>
+      )}
       <ArticleUpdateForm article={article} />
     </div>
   );

@@ -1,7 +1,7 @@
 .boardShell {
   display: grid;
   gap: 1.5rem;
-  padding: 2rem 0 3rem;
+  padding: 1rem 2rem 3rem;
 }
 
 .boardHeader {
@@ -45,7 +45,6 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
   cursor: pointer;
 }
 
@@ -67,28 +66,92 @@
   border: none;
 }
 
-.panel {
+.articleSection {
   display: grid;
   gap: 1rem;
-  background: #ffffff;
-  border: 1px solid #e0e4ea;
-  border-radius: 12px;
-  padding: 1.5rem;
-}
-
-.panelHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .sectionTitle {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #111827;
+}
+
+.articleList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.articleItem,
+.pinnedArticleItem {
+  display: grid;
+  gap: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e0e4ea;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+.pinnedArticleItem {
+  background: #f9fafb;
+  border-color: #cfd8e3;
+}
+
+.articleTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.articleTitleWrap {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.articleTitleLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.articleTitleLink:hover {
+  text-decoration: underline;
+}
+
+.articleTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  overflow-wrap: break-word;
+}
+
+.pinnedBadge {
+  background: #111827;
+  color: #ffffff;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.articleMeta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #4b5563;
+  font-size: 0.92rem;
+}
+
+.articleDate {
+  color: #6b7280;
+  font-size: 0.88rem;
 }
 
 .searchShell {
@@ -188,87 +251,6 @@
   color: #ffffff;
   font-size: 0.9rem;
   cursor: pointer;
-}
-
-.articleSection {
-  display: grid;
-  gap: 1rem;
-}
-
-.articleList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 0.85rem;
-}
-
-.articleItem,
-.pinnedArticleItem {
-  display: grid;
-  gap: 0.75rem;
-  background: #ffffff;
-  border: 1px solid #e0e4ea;
-  border-radius: 12px;
-  padding: 1rem 1.1rem;
-}
-
-.pinnedArticleItem {
-  background: #f9fafb;
-  border-color: #cfd8e3;
-}
-
-.articleTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.articleTitleWrap {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 0;
-}
-
-.articleTitleLink {
-  text-decoration: none;
-  color: inherit;
-}
-
-.articleTitleLink:hover {
-  text-decoration: underline;
-}
-
-.articleTitle {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #111827;
-  overflow-wrap: break-word;
-}
-
-.pinnedBadge {
-  background: #111827;
-  color: #ffffff;
-  padding: 0.35rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.articleMeta {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  color: #4b5563;
-  font-size: 0.92rem;
-}
-
-.articleDate {
-  color: #6b7280;
-  font-size: 0.88rem;
 }
 
 .pagination {

@@ -103,7 +103,7 @@
 .rowValue {
   color: #111827;
   font-weight: 500;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .emptyNote {
@@ -211,7 +211,7 @@
 @media (max-width: 700px) {
   .authShell,
   .meShell,
-  .resultShell {
+  .resetShell {
     padding: 1.5rem 0 2rem;
   }
 }

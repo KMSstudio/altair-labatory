@@ -75,7 +75,7 @@ function CommentComponent({
       <ReplySection parentId={commentId} articleId={articleId} />
 
       {comment.children.length > 0 && (
-        <div className={styles.childComment}>
+        <div className={styles.childComments}>
           {comment.children.map((child) => (
             <CommentComponent
               key={child.id}

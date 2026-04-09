@@ -45,7 +45,7 @@ export default async function Page({
   }
 
   return (
-    <div className={styles.UpdateShell}>
+    <div className={styles.updateShell}>
       {searchParams?.error && (
         <p className={styles.errorBanner}>{decodeURIComponent(searchParams.error)}</p>
       )}

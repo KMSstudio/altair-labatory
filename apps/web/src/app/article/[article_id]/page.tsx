@@ -113,7 +113,7 @@ export default async function Page({ params }: { params: { article_id: string } 
         {article.tags.length ? (
           <ol className={styles.tagList}>
             {article.tags.map((articleTag) => (
-              <li className={styles.emptyNote} key={articleTag.id}>
+              <li className={styles.tagItem} key={articleTag.id}>
                 {articleTag.text ?? articleTag.id}
               </li>
             ))}

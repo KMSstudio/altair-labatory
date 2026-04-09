@@ -13,7 +13,7 @@ export default async function Page({
   const now = new Date();
 
   if (!tokenparams.token || !tokenparams.email) {
-    return <div className={styles.resultNote}>유효하지 않은 접근입니다.</div>;
+    return <div className={styles.errorNote}>유효하지 않은 접근입니다.</div>;
   }
 
   const tokens = await prisma.verificationToken.findMany({

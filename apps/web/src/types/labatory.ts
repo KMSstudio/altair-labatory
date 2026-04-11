@@ -46,3 +46,29 @@ export type Labatory_Update_Input = {
   description: string | null;
   universityId: bigint | null;
 };
+
+export type Labatory_Review_Input = {
+  content: string;
+  recommend: boolean;
+  atmos: number;
+  lectr: number;
+  paper: number;
+  salry: number;
+  persn: number;
+  guidance: number | null;
+  meetFreq: number | null;
+  externOk: number | null;
+};
+
+export type Labatory_Review_Update_Input = {
+  content: string;
+  recommend: boolean;
+  atmos: number;
+  lectr: number;
+  paper: number;
+  salry: number;
+  persn: number;
+  guidance: number | null;
+  meetFreq: number | null;
+  externOk: number | null;
+};

@@ -22,7 +22,7 @@ type Body = {
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { lab_id: string; review_id: string } },
+  { params }: { params: Promise<{ lab_id: string; review_id: string }> },
 ) {
   const { review_id } = await params;
 

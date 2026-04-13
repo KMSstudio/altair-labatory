@@ -96,6 +96,7 @@ model University {
   nameEn     String? @db.VarChar(200) @map("name_en")
   country    String? @db.VarChar(100)
   websiteUrl String? @db.VarChar(1024) @map("website_url")
+  domain String? @db.VarChar(100)
 
   labs Lab[]
 

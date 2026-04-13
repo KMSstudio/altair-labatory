@@ -10,6 +10,7 @@ type UnivInput = {
   nameEn: string | null;
   country: string | null;
   websiteUrl: string | null;
+  domain: string | null;
 };
 
 /**
@@ -50,6 +51,7 @@ const parseUnivInput = (formData: FormData): UnivInput => ({
   nameEn: normalizeText(formData.get("nameEn")),
   country: normalizeText(formData.get("country")),
   websiteUrl: normalizeText(formData.get("websiteUrl")),
+  domain: normalizeText(formData.get("domain")),
 });
 
 /**

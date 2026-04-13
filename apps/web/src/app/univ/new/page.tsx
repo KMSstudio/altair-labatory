@@ -36,6 +36,10 @@ export default function NewUniversityPage() {
           Website URL
           <input name="websiteUrl" type="url" placeholder="https://www.snu.ac.kr/" />
         </label>
+        <label>
+          Domain
+          <input name="domain" placeholder="snu.ac.kr" />
+        </label>
 
         <div className={`${styles.actions} ${styles.actionsEnd}`}>
           <Link href="/univ" className={styles.ghost}>

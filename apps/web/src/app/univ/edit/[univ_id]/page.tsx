@@ -64,6 +64,10 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
           Website URL
           <input name="websiteUrl" type="url" defaultValue={university.websiteUrl ?? ""} />
         </label>
+        <label>
+          Domain
+          <input name="domain" defaultValue={university.domain ?? ""} />
+        </label>
 
         <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
           <button type="submit" className={styles.primary}>
@@ -79,7 +83,6 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
           </button>
         </div>
       </form>
-      =
     </main>
   );
 }

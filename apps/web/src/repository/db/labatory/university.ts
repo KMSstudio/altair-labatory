@@ -40,7 +40,7 @@ export async function getUniversityCore({
  * 1) Create university.
  * 2) Create tag associated with university.
  *
- * @param input - korean name, english name, websiteUrl, and country of new university.
+ * @param input - korean name, english name, websiteUrl, domain, and country of new university.
  * @returns University DTO of new University.
  */
 export async function createUniversityCore({
@@ -54,6 +54,7 @@ export async function createUniversityCore({
         nameKo: input.nameKo,
         nameEn: input.nameEn,
         websiteUrl: input.websiteUrl,
+        domain: input.domain,
         country: input.country,
       },
       select: getUniversitySelect,
@@ -64,14 +65,14 @@ export async function createUniversityCore({
 }
 
 /**
- * Update existing university's korean name, english name, websiteUrl, and country.
+ * Update existing university's korean name, english name, websiteUrl, domain, and country.
  *
  * The update runs in a single transaction:
  * 1) Create university.
  * 2) Update tag associated with university. If tag does not exists for some reason, create one.
  *
  * @param universityId - Target university id.
- * @param input - korean name, english name, websiteUrl, and country of updated university.
+ * @param input - korean name, english name, websiteUrl, domain, and country of updated university.
  * @throws If university id is invalid.
  * @returns University DTO of updated University.
  */
@@ -92,6 +93,7 @@ export async function updateUniversityCore({
           nameKo: input.nameKo,
           nameEn: input.nameEn,
           websiteUrl: input.websiteUrl,
+          domain: input.domain,
           country: input.country,
         },
         select: {

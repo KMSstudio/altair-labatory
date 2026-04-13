@@ -9,6 +9,7 @@ export type UniversityDbShape = {
   nameEn: string | null;
   country: string | null;
   websiteUrl: string | null;
+  domain: string | null;
   createdAt: Date;
 };
 
@@ -18,6 +19,7 @@ export const getUniversitySelect = {
   nameEn: true,
   country: true,
   websiteUrl: true,
+  domain: true,
   createdAt: true,
 } as const;
 
@@ -27,6 +29,7 @@ export type UniversityDTO = {
   nameEn: string | null;
   country: string | null;
   websiteUrl: string | null;
+  domain: string | null;
   createdAt: string;
 };
 

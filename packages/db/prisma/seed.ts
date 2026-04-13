@@ -235,6 +235,7 @@ async function main() {
       nameEn: "Seoul National University",
       country: "KR",
       websiteUrl: "https://www.snu.ac.kr",
+      domain: "snu.ac.kr",
     },
   });
 
@@ -244,6 +245,7 @@ async function main() {
       nameEn: "Yonsei University",
       country: "KR",
       websiteUrl: "https://www.yonsei.ac.kr",
+      domain: "yonsei.ac.kr",
     },
   });
 
@@ -253,6 +255,7 @@ async function main() {
       nameEn: "Korea University",
       country: "KR",
       websiteUrl: "https://www.korea.ac.kr",
+      domain: "korea.ac.kr",
     },
   });
 
@@ -262,6 +265,7 @@ async function main() {
       nameEn: "KAIST",
       country: "KR",
       websiteUrl: "https://www.kaist.ac.kr",
+      domain: "kaist.ac.kr",
     },
   });
 
@@ -271,6 +275,7 @@ async function main() {
       nameEn: "University of California, Berkeley",
       country: "US",
       websiteUrl: "https://www.berkeley.edu",
+      domain: "berkeley.edu",
     },
   });
 
@@ -280,6 +285,7 @@ async function main() {
       nameEn: "University of Oxford",
       country: "UK",
       websiteUrl: "https://www.ox.ac.uk",
+      domain: "ox.ac.uk",
     },
   });
 

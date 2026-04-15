@@ -97,9 +97,11 @@ CREATE TABLE "labs" (
     "name_en" VARCHAR(200),
     "website_url" VARCHAR(1024),
     "description" TEXT,
+    "is_deleted" BOOLEAN NOT NULL DEFAULT false,
     "university_id" BIGINT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "labs_pkey" PRIMARY KEY ("id")
 );

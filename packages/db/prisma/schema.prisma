@@ -170,6 +170,7 @@ model Lab {
   nameEn      String? @db.VarChar(200) @map("name_en")
   websiteUrl  String? @db.VarChar(1024) @map("website_url")
   description String? @db.Text
+  isDeleted   Boolean @default(false) @map("is_deleted")
 
   universityId BigInt? @map("university_id")
   university University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
@@ -183,6 +184,7 @@ model Lab {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt      @map("updated_at")
+  deletedAt DateTime?                @map("deleted_at")
 
   @@index([nameKo],       map: "idx_labs_name_ko")
   @@index([universityId], map: "idx_labs_university")

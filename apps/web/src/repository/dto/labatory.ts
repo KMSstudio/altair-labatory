@@ -186,3 +186,43 @@ export type LabReviewDTO = {
   createdAt: string;
   updatedAt: string;
 };
+
+//LAB
+export type LabDbShape = {
+  id: bigint;
+  nameKo: string;
+  nameEn: string | null;
+  websiteUrl: string | null;
+  description: string | null;
+  createdAt: Date;
+  university: UniversityDbShape | null;
+  pi: PiDbShape | null;
+  subjects: SubjectDbShape[];
+};
+
+export const getLabselect = {
+  id: true,
+  nameKo: true,
+  nameEn: true,
+  websiteUrl: true,
+  description: true,
+  createdAt: true,
+  university: { select: getUniversitySelect },
+  pi: { select: getPiSelect },
+  subjects: {
+    orderBy: { createdAt: "desc" },
+    select: getSubjectSelect,
+  },
+} as const;
+
+export type LabDTO = {
+  id: string;
+  nameKo: string;
+  nameEn: string | null;
+  websiteUrl: string | null;
+  description: string | null;
+  createdAt: string;
+  university: UniversityDTO | null;
+  pi: PiDTO | null;
+  subjects: SubjectDTO[];
+};

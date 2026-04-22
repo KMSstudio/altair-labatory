@@ -21,16 +21,15 @@ export default async function NewReviewPage({ params }: Params) {
     notFound();
   }
 
-  const [session, lab] = await Promise.all([
-    getServerSession(authOptions),
-    getLabCore({ id: labId }),
-  ]);
-
-  if (!lab) notFound();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user) {
     redirect("/");
   }
+
+  const lab = await getLabCore({ id: labId });
+
+  if (!lab) notFound();
 
   const isPi = session.user.role === "PI";
 

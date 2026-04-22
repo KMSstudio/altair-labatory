@@ -56,11 +56,41 @@ export async function POST(request: Request, { params }: { params: Promise<{ lab
 
   const { content, recommend, atmos, lectr, paper, salry, persn, guidance, meetFreq, externOk } =
     body;
+
   if (typeof recommend !== "boolean") {
     return NextResponse.json({ error: "recommend is required." }, { status: 400 });
   }
-  if ([atmos, lectr, paper, salry, persn].some((v) => !v || v < 1 || v > 5)) {
-    return NextResponse.json({ error: "All score fields are required (1–5)." }, { status: 400 });
+
+  const requiredScores: [string, unknown][] = [
+    ["atmos", atmos],
+    ["lectr", lectr],
+    ["paper", paper],
+    ["salry", salry],
+    ["persn", persn],
+  ];
+  for (const [name, v] of requiredScores) {
+    if (typeof v !== "number" || !Number.isFinite(v) || v < 1 || v > 5) {
+      return NextResponse.json(
+        { error: `${name} must be a number between 1 and 5.` },
+        { status: 400 },
+      );
+    }
+  }
+ 
+  const optionalScores: [string, unknown][] = [
+    ["guidance", guidance],
+    ["meetFreq", meetFreq],
+    ["externOk", externOk],
+  ];
+  for (const [name, v] of optionalScores) {
+    if (v !== undefined && v !== null) {
+      if (typeof v !== "number" || !Number.isFinite(v) || v < -3 || v > 3) {
+        return NextResponse.json(
+          { error: `${name} must be a number between -3 and 3.` },
+          { status: 400 },
+        );
+      }
+    }
   }
 
   const input: Labatory_Review_Input = {

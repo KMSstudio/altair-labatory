@@ -99,14 +99,16 @@ export async function getRecentReviewInLab(userId: bigint, labId: bigint, db: Db
  * Create a new lab review in the database.
  *
  * This function performs only database operations and assumes that
- * all authentication, authorization, and input validation have already
- * been completed by the caller.
+ * all authentication and authorization have already been completed by the caller.
+ *
+ * Enforces the 7-day duplicate-review rule inside the transaction to prevent
+ * race conditions between the pre-flight check in the route and the actual insert.
  *
  * @param authorId - ID of the user creating the review.
  * @param labId - ID of the target laboratory.
  * @param input - Review data payload (content, scores, etc.).
  *
- * @returns Review DB shape of the new review.
+ * @returns Review DTO of the new review, or null if a recent review already exists.
  *
  * @throws Prisma.PrismaClientKnownRequestError
  * If a database constraint violation occurs (e.g., invalid foreign key,
@@ -118,6 +120,17 @@ export async function CreateLabReviewCore(
   input: Labatory_Review_Input,
 ): Promise<LabReviewDTO | null> {
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const recentReview = await tx.labReview.findFirst({
+      where: {
+        authorId,
+        labId,
+        createdAt: { gte: since },
+      },
+      select: { id: true },
+    });
+    if (recentReview) return null;
+ 
     const newReview = await tx.labReview.create({
       data: {
         authorId: authorId,
@@ -135,7 +148,7 @@ export async function CreateLabReviewCore(
       },
       select: { id: true },
     });
-
+ 
     return await getLabReviewCore({ reviewId: newReview.id, db: tx });
   });
 }

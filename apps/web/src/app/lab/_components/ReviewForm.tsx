@@ -76,8 +76,8 @@ export function ReviewForm({
         <p className={styles.eyebrow}>항목별 평가</p>
         <div style={{ display: "grid", gap: "1rem" }}>
           {LABATORY_REVIEW_SCORE_FIELDS.map(({ field, label }) => (
-            <div key={field}>
-              <p className={styles.eyebrow}>{label}</p>
+            <fieldset key={field} style={{ border: "none", padding: 0, margin: 0 }}>
+              <legend className={styles.eyebrow}>{label}</legend>
               <div className={styles.actions}>
                 {[1, 2, 3, 4, 5].map((v) => (
                   <button
@@ -92,7 +92,7 @@ export function ReviewForm({
                   <span className={styles.muted}>{LABATORY_REVIEW_SCORE_LABELS[score[field]]}</span>
                 )}
               </div>
-            </div>
+            </fieldset>
           ))}
         </div>
       </section>
@@ -100,40 +100,49 @@ export function ReviewForm({
       <section className={styles.panel}>
         <p className={styles.eyebrow}>정보성 평가 (선택)</p>
         <div style={{ display: "grid", gap: "1.5rem" }}>
-          {LABATORY_REVIEW_NEUTRAL_FIELDS.map(({ field, label, left, right }) => (
-            <div key={field}>
-              <p className={styles.eyebrow}>{label}</p>
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                <span className={styles.muted}>{left}</span>
-                <input
-                  type="range"
-                  min={-3}
-                  max={3}
-                  step={0.5}
-                  value={neutral[field] ?? 0}
-                  onChange={(e) => onNeutralChange(field, Number(e.target.value))}
-                  style={{ flex: 1 }}
-                />
-                <span className={styles.muted}>{right}</span>
-                <span style={{ minWidth: "2rem", textAlign: "center", fontWeight: 600 }}>
-                  {neutral[field] ?? 0}
-                </span>
+          {LABATORY_REVIEW_NEUTRAL_FIELDS.map(({ field, label, left, right }) => {
+            const inputId = `neutral-${field}`;
+            return (
+              <div key={field}>
+                <label htmlFor={inputId} className={styles.eyebrow}>
+                  {label}
+                </label>
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                  <span className={styles.muted}>{left}</span>
+                  <input
+                    id={inputId}
+                    type="range"
+                    min={-3}
+                    max={3}
+                    step={0.5}
+                    value={neutral[field] ?? 0}
+                    onChange={(e) => onNeutralChange(field, Number(e.target.value))}
+                    style={{ flex: 1 }}
+                  />
+                  <span className={styles.muted}>{right}</span>
+                  <span style={{ minWidth: "2rem", textAlign: "center", fontWeight: 600 }}>
+                    {neutral[field] ?? "응답 안함"}
+                  </span>
+                </div>
+                <button
+                  className={styles.ghost}
+                  style={{ marginTop: "0.35rem", fontSize: "0.8rem" }}
+                  onClick={() => onNeutralChange(field, null)}
+                >
+                  응답 안함
+                </button>
               </div>
-              <button
-                className={styles.ghost}
-                style={{ marginTop: "0.35rem", fontSize: "0.8rem" }}
-                onClick={() => onNeutralChange(field, null)}
-              >
-                응답 안함
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
       <section className={styles.panel}>
-        <p className={styles.eyebrow}>한줄평 (선택)</p>
+        <label htmlFor="review-content" className={styles.eyebrow}>
+          한줄평 (선택)
+        </label>
         <textarea
+          id="review-content"
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
           placeholder="자유롭게 작성해주세요."

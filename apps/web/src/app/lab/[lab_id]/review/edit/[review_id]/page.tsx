@@ -27,16 +27,15 @@ export default async function EditReviewPage({ params }: Params) {
     notFound();
   }
 
-  const [session, review] = await Promise.all([
-    getServerSession(authOptions),
-    getLabReviewCore({ reviewId }),
-  ]);
-
-  if (!review || BigInt(review.labId) !== labId) notFound();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user) {
     redirect("/");
   }
+
+  const review = await getLabReviewCore({ reviewId });
+
+  if (!review || BigInt(review.labId) !== labId) notFound();
 
   const isAdmin = session.user.role === "ADMIN";
   const isAuthor = review.authorId === session.user.id;

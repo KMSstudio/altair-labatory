@@ -24,7 +24,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ lab_id: string; review_id: string }> },
 ) {
-  const { review_id } = await params;
+  const { lab_id, review_id } = await params;
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -38,6 +38,13 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
+  let labId: bigint;
+  try {
+    labId = BigInt(lab_id);
+  } catch {
+    return NextResponse.json({ error: "Invalid review id." }, { status: 400 });
+  }
+
   let reviewId: bigint;
   try {
     reviewId = BigInt(review_id);
@@ -46,20 +53,52 @@ export async function PATCH(
   }
 
   const review = await getLabReviewCore({ reviewId });
-  if (!review) {
+
+  if (!review || BigInt(review.labId) !== labId) {
     return NextResponse.json({ error: "Review not found." }, { status: 404 });
   }
+
   if (review.authorId !== session.user.id && session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   }
 
   const { content, recommend, atmos, lectr, paper, salry, persn, guidance, meetFreq, externOk } =
     body;
+
   if (typeof recommend !== "boolean") {
     return NextResponse.json({ error: "recommend is required." }, { status: 400 });
   }
-  if ([atmos, lectr, paper, salry, persn].some((v) => !v || v < 1 || v > 5)) {
-    return NextResponse.json({ error: "All score fields are required (1–5)." }, { status: 400 });
+  
+  const requiredScores: [string, unknown][] = [
+    ["atmos", atmos],
+    ["lectr", lectr],
+    ["paper", paper],
+    ["salry", salry],
+    ["persn", persn],
+  ];
+  for (const [name, v] of requiredScores) {
+    if (typeof v !== "number" || !Number.isFinite(v) || v < 1 || v > 5) {
+      return NextResponse.json(
+        { error: `${name} must be a number between 1 and 5.` },
+        { status: 400 },
+      );
+    }
+  }
+ 
+  const optionalScores: [string, unknown][] = [
+    ["guidance", guidance],
+    ["meetFreq", meetFreq],
+    ["externOk", externOk],
+  ];
+  for (const [name, v] of optionalScores) {
+    if (v !== undefined && v !== null) {
+      if (typeof v !== "number" || !Number.isFinite(v) || v < -3 || v > 3) {
+        return NextResponse.json(
+          { error: `${name} must be a number between -3 and 3.` },
+          { status: 400 },
+        );
+      }
+    }
   }
 
   const input: Labatory_Review_Update_Input = {

@@ -76,7 +76,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ lab
       );
     }
   }
- 
+
   const optionalScores: [string, unknown][] = [
     ["guidance", guidance],
     ["meetFreq", meetFreq],

@@ -130,7 +130,7 @@ export async function CreateLabReviewCore(
       select: { id: true },
     });
     if (recentReview) return null;
- 
+
     const newReview = await tx.labReview.create({
       data: {
         authorId: authorId,
@@ -148,7 +148,7 @@ export async function CreateLabReviewCore(
       },
       select: { id: true },
     });
- 
+
     return await getLabReviewCore({ reviewId: newReview.id, db: tx });
   });
 }

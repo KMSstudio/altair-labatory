@@ -68,7 +68,7 @@ export async function PATCH(
   if (typeof recommend !== "boolean") {
     return NextResponse.json({ error: "recommend is required." }, { status: 400 });
   }
-  
+
   const requiredScores: [string, unknown][] = [
     ["atmos", atmos],
     ["lectr", lectr],
@@ -84,7 +84,7 @@ export async function PATCH(
       );
     }
   }
- 
+
   const optionalScores: [string, unknown][] = [
     ["guidance", guidance],
     ["meetFreq", meetFreq],

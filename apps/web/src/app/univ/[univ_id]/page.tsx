@@ -76,6 +76,10 @@ export default async function UniversityDetailPage({ params }: UnivPageProps) {
           )}
         </div>
         <div>
+          <p className={styles.eyebrow}>Domain</p>
+          <p className={styles.value}>{university.domain ?? "No domain"}</p>
+        </div>
+        <div>
           <p className={styles.eyebrow}>ID</p>
           <p className={styles.value}>{university.id.toString()}</p>
         </div>

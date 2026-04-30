@@ -51,6 +51,7 @@ CREATE TABLE "universities" (
     "name_en" VARCHAR(200),
     "country" VARCHAR(100),
     "website_url" VARCHAR(1024),
+    "domain" VARCHAR(100),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 

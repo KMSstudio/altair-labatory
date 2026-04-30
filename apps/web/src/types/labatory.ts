@@ -5,6 +5,7 @@ export type University_Input = {
   nameEn: string | null;
   country: string | null;
   websiteUrl: string | null;
+  domain: string | null;
 };
 
 export type Subject_Input = {

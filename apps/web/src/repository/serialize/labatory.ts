@@ -14,6 +14,7 @@ export function serializeUniversity(univ: UniversityDbShape): UniversityDTO {
     nameEn: univ.nameEn,
     country: univ.country,
     websiteUrl: univ.websiteUrl,
+    domain: univ.domain,
     createdAt: univ.createdAt.toISOString(),
   };
 }

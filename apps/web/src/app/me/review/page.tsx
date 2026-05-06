@@ -94,10 +94,7 @@ export default async function MyReviewPage() {
                       >
                         보기
                       </Link>
-                      <Link
-                        href={`/review/${reviewId}/edit`}
-                        className={styles.smallPrimary}
-                      >
+                      <Link href={`/review/${reviewId}/edit`} className={styles.smallPrimary}>
                         수정
                       </Link>
                     </div>

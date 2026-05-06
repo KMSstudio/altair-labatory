@@ -1,12 +1,12 @@
-// src/app/lab/[lab_id]/review/new/_components/CreateReviewForm.tsx
+// src/app/lab/[lab_id]/review/_components/CreateReviewForm.tsx
 
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ReviewForm } from "@/app/lab/_components/ReviewForm";
-import styles from "../../../../lab.module.css";
+import { ReviewForm } from "@/app/review/_components/ReviewForm";
+import styles from "../../../lab.module.css";
 
 type Props = {
   labId: string;
@@ -45,10 +45,13 @@ export function CreateReviewForm({ labId, labName, recentReviewId }: Props) {
 
     let res: Response;
     try {
-      res = await fetch(`/api/lab/${labId}/review/new`, {
+      res = await fetch("/api/review/new", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, recommend, ...score, ...neutral }),
+        body: JSON.stringify({
+          labid: Number(labId),
+          review: { content, recommend, ...score, ...neutral },
+        }),
       });
     } catch {
       setSubmitting(false);
@@ -61,9 +64,9 @@ export function CreateReviewForm({ labId, labName, recentReviewId }: Props) {
     if (!res.ok || !data.ok) {
       setSubmitting(false);
       if (data.error === "TOO_SOON") {
-        alert("같은 랩에 7일 이내 연속하여 리뷰를 달 수 없습니다.");
+        alert("같은 랩에 7일 이내 연속하여 리뷰를 쓸 수 없습니다.");
         if (data.recentReviewId) {
-          router.replace(`/lab/${labId}/review/edit/${data.recentReviewId}`);
+          router.replace(`/review/${data.recentReviewId}/edit`);
         }
         return;
       }
@@ -81,7 +84,7 @@ export function CreateReviewForm({ labId, labName, recentReviewId }: Props) {
     >
       <header className={styles.labHeader}>
         <div>
-          <p className={styles.eyebrow}>/lab/{labId}/review/new</p>
+          <p className={styles.eyebrow}>/lab/{labId}/review</p>
           <h1>{labName} 리뷰 작성</h1>
         </div>
         <Link href={`/lab/${labId}`} className={styles.ghost}>
@@ -92,10 +95,10 @@ export function CreateReviewForm({ labId, labName, recentReviewId }: Props) {
       {isBlocked && (
         <section className={styles.panel} style={{ pointerEvents: "auto" }}>
           <p style={{ color: "#b91c1c", fontWeight: 600 }}>
-            같은 랩에 7일 이내 연속하여 리뷰를 달 수 없습니다.
+            같은 랩에 7일 이내 연속하여 리뷰를 쓸 수 없습니다.
           </p>
           <Link
-            href={`/lab/${labId}/review/edit/${recentReviewId}`}
+            href={`/review/${recentReviewId}/edit`}
             className={styles.primary}
             style={{ marginTop: "0.5rem", display: "inline-flex" }}
           >

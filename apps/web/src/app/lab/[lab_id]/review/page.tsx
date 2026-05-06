@@ -1,4 +1,4 @@
-// src/app/lab/[lab_id]/review/new/page.tsx
+// src/app/lab/[lab_id]/review/page.tsx
 
 import { redirect, notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -24,7 +24,7 @@ export default async function NewReviewPage({ params }: Params) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    redirect("/");
+    redirect("/login");
   }
 
   const lab = await getLabCore({ id: labId });
@@ -34,7 +34,7 @@ export default async function NewReviewPage({ params }: Params) {
   const isPi = session.user.role === "PI";
 
   if (isPi) {
-    redirect("/");
+    redirect(`/lab/${lab_id}`);
   }
 
   const userId = BigInt(session.user.id);

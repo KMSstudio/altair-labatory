@@ -1,5 +1,31 @@
+import type { LabReviewInput } from "@/types/labatory";
+
+type LabatoryReviewRequiredScoreField = keyof Pick<
+  LabReviewInput,
+  "atmos" | "lectr" | "paper" | "salry" | "persn"
+>;
+
+type LabatoryReviewOptionalScoreField = keyof Pick<
+  LabReviewInput,
+  "guidance" | "meetFreq" | "externOk"
+>;
+
+/**
+ * Numeric lab review score fields that are required on create/update.
+ * Each value is stored as a 1-5 rating.
+ */
+export const LABATORY_REVIEW_REQUIRED_SCORE_FIELD_NAMES: readonly LabatoryReviewRequiredScoreField[] =
+  ["atmos", "lectr", "paper", "salry", "persn"] as const;
+
+/**
+ * Optional lab review score fields that are submitted on create/update.
+ * Each value may be null, or a -3 to 3 rating when answered.
+ */
+export const LABATORY_REVIEW_OPTIONAL_SCORE_FIELD_NAMES: readonly LabatoryReviewOptionalScoreField[] =
+  ["guidance", "meetFreq", "externOk"] as const;
+
 export const LABATORY_REVIEW_SCORE_FIELDS: {
-  field: "atmos" | "lectr" | "paper" | "salry" | "persn";
+  field: LabatoryReviewRequiredScoreField;
   label: string;
 }[] = [
   { field: "atmos", label: "연구실 분위기" },
@@ -18,7 +44,7 @@ export const LABATORY_REVIEW_SCORE_LABELS: Record<number, string> = {
 } as const;
 
 export const LABATORY_REVIEW_NEUTRAL_FIELDS: {
-  field: "guidance" | "meetFreq" | "externOk";
+  field: LabatoryReviewOptionalScoreField;
   label: string;
   left: string;
   right: string;

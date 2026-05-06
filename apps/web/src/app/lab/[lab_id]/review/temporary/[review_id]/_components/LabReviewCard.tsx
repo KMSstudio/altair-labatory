@@ -33,7 +33,6 @@ function ScoreBar({ value }: { value: number }) {
 }
 
 function NeutralBar({ value, left, right }: { value: number; left: string; right: string }) {
-  // change -3 ~ 3 to 0 ~ 100%
   const percent = ((value + 3) / 6) * 100;
   return (
     <div style={{ display: "grid", gap: "0.25rem" }}>
@@ -88,7 +87,7 @@ export function LabReviewCard({ review, labName, currentUserId }: Props) {
             ← Back
           </Link>
           {isAuthor && (
-            <Link href={`/lab/${review.labId}/review/edit/${review.id}`} className={styles.primary}>
+            <Link href={`/review/${review.id}/edit`} className={styles.primary}>
               수정
             </Link>
           )}

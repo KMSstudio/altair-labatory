@@ -1,4 +1,4 @@
-// src/app/lab/[lab_id]/review/edit/[review_id]/page.tsx
+// src/app/review/[review_id]/edit/page.tsx
 
 import { redirect, notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -7,23 +7,22 @@ import { getLabReviewCore } from "@/repository/db/labatory/lab-review";
 import { EditReviewForm } from "./_components/EditReviewForm";
 
 type Params = {
-  params: Promise<{ lab_id: string; review_id: string }>;
+  params: Promise<{ review_id: string }>;
 };
 
-export default async function EditReviewPage({ params }: Params) {
-  const { lab_id, review_id } = await params;
-
-  let labId: bigint;
+function parseBigInt(value: unknown) {
   try {
-    labId = BigInt(lab_id);
+    return BigInt(value as string);
   } catch {
-    notFound();
+    return null;
   }
+}
 
-  let reviewId: bigint;
-  try {
-    reviewId = BigInt(review_id);
-  } catch {
+export default async function EditReviewPage({ params }: Params) {
+  const { review_id } = await params;
+
+  const reviewId = parseBigInt(review_id);
+  if (reviewId === null) {
     notFound();
   }
 
@@ -35,7 +34,7 @@ export default async function EditReviewPage({ params }: Params) {
 
   const review = await getLabReviewCore({ reviewId });
 
-  if (!review || BigInt(review.labId) !== labId) notFound();
+  if (!review) notFound();
 
   const isAdmin = session.user.role === "ADMIN";
   const isAuthor = review.authorId === session.user.id;

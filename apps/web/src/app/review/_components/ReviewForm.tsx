@@ -1,8 +1,8 @@
-// @/app/lab/[lab_id]/review/_components/ReviewForm.tsx
+// @/app/review/_components/ReviewForm.tsx
 
 "use client";
 
-import styles from "../lab.module.css";
+import styles from "@/app/lab/lab.module.css";
 import {
   LABATORY_REVIEW_SCORE_FIELDS,
   LABATORY_REVIEW_SCORE_LABELS,
@@ -139,7 +139,7 @@ export function ReviewForm({
 
       <section className={styles.panel}>
         <label htmlFor="review-content" className={styles.eyebrow}>
-          한줄평 (선택)
+          서술형 (선택)
         </label>
         <textarea
           id="review-content"

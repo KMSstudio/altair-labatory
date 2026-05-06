@@ -1,26 +1,30 @@
-// @/app/api/lab/[lab_id]/review/new/route.ts
+// @/app/api/review/new/route.ts
 
 import { NextResponse } from "next/server";
 import { Prisma } from "@labatory/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { CreateLabReviewCore, getRecentReviewInLab } from "@/repository/db/labatory/lab-review";
-import type { Labatory_Review_Input } from "@/types/labatory";
+import type { LabReviewInput } from "@/types/labatory";
+import {
+  LABATORY_REVIEW_OPTIONAL_SCORE_FIELD_NAMES,
+  LABATORY_REVIEW_REQUIRED_SCORE_FIELD_NAMES,
+} from "@/util/labatory.constant";
 
 type Body = {
-  content: string;
-  recommend: boolean;
-  atmos: number;
-  lectr: number;
-  paper: number;
-  salry: number;
-  persn: number;
-  guidance: number | null;
-  meetFreq: number | null;
-  externOk: number | null;
+  labid: number;
+  review: LabReviewInput;
 };
 
-export async function POST(request: Request, { params }: { params: Promise<{ lab_id: string }> }) {
+function parseBigInt(value: unknown) {
+  try {
+    return BigInt(value as string);
+  } catch {
+    return null;
+  }
+}
+
+export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
@@ -36,12 +40,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ lab
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const { lab_id } = await params;
-  let labId: bigint;
-  try {
-    labId = BigInt(lab_id);
-  } catch {
+  const labId = parseBigInt(body.labid);
+  if (labId === null) {
     return NextResponse.json({ error: "Invalid lab id." }, { status: 400 });
+  }
+  if (!body.review || typeof body.review !== "object") {
+    return NextResponse.json({ error: "review is required." }, { status: 400 });
   }
 
   const userId = BigInt(session.user.id);
@@ -54,21 +58,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ lab
     );
   }
 
+  const { review } = body;
   const { content, recommend, atmos, lectr, paper, salry, persn, guidance, meetFreq, externOk } =
-    body;
+    review;
 
   if (typeof recommend !== "boolean") {
     return NextResponse.json({ error: "recommend is required." }, { status: 400 });
   }
 
-  const requiredScores: [string, unknown][] = [
-    ["atmos", atmos],
-    ["lectr", lectr],
-    ["paper", paper],
-    ["salry", salry],
-    ["persn", persn],
-  ];
-  for (const [name, v] of requiredScores) {
+  for (const name of LABATORY_REVIEW_REQUIRED_SCORE_FIELD_NAMES) {
+    const v = review[name];
     if (typeof v !== "number" || !Number.isFinite(v) || v < 1 || v > 5) {
       return NextResponse.json(
         { error: `${name} must be a number between 1 and 5.` },
@@ -77,23 +76,23 @@ export async function POST(request: Request, { params }: { params: Promise<{ lab
     }
   }
 
-  const optionalScores: [string, unknown][] = [
-    ["guidance", guidance],
-    ["meetFreq", meetFreq],
-    ["externOk", externOk],
-  ];
-  for (const [name, v] of optionalScores) {
-    if (v !== undefined && v !== null) {
-      if (typeof v !== "number" || !Number.isFinite(v) || v < -3 || v > 3) {
-        return NextResponse.json(
-          { error: `${name} must be a number between -3 and 3.` },
-          { status: 400 },
-        );
-      }
+  for (const name of LABATORY_REVIEW_OPTIONAL_SCORE_FIELD_NAMES) {
+    const v = review[name];
+    if (v == null) {
+      continue;
+    }
+    if (typeof v !== "number") {
+      return NextResponse.json({ error: `${name} must be a number.` }, { status: 400 });
+    }
+    if (!Number.isFinite(v) || v < -3 || v > 3) {
+      return NextResponse.json(
+        { error: `${name} must be a number between -3 and 3.` },
+        { status: 400 },
+      );
     }
   }
 
-  const input: Labatory_Review_Input = {
+  const input: LabReviewInput = {
     content,
     recommend,
     atmos,
@@ -107,9 +106,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ lab
   };
 
   try {
-    const review = await CreateLabReviewCore(userId, labId, input);
-    if (!review) throw new Error();
-    return NextResponse.json({ ok: true, reviewId: review.id }, { status: 201 });
+    const newReview = await CreateLabReviewCore(userId, labId, input);
+    if (!newReview) throw new Error();
+    return NextResponse.json({ ok: true, reviewId: newReview.id }, { status: 201 });
   } catch (e) {
     if (!(e instanceof Prisma.PrismaClientKnownRequestError)) {
       return NextResponse.json({ error: "Internal server error." }, { status: 500 });

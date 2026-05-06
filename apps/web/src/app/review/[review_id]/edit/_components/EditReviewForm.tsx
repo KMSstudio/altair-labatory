@@ -1,12 +1,12 @@
-// @/app/lab/[lab_id]/review/edit/[review_id]/_components/EditReviewForm.tsx
+// @/app/review/[review_id]/edit/_components/EditReviewForm.tsx
 
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ReviewForm } from "@/app/lab/_components/ReviewForm";
-import styles from "../../../../../lab.module.css";
+import { ReviewForm } from "@/app/review/_components/ReviewForm";
+import styles from "../../../../lab/lab.module.css";
 import type { LabReviewDTO } from "@/repository/dto/labatory";
 
 type Props = {
@@ -50,10 +50,10 @@ export function EditReviewForm({ review }: Props) {
 
     let res: Response;
     try {
-      res = await fetch(`/api/lab/${labId}/review/edit/${reviewId}`, {
-        method: "PATCH",
+      res = await fetch("/api/review/edit", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, recommend, ...score, ...neutral }),
+        body: JSON.stringify({ reviewId, content, recommend, ...score, ...neutral }),
       });
     } catch {
       setSubmitting(false);
@@ -80,9 +80,7 @@ export function EditReviewForm({ review }: Props) {
     <main className={styles.labShell}>
       <header className={styles.labHeader}>
         <div>
-          <p className={styles.eyebrow}>
-            /lab/{labId}/review/edit/{reviewId}
-          </p>
+          <p className={styles.eyebrow}>/review/{reviewId}/edit</p>
           <h1>리뷰 수정</h1>
         </div>
         <Link href={`/lab/${labId}`} className={styles.ghost}>

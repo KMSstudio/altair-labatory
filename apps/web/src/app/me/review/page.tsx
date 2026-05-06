@@ -95,7 +95,7 @@ export default async function MyReviewPage() {
                         보기
                       </Link>
                       <Link
-                        href={`/lab/${labId}/review/edit/${reviewId}`}
+                        href={`/review/${reviewId}/edit`}
                         className={styles.smallPrimary}
                       >
                         수정

@@ -5,7 +5,7 @@ import type { DbClient } from "@/types/db";
 import { getLabReviewSelect } from "@/repository/dto/labatory";
 import { serializeLabReview } from "@/repository/serialize/labatory";
 import type { LabReviewDTO, LabReviewDbShape } from "@/repository/dto/labatory";
-import type { Labatory_Review_Input, Labatory_Review_Update_Input } from "@/types/labatory";
+import type { LabReviewInput } from "@/types/labatory";
 
 /**
  * Retrieve a specific lab review by review id.
@@ -117,7 +117,7 @@ export async function getRecentReviewInLab(userId: bigint, labId: bigint, db: Db
 export async function CreateLabReviewCore(
   authorId: bigint,
   labId: bigint,
-  input: Labatory_Review_Input,
+  input: LabReviewInput,
 ): Promise<LabReviewDTO | null> {
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -170,7 +170,7 @@ export async function CreateLabReviewCore(
  */
 export async function UpdateLabReviewCore(
   reviewId: bigint,
-  input: Labatory_Review_Update_Input,
+  input: LabReviewInput,
 ): Promise<LabReviewDTO | null> {
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const review = await tx.labReview.findUnique({

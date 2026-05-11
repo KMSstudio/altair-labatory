@@ -21,7 +21,7 @@ const ReviewOrder: ReviewKey[] = ["atmos", "lectr", "paper", "salry", "persn"];
 
 export default async function ReviewPage({ params }: { params: { lab_id: string } }) {
   params = await params;
-  const n = 0;
+  const n = 2;
 
   let labId: bigint;
   try {
@@ -100,24 +100,32 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
           </Link>
         </div>
       </header>
-      <PentagonSection
-        ReviewOrder={ReviewOrder.map((order) => order.toString())}
-        labReviewMean={ReviewOrder.map((order) => labReviewMean[order])}
-      />
-      <section className={styles.panel}>
-        <header className={styles.panelHead}>
-          <div>
-            <p className={styles.eyebrow}>Reviews</p>
-          </div>
-        </header>
-        {labReviews.map((review) => {
-          return (
-            <div key={review.id} className={styles.panel}>
-              <p className={styles.value}>{review.content}</p>
-            </div>
-          );
-        })}
-      </section>
+      {n <= labReviews.length ? (
+        <>
+          <PentagonSection
+            ReviewOrder={ReviewOrder.map((order) => order.toString())}
+            labReviewMean={ReviewOrder.map((order) => labReviewMean[order])}
+          />
+          <section className={styles.panel}>
+            <header className={styles.panelHead}>
+              <div>
+                <p className={styles.eyebrow}>Reviews</p>
+              </div>
+            </header>
+            {labReviews.map((review) => {
+              return (
+                <div key={review.id} className={styles.panel}>
+                  <p className={styles.value}>{review.content}</p>
+                </div>
+              );
+            })}
+          </section>
+        </>
+      ) : (
+        <section className={styles.panel}>
+          <div className={styles.primary}>Not enough review!</div>
+        </section>
+      )}
     </main>
   );
 }

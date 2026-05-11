@@ -87,6 +87,6 @@ export function serializeLab(lab: LabDbShape): LabDTO {
     createdAt: lab.createdAt.toISOString(),
     university: lab.university ? serializeUniversity(lab.university) : null,
     pi: lab.pi ? serializePi(lab.pi) : null,
-    subjects: lab.subjects.map(serializeSubject),
+    subjects: lab.subjects.map((subject) => serializeSubject(subject.subject)),
   };
 }

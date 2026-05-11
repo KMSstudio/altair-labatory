@@ -197,7 +197,7 @@ export type LabDbShape = {
   createdAt: Date;
   university: UniversityDbShape | null;
   pi: PiDbShape | null;
-  subjects: SubjectDbShape[];
+  subjects: { subject: SubjectDbShape }[];
 };
 
 export const getLabselect = {
@@ -210,10 +210,13 @@ export const getLabselect = {
   university: { select: getUniversitySelect },
   pi: { select: getPiSelect },
   subjects: {
-    orderBy: { createdAt: "desc" },
-    select: getSubjectSelect,
+    select: {
+      subject: {
+        select: getSubjectSelect,
+      },
+    },
   },
-} as const;
+};
 
 export type LabDTO = {
   id: string;

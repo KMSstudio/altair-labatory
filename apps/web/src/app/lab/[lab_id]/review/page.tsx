@@ -30,17 +30,16 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
     redirect("/lab");
   }
 
-  let labReviews: LabReviewDTO[];
   let lab: LabDTO | null;
   try {
     lab = await getLabCore({ id: labId });
     if (!lab) throw Error();
-  } catch (e) {
+  } catch {
     redirect("/lab");
   }
-  labReviews = await getLabReviews({ labId });
+  const labReviews: LabReviewDTO[] = await getLabReviews({ labId });
   let totalWeight: number = 0;
-  let labReviewMean: Record<ReviewKey, number> = {
+  const labReviewMean: Record<ReviewKey, number> = {
     atmos: 0,
     lectr: 0,
     paper: 0,
@@ -48,7 +47,7 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
     persn: 0,
   };
 
-  let contentList: string[] = [];
+  const contentList: string[] = [];
 
   if (labReviews.length >= n) {
     labReviews.map((review) => {

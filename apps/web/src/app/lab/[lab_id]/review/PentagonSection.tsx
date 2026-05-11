@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "../../lab.module.css";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 /**
  * calculate angle for point of pentagon.
  * @param i index of each point. point is assigned in clockwise, starting in upward.

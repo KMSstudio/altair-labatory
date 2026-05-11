@@ -344,6 +344,31 @@
   white-space: nowrap;
 }
 
+.pentagon-chart {
+  display: block;
+  width: 100%;
+}
+
+.pentagon-chart__background {
+  fill: none;
+  stroke: grey;
+  stroke-width: 1;
+  stroke-dasharray: 2;
+}
+
+.pentagon-chart__outline {
+  fill: none;
+  stroke: black;
+  stroke-width: 2;
+}
+
+.pentagon-chart__data {
+  fill: blue;
+  fill-opacity: 0.5;
+  stroke: aqua;
+  stroke-width: 2;
+}
+
 @media (max-width: 700px) {
   .labShell,
   .labFormShell {

@@ -47,3 +47,16 @@ export type Labatory_Update_Input = {
   description: string | null;
   universityId: bigint | null;
 };
+
+export type LabReviewInput = {
+  content: string;
+  recommend: boolean;
+  atmos: number;
+  lectr: number;
+  paper: number;
+  salry: number;
+  persn: number;
+  guidance: number | null;
+  meetFreq: number | null;
+  externOk: number | null;
+};

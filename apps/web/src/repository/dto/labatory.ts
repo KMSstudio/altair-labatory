@@ -150,6 +150,9 @@ export type LabReviewDbShape = {
   paper: number;
   salry: number;
   persn: number;
+  guidance: number | null;
+  meetFreq: number | null;
+  externOk: number | null;
   visib: Visibility;
   createdAt: Date;
   updatedAt: Date;
@@ -166,10 +169,13 @@ export const getLabReviewSelect = {
   paper: true,
   salry: true,
   persn: true,
+  guidance: true,
+  meetFreq: true,
+  externOk: true,
   visib: true,
   createdAt: true,
   updatedAt: true,
-};
+} as const;
 
 export type LabReviewDTO = {
   id: string;
@@ -182,6 +188,9 @@ export type LabReviewDTO = {
   paper: number;
   salry: number;
   persn: number;
+  guidance: number | null;
+  meetFreq: number | null;
+  externOk: number | null;
   visib: Visibility;
   createdAt: string;
   updatedAt: string;
@@ -197,7 +206,7 @@ export type LabDbShape = {
   createdAt: Date;
   university: UniversityDbShape | null;
   pi: PiDbShape | null;
-  subjects: SubjectDbShape[];
+  subjects: { subject: SubjectDbShape }[];
 };
 
 export const getLabselect = {
@@ -211,7 +220,9 @@ export const getLabselect = {
   pi: { select: getPiSelect },
   subjects: {
     orderBy: { createdAt: "desc" },
-    select: getSubjectSelect,
+    select: {
+      subject: { select: getSubjectSelect },
+    },
   },
 } as const;
 

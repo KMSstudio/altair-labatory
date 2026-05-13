@@ -209,7 +209,6 @@ export type LabDbShape = {
   subjects: { subject: SubjectDbShape }[];
 };
 
-
 export const getLabselect = {
   id: true,
   nameKo: true,
@@ -220,7 +219,7 @@ export const getLabselect = {
   university: { select: getUniversitySelect },
   pi: { select: getPiSelect },
   subjects: {
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "desc" as const },
     select: {
       subject: { select: getSubjectSelect },
     },

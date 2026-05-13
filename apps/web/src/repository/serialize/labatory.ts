@@ -70,6 +70,9 @@ export function serializeLabReview(labReview: LabReviewDbShape): LabReviewDTO {
     lectr: labReview.lectr,
     paper: labReview.paper,
     salry: labReview.salry,
+    guidance: labReview.guidance,
+    meetFreq: labReview.meetFreq,
+    externOk: labReview.externOk,
     persn: labReview.persn,
     visib: labReview.visib,
     createdAt: labReview.createdAt.toISOString(),
@@ -87,6 +90,6 @@ export function serializeLab(lab: LabDbShape): LabDTO {
     createdAt: lab.createdAt.toISOString(),
     university: lab.university ? serializeUniversity(lab.university) : null,
     pi: lab.pi ? serializePi(lab.pi) : null,
-    subjects: lab.subjects.map((subject) => serializeSubject(subject.subject)),
+    subjects: lab.subjects.map(({ subject }) => serializeSubject(subject)),
   };
 }

@@ -39,7 +39,7 @@ export function PentagonSection({
   if (ReviewOrder.length != 5 || labReviewMean.length != 5) {
     throw new Error("PentagonSection requires exactly 5 review dimensions");
   }
-  const [windowCenter, setWindowCenter] = useState(window.innerWidth / 2);
+  const [windowCenter, setWindowCenter] = useState(0);
   const PentagonHeight = 500;
   const sizeMultiplier = 0.06;
   useEffect(() => {

@@ -186,3 +186,27 @@ export async function UpdateLabReviewCore(
     return await getLabReviewCore({ reviewId, db: tx });
   });
 }
+
+/**
+ * Retrieve all lab reviews of single lab by lab id.
+ *
+ * This is a DB-only function. No authentication/authorization is performed here.
+ *
+ * @param labId - ID of the lab.
+ * @param db - Client where query will be performed. Default is prisma.
+ *
+ * @returns lab review list.
+ */
+export async function getLabReviews({
+  labId,
+  db = prisma,
+}: {
+  labId: bigint;
+  db?: DbClient;
+}): Promise<LabReviewDTO[]> {
+  const labReviews = (await db.labReview.findMany({
+    where: { labId },
+    select: getLabReviewSelect,
+  })) as LabReviewDbShape[];
+  return labReviews.map(serializeLabReview);
+}

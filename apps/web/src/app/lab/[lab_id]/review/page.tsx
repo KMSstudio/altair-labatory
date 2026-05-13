@@ -1,4 +1,4 @@
-import { getLabReviews } from "@/repository/db/labatory/lab_review";
+import { getLabReviews } from "@/repository/db/labatory/lab-review";
 import { getLabCore } from "@/repository/db/labatory/labatory";
 import { type LabDTO, type LabReviewDTO } from "@/repository/dto/labatory";
 import { redirect } from "next/navigation";

@@ -8,43 +8,43 @@ import { getRecentReviewInLab } from "@/repository/db/labatory/lab-review";
 import { CreateReviewForm } from "../_components/CreateReviewForm";
 
 type Params = {
-    params: Promise<{ lab_id: string }>;
+  params: Promise<{ lab_id: string }>;
 };
 
 export default async function NewReviewPage({ params }: Params) {
-    const { lab_id } = await params;
+  const { lab_id } = await params;
 
-    let labId: bigint;
-    try {
-        labId = BigInt(lab_id);
-    } catch {
-        notFound();
-    }
+  let labId: bigint;
+  try {
+    labId = BigInt(lab_id);
+  } catch {
+    notFound();
+  }
 
-    const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-        redirect("auth/login");
-    }
+  if (!session?.user) {
+    redirect("auth/login");
+  }
 
-    const lab = await getLabCore({ id: labId });
+  const lab = await getLabCore({ id: labId });
 
-    if (!lab) notFound();
+  if (!lab) notFound();
 
-    const isPi = session.user.role === "PI";
+  const isPi = session.user.role === "PI";
 
-    if (isPi) {
-        redirect(`/lab/${lab_id}`);
-    }
+  if (isPi) {
+    redirect(`/lab/${lab_id}`);
+  }
 
-    const userId = BigInt(session.user.id);
-    const recentReview = await getRecentReviewInLab(userId, labId);
+  const userId = BigInt(session.user.id);
+  const recentReview = await getRecentReviewInLab(userId, labId);
 
-    return (
-        <CreateReviewForm
-            labId={lab_id}
-            labName={lab.nameKo}
-            recentReviewId={recentReview?.id.toString() ?? null}
-        />
-    );
+  return (
+    <CreateReviewForm
+      labId={lab_id}
+      labName={lab.nameKo}
+      recentReviewId={recentReview?.id.toString() ?? null}
+    />
+  );
 }

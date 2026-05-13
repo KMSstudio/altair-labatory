@@ -47,7 +47,7 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
     persn: 0,
   };
 
-  const contentList: string[] = [];
+  const contentList: LabReviewDTO[] = [];
 
   if (labReviews.length >= n) {
     labReviews.map((review) => {
@@ -68,16 +68,16 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
           labReviewMean[key] += scores[key] * weight;
         }
       } catch {
-        return;
+        return <div>something went wrong!</div>;
       }
 
       if (review.visib == "PUBLIC" || review.visib == "PROTECT") {
-        contentList.push(review.content);
+        contentList.push(review);
       }
     });
 
-    for (const key in labReviewMean) {
-      labReviewMean[key] /= totalWeight;
+    for (const key of Object.entries(labReviewMean)) {
+      labReviewMean[key[0]] /= totalWeight;
     }
   } else {
     labReviewMean.atmos = -1;
@@ -112,7 +112,7 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
                 <p className={styles.eyebrow}>Reviews</p>
               </div>
             </header>
-            {labReviews.map((review) => {
+            {contentList.map((review) => {
               return (
                 <div key={review.id} className={styles.panel}>
                   <p className={styles.value}>{review.content}</p>

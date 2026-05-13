@@ -36,10 +36,15 @@ export function PentagonSection({
   ReviewOrder: string[];
   labReviewMean: number[];
 }) {
+  if (ReviewOrder.length != 5 || labReviewMean.length != 5) {
+    throw new Error("PentagonSection requires exactly 5 review dimensions");
+  }
   const [windowCenter, setWindowCenter] = useState(window.innerWidth / 2);
   const PentagonHeight = 500;
   const sizeMultiplier = 0.06;
   useEffect(() => {
+    const update = () => setWindowCenter(window.innerWidth / 2);
+    update();
     const handleResize = () => {
       setWindowCenter(window.innerWidth / 2);
     };
@@ -50,8 +55,6 @@ export function PentagonSection({
     };
   }, []);
 
-  // Don't forget cleanup
-  // window.removeEventListener('resize', debouncedResize);
   const backgroundPentagons = [1, 2, 3, 4, 5, 6].map((score) => {
     return [0, 1, 2, 3, 4].map((index) =>
       GetPoint(
@@ -103,7 +106,7 @@ export function PentagonSection({
           />
 
           <polygon
-            points={PentagonPoints.join(" ")}
+            points={PentagonPoints.map((point) => point.join(",")).join(" ")}
             fill="blue"
             fillOpacity={0.5}
             stroke="aqua"

@@ -209,6 +209,7 @@ export type LabDbShape = {
   subjects: { subject: SubjectDbShape }[];
 };
 
+
 export const getLabselect = {
   id: true,
   nameKo: true,

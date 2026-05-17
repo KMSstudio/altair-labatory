@@ -219,12 +219,12 @@ export const getLabselect = {
   university: { select: getUniversitySelect },
   pi: { select: getPiSelect },
   subjects: {
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "desc" as const },
     select: {
       subject: { select: getSubjectSelect },
     },
   },
-} as const;
+};
 
 export type LabDTO = {
   id: string;

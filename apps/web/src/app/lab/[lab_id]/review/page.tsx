@@ -1,50 +1,132 @@
-// src/app/lab/[lab_id]/review/page.tsx
-
-import { redirect, notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getLabReviews } from "@/repository/db/labatory/lab-review";
 import { getLabCore } from "@/repository/db/labatory/labatory";
-import { getRecentReviewInLab } from "@/repository/db/labatory/lab-review";
-import { CreateReviewForm } from "./_components/CreateReviewForm";
+import { type LabDTO, type LabReviewDTO } from "@/repository/dto/labatory";
+import { redirect } from "next/navigation";
+import styles from "../../lab.module.css";
+import Link from "next/link";
+import { PentagonSection } from "./PentagonSection";
 
-type Params = {
-  params: Promise<{ lab_id: string }>;
-};
+/**
+ * Calculate Weight of lab review based on its createdDate.
+ * exact formula: 1 / (1 + 0.1 * Difference of current time and created time)
+ * Treats one day as a unit value of 1, and Difference is floored.
+ */
+function WeightFunction(parsedReviewDate: number): number {
+  return 1 / (1 + 0.1 * Math.floor((Date.now() - parsedReviewDate) / 86400000));
+}
 
-export default async function NewReviewPage({ params }: Params) {
-  const { lab_id } = await params;
+type ReviewKey = "atmos" | "lectr" | "paper" | "salry" | "persn";
+
+const ReviewOrder: ReviewKey[] = ["atmos", "lectr", "paper", "salry", "persn"];
+
+export default async function ReviewPage({ params }: { params: { lab_id: string } }) {
+  params = await params;
+  const n = 2;
 
   let labId: bigint;
   try {
-    labId = BigInt(lab_id);
+    labId = BigInt(params.lab_id);
   } catch {
-    notFound();
+    redirect("/lab");
   }
 
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user) {
-    redirect("/login");
+  let lab: LabDTO | null;
+  try {
+    lab = await getLabCore({ id: labId });
+    if (!lab) throw Error();
+  } catch {
+    redirect("/lab");
   }
+  const labReviews: LabReviewDTO[] = await getLabReviews({ labId });
+  let totalWeight: number = 0;
+  const labReviewMean: Record<ReviewKey, number> = {
+    atmos: 0,
+    lectr: 0,
+    paper: 0,
+    salry: 0,
+    persn: 0,
+  };
 
-  const lab = await getLabCore({ id: labId });
+  const contentList: LabReviewDTO[] = [];
 
-  if (!lab) notFound();
-
-  const isPi = session.user.role === "PI";
-
-  if (isPi) {
-    redirect(`/lab/${lab_id}`);
+  if (labReviews.length >= n) {
+    for (const review of labReviews) {
+      try {
+        const weight = WeightFunction(Date.parse(review.createdAt));
+        const scores: Record<ReviewKey, number> = {
+          atmos: Number(review.atmos),
+          lectr: Number(review.lectr),
+          paper: Number(review.paper),
+          salry: Number(review.salry),
+          persn: Number(review.persn),
+        };
+        totalWeight += weight;
+        for (const key of ReviewOrder) {
+          labReviewMean[key] += scores[key] * weight;
+        }
+      } catch {
+        console.error(`Failed to process review ${review.id} for lab ${labId}`);
+        continue;
+      }
+      if (review.visib === "PUBLIC" || review.visib === "PROTECT") {
+        contentList.push(review);
+      }
+    }
+    for (const key of ReviewOrder) {
+      try {
+        labReviewMean[key] /= totalWeight;
+      } catch {
+        console.error(`Failed to process reviews for lab ${labId}: Total Weight is zero.`);
+        labReviewMean[key] = 0;
+      }
+    }
+  } else {
+    labReviewMean.atmos = -1;
+    labReviewMean.lectr = -1;
+    labReviewMean.paper = -1;
+    labReviewMean.salry = -1;
+    labReviewMean.persn = -1;
   }
-
-  const userId = BigInt(session.user.id);
-  const recentReview = await getRecentReviewInLab(userId, labId);
-
   return (
-    <CreateReviewForm
-      labId={lab_id}
-      labName={lab.nameKo}
-      recentReviewId={recentReview?.id.toString() ?? null}
-    />
+    <main className={styles.labShell}>
+      <header className={styles.labHeader}>
+        <div>
+          <p className={styles.eyebrow}>/lab/{labId}/review</p>
+          <h1>{lab.nameKo}</h1>
+          {lab.nameEn && <p className={styles.muted}>{lab.nameEn}</p>}
+        </div>
+        <div className={styles.actions}>
+          <Link href={`/lab/${labId}`} className={styles.ghost}>
+            ← Back
+          </Link>
+        </div>
+      </header>
+      {n <= labReviews.length ? (
+        <>
+          <PentagonSection
+            ReviewOrder={ReviewOrder.map((order) => order.toString())}
+            labReviewMean={ReviewOrder.map((order) => labReviewMean[order])}
+          />
+          <section className={styles.panel}>
+            <header className={styles.panelHead}>
+              <div>
+                <p className={styles.eyebrow}>Reviews</p>
+              </div>
+            </header>
+            {contentList.map((review) => {
+              return (
+                <div key={review.id} className={styles.panel}>
+                  <p className={styles.value}>{review.content}</p>
+                </div>
+              );
+            })}
+          </section>
+        </>
+      ) : (
+        <section className={styles.panel}>
+          <div className={styles.primary}>Not enough review!</div>
+        </section>
+      )}
+    </main>
   );
 }

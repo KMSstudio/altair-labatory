@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: `${e}` }, { status: 400 });
   }
   try {
-    const reviews = getLabReviews({ labId });
+    const reviews = await getLabReviews({ labId });
     return NextResponse.json({ ok: true, reviews }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

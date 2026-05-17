@@ -75,7 +75,7 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
     for (const key of ReviewOrder) {
       try {
         labReviewMean[key] /= totalWeight;
-      } catch (e) {
+      } catch {
         console.error(`Failed to process reviews for lab ${labId}: Total Weight is zero.`);
         labReviewMean[key] = 0;
       }

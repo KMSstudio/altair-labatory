@@ -206,6 +206,7 @@ export async function getLabReviews({
 }): Promise<LabReviewDTO[]> {
   const labReviews = (await db.labReview.findMany({
     where: { labId },
+    orderBy: { createdAt: "desc" },
     select: getLabReviewSelect,
   })) as LabReviewDbShape[];
   return labReviews.map(serializeLabReview);

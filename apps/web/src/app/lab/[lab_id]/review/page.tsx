@@ -50,10 +50,9 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
   const contentList: LabReviewDTO[] = [];
 
   if (labReviews.length >= n) {
-    labReviews.map((review) => {
+    for (const review of labReviews) {
       try {
         const weight = WeightFunction(Date.parse(review.createdAt));
-
         const scores: Record<ReviewKey, number> = {
           atmos: Number(review.atmos),
           lectr: Number(review.lectr),
@@ -61,23 +60,25 @@ export default async function ReviewPage({ params }: { params: { lab_id: string 
           salry: Number(review.salry),
           persn: Number(review.persn),
         };
-
         totalWeight += weight;
-
-        for (const key in scores) {
+        for (const key of ReviewOrder) {
           labReviewMean[key] += scores[key] * weight;
         }
       } catch {
-        return <div>something went wrong!</div>;
+        console.error(`Failed to process review ${review.id} for lab ${labId}`);
+        continue;
       }
-
-      if (review.visib == "PUBLIC" || review.visib == "PROTECT") {
+      if (review.visib === "PUBLIC" || review.visib === "PROTECT") {
         contentList.push(review);
       }
-    });
-
-    for (const key of Object.entries(labReviewMean)) {
-      labReviewMean[key[0]] /= totalWeight;
+    }
+    for (const key of ReviewOrder) {
+      try {
+        labReviewMean[key] /= totalWeight;
+      } catch (e) {
+        console.error(`Failed to process reviews for lab ${labId}: Total Weight is zero.`);
+        labReviewMean[key] = 0;
+      }
     }
   } else {
     labReviewMean.atmos = -1;

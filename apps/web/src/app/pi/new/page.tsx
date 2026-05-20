@@ -3,17 +3,19 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { PIApplicationForm } from "./PIApplicationForm";
 import styles from "../pi.module.css";
+import { getLabsCore } from "@/repository/db/labatory/labatory";
 
 export default async function PIApplicationApplyPage() {
   const session = await getServerSession(authOptions);
-
   if (!session?.user || session.user.role !== "USER") {
     redirect("/");
   }
+
+  const labs = await getLabsCore({});
   return (
     <main className={styles.piShell}>
       <h1 className={styles.panelTitle}>Apply as PI</h1>
-      <PIApplicationForm />
+      <PIApplicationForm labs={labs} />
     </main>
   );
 }

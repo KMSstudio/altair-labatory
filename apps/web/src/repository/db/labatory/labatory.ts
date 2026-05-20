@@ -47,11 +47,15 @@ export async function getLabCore({
  * @param db - Client where query will be performed. Default is prisma.
  * @returns list of labatory DTO.
  */
-export async function getLabsCore({ db = prisma }: { db?: DbClient }): Promise<LabDTO[]> {
+export async function getLabsCore({
+  where = { isDeleted: false },
+  db = prisma,
+}: {
+  where?: Prisma.LabWhereInput;
+  db?: DbClient;
+}): Promise<LabDTO[]> {
   const labs = (await db.lab.findMany({
-    where: {
-      isDeleted: false,
-    },
+    where,
     select: getLabselect,
   })) as LabDbShape[];
   return labs.map(serializeLab);
@@ -77,7 +81,7 @@ export async function getLabList({
   univId?: bigint;
   subjId?: bigint;
   db?: DbClient;
-}) {
+}): Promise<LabDTO[]> {
   if (!univId && !subjId) throw new Error("Either univId or subjId is needed");
   const andConditions: Prisma.LabWhereInput[] = [{ isDeleted: false }];
   if (univId) {

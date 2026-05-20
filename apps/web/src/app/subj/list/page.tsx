@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { prisma } from "@labatory/db";
-import { Prisma } from "@prisma/client";
 import styles from "../subj.module.css";
+import { getSubjects } from "@/repository/db/labatory/subject";
 
 type ListPageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -28,41 +27,6 @@ const normalizeFilter = (value: string): "all" | "active" | "inactive" => {
   if (value === "active" || value === "inactive") return value;
   return "all";
 };
-
-/**
- * Loads subjects from the database with basic search and status filtering.
- *
- * @param params - Search query and status filter.
- * @returns List of subjects (selected fields).
- */
-async function getSubjects(params: { q: string; status: "all" | "active" | "inactive" }) {
-  const where: Prisma.SubjectWhereInput = {};
-  const q = params.q.trim();
-  if (q.length) {
-    where.OR = [
-      { nameKo: { contains: q, mode: "insensitive" } },
-      { nameEn: { contains: q, mode: "insensitive" } },
-    ];
-  }
-
-  if (params.status === "active") where.isActive = true;
-  if (params.status === "inactive") where.isActive = false;
-
-  return prisma.subject.findMany({
-    where,
-    orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
-    select: {
-      id: true,
-      nameKo: true,
-      nameEn: true,
-      description: true,
-      isActive: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-}
-
 /**
  * /subj/list
  *
@@ -76,7 +40,7 @@ export default async function SubjectListPage({ searchParams }: ListPageProps) {
   const q = normalizeQuery(sp.q);
   const status = normalizeFilter(normalizeQuery(sp.status));
 
-  const subjects = await getSubjects({ q, status });
+  const subjects = await getSubjects({});
 
   return (
     <main className={styles.subjShell}>

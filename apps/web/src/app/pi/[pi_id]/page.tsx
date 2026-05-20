@@ -1,19 +1,29 @@
 import { notFound } from "next/navigation";
-import { GetLab, GetPI } from "../actions";
 import styles from "../pi.module.css";
+import { getPiCore } from "@/repository/db/labatory/pi";
+import { getLabCore } from "@/repository/db/labatory/labatory";
 
 export default async function PIDetailPage({ params }: { params: { pi_id: string } }) {
   params = await params;
-  let id: bigint;
+  let piId: bigint;
   try {
-    id = BigInt(params.pi_id);
+    piId = BigInt(params.pi_id);
   } catch {
     notFound();
   }
 
-  const pi = await GetPI(id);
+  const pi = await getPiCore({ piId });
   if (!pi) notFound();
-  const lab = pi.labId ? await GetLab(pi.labId) : null;
+
+  let labId: bigint | null = null;
+  if (pi.labId) {
+    try {
+      labId = BigInt(pi.labId);
+    } catch {
+      notFound();
+    }
+  }
+  const lab = labId ? await getLabCore({ id: labId }) : null;
 
   return (
     <main className={styles.piShell}>
@@ -39,7 +49,7 @@ export default async function PIDetailPage({ params }: { params: { pi_id: string
 
         <div className={styles.row}>
           <strong className={styles.rowLabel}>createdAt:</strong>{" "}
-          <span className={styles.rowValue}>{pi.createdAt.getTime()}</span>
+          <span className={styles.rowValue}>{pi.createdAt}</span>
         </div>
       </section>
 

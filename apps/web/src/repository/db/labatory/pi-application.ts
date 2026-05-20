@@ -37,6 +37,28 @@ export async function getPiApplication({
 }
 
 /**
+ * Retrieve entire (not deleted) pi application data.
+ *
+ * This is a DB-only function. No authentication/authorization is performed here.
+ * @param where - Prisma `where` clause to filter results. Omit to fetch all.
+ * @param db - Client where query will be performed. Default is prisma.
+ * @returns List of subject DB shape.
+ */
+export async function getPiApplicationLists({
+  where,
+  db = prisma,
+}: {
+  where?: Prisma.PIApplicationWhereInput;
+  db?: DbClient;
+}): Promise<PiApplicationDTO[]> {
+  const piApplications = (await db.pIApplication.findMany({
+    where,
+    select: getPiApplicationSelect,
+  })) as PiApplicationDbShape[];
+  return piApplications.map(serializePiApplication);
+}
+
+/**
  * Create PI Application.
  *
  * This is a DB-only function. Caller must ensure:
@@ -63,7 +85,7 @@ export async function createPiApplication({
       requestedName: input.requestedName,
       labId: input.labId,
       schoolEmail: input.schoolEmail,
-      ScholarUrl: input.scholarUrl,
+      scholarUrl: input.scholarUrl,
       note: input.note,
     },
     select: getPiApplicationSelect,

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { createUniversity } from "../actions";
 import styles from "../univ.module.css";
+import UnivCreateForm from "./UnivCreateForm";
 
 export default function NewUniversityPage() {
   return (
@@ -18,38 +18,7 @@ export default function NewUniversityPage() {
           ← Back to list
         </Link>
       </header>
-
-      <form action={createUniversity} className={styles.form}>
-        <label>
-          Korean name *
-          <input name="nameKo" placeholder="서울대학교" required />
-        </label>
-        <label>
-          English name
-          <input name="nameEn" placeholder="Seoul National University" />
-        </label>
-        <label>
-          Country
-          <input name="country" placeholder="Korea" />
-        </label>
-        <label>
-          Website URL
-          <input name="websiteUrl" type="url" placeholder="https://www.snu.ac.kr/" />
-        </label>
-        <label>
-          Domain
-          <input name="domain" placeholder="snu.ac.kr" />
-        </label>
-
-        <div className={`${styles.actions} ${styles.actionsEnd}`}>
-          <Link href="/univ" className={styles.ghost}>
-            Cancel
-          </Link>
-          <button type="submit" className={styles.primary}>
-            Create
-          </button>
-        </div>
-      </form>
+      <UnivCreateForm />
     </main>
   );
 }

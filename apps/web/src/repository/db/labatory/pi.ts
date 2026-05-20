@@ -31,6 +31,29 @@ export async function getPiCore({
 }
 
 /**
+ * Retrieve entire (not deleted) pis data.
+ *
+ * This is a DB-only function. No authentication/authorization is performed here.
+ *
+ * @param where - Prisma `where` clause to filter results. Omit to fetch all.
+ * @param db - Client where query will be performed. Default is prisma.
+ * @returns List of pi DB shape.
+ */
+export async function getPiLists({
+  where = {},
+  db = prisma,
+}: {
+  where?: Prisma.PIWhereInput;
+  db?: DbClient;
+}): Promise<PiDTO[]> {
+  const pis = (await db.pI.findMany({
+    where,
+    select: getPiSelect,
+  })) as PiDbShape[];
+  return pis.map(serializePi);
+}
+
+/**
  * Create new PI.
  *
  * @param input - new name, email, scholarUrl, labId, and userId of Pi.

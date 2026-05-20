@@ -1,25 +1,8 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
-import { prisma } from "@labatory/db";
-import { mergeSubjects } from "../actions";
 import styles from "../subj.module.css";
-
-/**
- * Loads subjects for the merge UI.
- * We order by active status first so active subjects appear at the top.
- * @returns Subjects list with minimal fields for selection.
- */
-async function getSubjectsForMerge() {
-  return prisma.subject.findMany({
-    orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
-    select: {
-      id: true,
-      nameKo: true,
-      nameEn: true,
-      isActive: true,
-    },
-  });
-}
+import { getSubjects } from "@/repository/db/labatory/subject";
+import SubjectMergeForm from "./SubjectMergeForm";
 
 type MergePageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -37,7 +20,7 @@ const asString = (v: string | string[] | undefined): string | undefined =>
  * @returns JSX for the merge page.
  */
 export default async function MergeSubjectPage(param: Promise<MergePageProps>) {
-  const subjects = await getSubjectsForMerge();
+  const subjects = await getSubjects({});
   const _param = await param;
   let { searchParams } = _param;
   searchParams = await searchParams;
@@ -81,8 +64,8 @@ export default async function MergeSubjectPage(param: Promise<MergePageProps>) {
             <h3>Pick a source and destination</h3>
           </div>
         </header>
-
-        <form action={mergeSubjects} className={styles.form}>
+        <SubjectMergeForm subjects={subjects} />
+        {/* <form action={mergeSubjects} className={styles.form}>
           <div className={styles.mergeGrid}>
             <fieldset className={styles.choiceGroup}>
               <legend>From (source) *</legend>
@@ -138,7 +121,7 @@ export default async function MergeSubjectPage(param: Promise<MergePageProps>) {
               Merge
             </button>
           </div>
-        </form>
+        </form> */}
       </section>
     </main>
   );

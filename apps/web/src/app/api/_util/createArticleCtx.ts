@@ -3,7 +3,7 @@
 import "server-only";
 
 import type { Session } from "next-auth";
-import { getClientIp } from "@/util/util";
+import { getClientIp } from "@/util/util.server";
 import type { Article_Ctx, Comment_Ctx } from "@/types/article";
 
 /**

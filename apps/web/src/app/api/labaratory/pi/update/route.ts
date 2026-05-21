@@ -18,33 +18,32 @@ type Body = {
 };
 
 /**
- * Handle PI application creation requests.
+ * Handle PI (Principal Investigator) update requests.
  *
- * This API endpoint performs all **server-side validation** before
- * delegating the actual database write operation to `createPiApplication`.
+ * This API endpoint performs all **server-side validation and authorization**
+ * before delegating the actual database write operation to `updatePiCore`.
  *
  * Validation performed here includes:
  * - Request body JSON parsing
  * - Authentication check via `getServerSession`
- * - User ID parsing (BigInt)
- * - School email extraction from session
- * - Required field checks (`requestedName`, `scholarUrl`)
- * - URL format validation for `scholarUrl`
- * - Optional `labId` parsing (invalid values fall back to `null`)
- * - Duplicate pending application check (only one PENDING application
- *   per user is allowed)
+ * - Required field checks (`name`, `email`, `scholarUrl`)
+ * - `piId` parsing (BigInt) via `parseBigInt`
+ * - Optional `labId` and `userId` parsing (BigInt)
+ * - PI existence check via `getPiCore`
+ * - Ownership verification (the authenticated user must own the target PI)
  *
  * @param request - Incoming HTTP request containing a JSON body with
- *   `requestedName`, `scholarUrl`, optional `note`, and optional `labId`.
+ *   `name`, `email`, `scholarUrl`, `piId`, and optional `labId` and `userId`.
  *
  * @returns
- * - `200` with `{ ok: true, piApplication }` if creation succeeds
- * - `400` for validation errors (invalid JSON, missing fields, invalid
- *   URL, invalid user id, missing school email, or an existing pending
- *   application)
+ * - `200` with `{ ok: true, pi }` if the update succeeds
+ * - `400` for validation errors (invalid JSON, missing required fields,
+ *   invalid `piId`/`labId`/`userId`, or non-existent PI)
  * - `401` if the user is not authenticated
+ * - `403` if the authenticated user does not match the PI owner
  * - `500` for internal or database errors
  */
+
 export async function POST(request: Request) {
   let body: Body;
   try {
@@ -80,7 +79,7 @@ export async function POST(request: Request) {
     try {
       labId = BigInt(body.labId);
     } catch {
-      // labId is null
+      return NextResponse.json({ error: "Invalid session lab id." }, { status: 400 });
     }
   }
 
@@ -89,7 +88,7 @@ export async function POST(request: Request) {
     try {
       userId = BigInt(body.userId);
     } catch {
-      // userId is null
+      return NextResponse.json({ error: "Invalid session user id." }, { status: 400 });
     }
   }
 
@@ -97,8 +96,11 @@ export async function POST(request: Request) {
   const pi = await getPiCore({ piId });
   if (!pi) return NextResponse.json({ error: "pi does not exist." }, { status: 400 });
 
-  // if (pi.userId != session.user.id)
-  //   return NextResponse.json({ error: "Authenticated user does not match the PI." }, { status: 400 });
+  if (pi.userId != session.user.id)
+    return NextResponse.json(
+      { error: "Authenticated user does not match the PI." },
+      { status: 403 },
+    );
 
   try {
     const updatepi = await updatePiCore({

@@ -26,6 +26,7 @@ type Body = {
  * - `400` invalid parameters
  * - `500` internal server error
  */
+
 export async function POST(request: Request) {
   let body: Body;
   try {
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "University does not exist." }, { status: 400 });
 
   try {
-    deleteUniversityCore({ universityId });
+    await deleteUniversityCore({ universityId });
     return NextResponse.json({ ok: true, universityId: universityId.toString() }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

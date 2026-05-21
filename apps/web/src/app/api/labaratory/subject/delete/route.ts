@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 
 import { deleteSubjectCore, getSubjectCore } from "@/repository/db/labatory/subject";
 import { parseBigInt } from "@/app/api/_util/parse";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 type Body = {
   subjectId: string;
@@ -24,14 +26,21 @@ type Body = {
  * @returns
  * - `200` `{ ok: true, subjectId }` on success
  * - `400` invalid parameters
+ * - `401` if the user is not authenticated
  * - `500` internal server error
  */
+
 export async function POST(request: Request) {
   let body: Body;
   try {
     body = (await request.json()) as Body;
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
+
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "User must be logged in." }, { status: 401 });
   }
 
   let subjectId: bigint;
@@ -46,7 +55,7 @@ export async function POST(request: Request) {
   if (!subject) return NextResponse.json({ error: "Subject does not Exist." }, { status: 400 });
 
   try {
-    deleteSubjectCore({ subjectId });
+    await deleteSubjectCore({ subjectId });
     return NextResponse.json({ ok: true, subjectId: subjectId.toString() }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

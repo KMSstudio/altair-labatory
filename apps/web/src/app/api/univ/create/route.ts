@@ -12,24 +12,28 @@ type Body = {
   websiteUrl: string;
   domain: string;
 };
-
 /**
- * Handle university create requests.
+ * Handle university creation requests.
  *
  * This API endpoint performs all **server-side validation** before
  * delegating the actual database write operation to `createUniversityCore`.
  *
  * Validation performed here includes:
- * - Request body validation
- * - university existence check
+ * - Request body JSON parsing
+ * - Required field check (`nameKo`)
+ * - Duplicate Korean name check via `getUniversityLists` (the Korean name
+ *   must be unique among non-deleted universities)
  *
- * @param request - Incoming HTTP request containing a JSON body.
+ * @param request - Incoming HTTP request containing a JSON body with
+ *   `nameKo`, and optional `nameEn`, `country`, `websiteUrl`, and `domain`.
  *
  * @returns
- * - `200` with `{ ok: true, universityId }` if create succeeds
- * - `400` for validation errors
+ * - `200` with `{ ok: true, university }` if creation succeeds
+ * - `400` for validation errors (invalid JSON, missing `nameKo`, or a
+ *   duplicate Korean name)
  * - `500` for internal or database errors
  */
+
 export async function POST(request: Request) {
   let body: Body;
   try {

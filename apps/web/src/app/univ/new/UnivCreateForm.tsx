@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import styles from "../../univ.module.css";
+import styles from "../univ.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseUnivInput } from "@/util/univ";

@@ -11,19 +11,27 @@ type Body = {
 };
 
 /**
- * POST /api/labaratory/merge
+ * Handle subject merge requests.
  *
- * Merges two subjects via JSON request body.
- * This endpoint moves LabSubject edges from `sourceSubjectId` to `destinationSubjectId`.
+ * This API endpoint performs all **server-side validation** before
+ * delegating the actual merge operation to `mergeSubjectCore`, which
+ * consolidates the source subject into the destination subject.
  *
- * Expected JSON:
- * - sourceSubjectId: string (required; integer string)
- * - destinationSubjectId: string (required; integer string)
- * - deactivateFrom: boolean (optional; defaults to true)
+ * Validation performed here includes:
+ * - Request body JSON parsing
+ * - Required field checks (`sourceSubjectId`, `destinationSubjectId`)
+ * - BigInt parsing of both subject ids via `parseBigInt`
  *
- * @param request - Next.js Request object.
- * @returns JSON response with merge result summary or error.
+ * @param request - Incoming HTTP request containing a JSON body with
+ *   `sourceSubjectId` and `destinationSubjectId`.
+ *
+ * @returns
+ * - `200` with `{ ok: true, mergedSubject }` if the merge succeeds
+ * - `400` for validation errors (invalid JSON, missing or invalid
+ *   `sourceSubjectId` or `destinationSubjectId`)
+ * - `500` for internal or database errors
  */
+
 export async function POST(request: Request) {
   let body: Body;
   try {

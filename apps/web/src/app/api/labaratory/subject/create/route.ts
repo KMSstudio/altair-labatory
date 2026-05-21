@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@labatory/db";
 import { getSubjects, createSubjectCore } from "@/repository/db/labatory/subject";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 type Body = {
   nameKo: string;
@@ -10,22 +12,28 @@ type Body = {
 };
 
 /**
- * Handle subject create requests.
+ * Handle subject creation requests.
  *
  * This API endpoint performs all **server-side validation** before
- * delegating the actual database write operation to `createsubjectCore`.
+ * delegating the actual database write operation to `createSubjectCore`.
  *
  * Validation performed here includes:
- * - Request body validation
- * - subject existence check
+ * - Request body JSON parsing
+ * - Required field checks (`nameKo`, `nameEn`)
+ * - Duplicate name check via `getSubjects` (both Korean and English names
+ *   must be unique among non-deleted subjects)
  *
- * @param request - Incoming HTTP request containing a JSON body.
+ * @param request - Incoming HTTP request containing a JSON body with
+ *   `nameKo`, `nameEn`, and optional `description`.
  *
  * @returns
- * - `200` with `{ ok: true, subjectId }` if create succeeds
- * - `400` for validation errors
+ * - `200` with `{ ok: true, subject }` if creation succeeds
+ * - `400` for validation errors (invalid JSON, missing `nameKo` or
+ *   `nameEn`, or a duplicate Korean/English name)
+ * - `401` if the user is not authenticated
  * - `500` for internal or database errors
  */
+
 export async function POST(request: Request) {
   let body: Body;
   try {
@@ -34,6 +42,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "User must be logged in." }, { status: 401 });
+  }
+
+  // Add role gating here if subject creation is restricted.
   const nameKo = body.nameKo ?? "";
   const nameEn = body.nameEn ?? "";
   const description = body.description ?? "";

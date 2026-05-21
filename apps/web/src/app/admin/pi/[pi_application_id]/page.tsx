@@ -57,8 +57,8 @@ export default async function PIApplicationDetailPage({
         </div>
         <div>
           <strong>Scholar URL:</strong>{" "}
-          <a href={application.ScholarUrl} target="_blank" rel="noopener noreferrer">
-            {application.ScholarUrl}
+          <a href={application.scholarUrl} target="_blank" rel="noopener noreferrer">
+            {application.scholarUrl}
           </a>
         </div>
         <div>

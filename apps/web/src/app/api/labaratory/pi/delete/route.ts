@@ -28,6 +28,7 @@ type Body = {
  * - `400` invalid parameters
  * - `500` internal server error
  */
+
 export async function POST(request: Request) {
   let body: Body;
   try {

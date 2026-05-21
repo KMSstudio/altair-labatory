@@ -124,7 +124,7 @@ export async function updatePiApplication({
         requestedName: input.requestedName,
         labId: input.labId,
         schoolEmail: input.schoolEmail,
-        ScholarUrl: input.scholarUrl,
+        scholarUrl: input.scholarUrl,
         note: input.note,
       },
       select: getPiApplicationSelect,

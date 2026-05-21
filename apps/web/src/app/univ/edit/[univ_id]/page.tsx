@@ -45,7 +45,7 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
       </header>
       <UnivEditForm univ={univ} />
       <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
-        <UnivDeleteButton univId={params.univ_id} />
+        <UnivDeleteButton universityId={params.univ_id} />
       </div>
     </main>
   );

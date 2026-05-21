@@ -1,6 +1,7 @@
 import Link from "next/link";
 import styles from "../subj.module.css";
 import { getSubjects } from "@/repository/db/labatory/subject";
+import { Prisma } from "@labatory/db";
 
 type ListPageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -40,7 +41,18 @@ export default async function SubjectListPage({ searchParams }: ListPageProps) {
   const q = normalizeQuery(sp.q);
   const status = normalizeFilter(normalizeQuery(sp.status));
 
-  const subjects = await getSubjects({});
+  const where: Prisma.SubjectWhereInput = { isDeleted: false };
+  const trimmedQ = q.trim();
+  if (trimmedQ.length) {
+    where.OR = [
+      { nameKo: { contains: trimmedQ, mode: "insensitive" } },
+      { nameEn: { contains: trimmedQ, mode: "insensitive" } },
+    ];
+  }
+  if (status === "active") where.isActive = true;
+  if (status === "inactive") where.isActive = false;
+
+  const subjects = await getSubjects({ where });
 
   return (
     <main className={styles.subjShell}>

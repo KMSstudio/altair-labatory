@@ -19,7 +19,7 @@ export type FormState =
  * // → ""
  */
 export const normalizeText2String = (value: unknown): string | null => {
-  if (typeof value !== "string") return "";
+  if (typeof value !== "string") return null;
   const trimmed = value.trim();
   return trimmed.length ? trimmed : null;
 };

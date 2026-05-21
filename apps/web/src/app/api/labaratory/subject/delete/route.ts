@@ -46,7 +46,7 @@ export async function POST(request: Request) {
   if (!subject) return NextResponse.json({ error: "Subject does not Exist." }, { status: 400 });
 
   try {
-    deleteSubjectCore({ subjectId });
+    await deleteSubjectCore({ subjectId });
     return NextResponse.json({ ok: true, subjectId: subjectId.toString() }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

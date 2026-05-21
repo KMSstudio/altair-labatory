@@ -14,8 +14,8 @@ import { getSubjects } from "@/repository/db/labatory/subject";
 
 export async function GET() {
   try {
-    const universities = await getSubjects({});
-    return NextResponse.json({ ok: true, subject: universities }, { status: 200 });
+    const subjects = await getSubjects({});
+    return NextResponse.json({ ok: true, subject: subjects }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }

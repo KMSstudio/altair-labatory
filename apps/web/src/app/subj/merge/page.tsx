@@ -65,64 +65,7 @@ export default async function MergeSubjectPage(param: Promise<MergePageProps>) {
           </div>
         </header>
         <SubjectMergeForm subjects={subjects} />
-        {/* <form action={mergeSubjects} className={styles.form}>
-          <div className={styles.mergeGrid}>
-            <fieldset className={styles.choiceGroup}>
-              <legend>From (source) *</legend>
-              <div className={styles.choiceList}>
-                {subjects.map((s) => (
-                  <label key={`from-${s.id.toString()}`} className={styles.choiceItem}>
-                    <input
-                      className={styles.choiceRadio}
-                      type="radio"
-                      name="fromId"
-                      value={s.id.toString()}
-                      required
-                    />
-                    <span className={styles.choiceBody}>
-                      <span className={styles.choiceText}>
-                        <span className={styles.choiceTitle}>{s.nameKo}</span>
-                        <span className={styles.choiceSub}>{s.nameEn}</span>
-                      </span>
-                      <span className={styles.statusTag}>{s.isActive ? "Active" : "Inactive"}</span>
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset className={styles.choiceGroup}>
-              <legend>To (destination) *</legend>
-              <div className={styles.choiceList}>
-                {subjects.map((s) => (
-                  <label key={`to-${s.id.toString()}`} className={styles.choiceItem}>
-                    <input
-                      className={styles.choiceRadio}
-                      type="radio"
-                      name="toId"
-                      value={s.id.toString()}
-                      required
-                    />
-                    <span className={styles.choiceBody}>
-                      <span className={styles.choiceText}>
-                        <span className={styles.choiceTitle}>{s.nameKo}</span>
-                        <span className={styles.choiceSub}>{s.nameEn}</span>
-                      </span>
-                      <span className={styles.statusTag}>{s.isActive ? "Active" : "Inactive"}</span>
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          </div>
-
-          <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
-            <button type="submit" className={styles.primary}>
-              Merge
-            </button>
-          </div>
-        </form> */}
       </section>
     </main>
   );
-}
+

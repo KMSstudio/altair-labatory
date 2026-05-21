@@ -14,8 +14,8 @@ import { getPiLists } from "@/repository/db/labatory/pi";
 
 export async function GET() {
   try {
-    const universities = await getPiLists({});
-    return NextResponse.json({ ok: true, pi: universities }, { status: 200 });
+    const piList = await getPiLists({});
+    return NextResponse.json({ ok: true, pi: piList }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }

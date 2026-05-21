@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     );
 
   try {
-    deletePiCore({ piId });
+    await deletePiCore({ piId });
     return NextResponse.json({ ok: true, piId: piId.toString() }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

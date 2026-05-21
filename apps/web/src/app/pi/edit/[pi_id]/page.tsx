@@ -19,7 +19,7 @@ export default async function EditUserPage({ params }: { params: { pi_id: string
   const pi = await getPiCore({ piId });
   const session = await getServerSession(authOptions);
   if (!session || !pi || !pi.userId) redirect("/");
-  // if (session.user.id !== pi.userId.toString()) redirect("/");
+  if (session.user.id !== pi.userId.toString()) redirect("/");
 
   const labs = await getLabsCore({});
   return (

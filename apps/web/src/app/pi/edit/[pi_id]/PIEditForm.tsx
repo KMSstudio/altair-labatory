@@ -93,7 +93,7 @@ export function PIEditFormClient({ pi, labs }: { pi: PiDTO; labs: LabDTO[] }) {
       )}
       {state.status === "success" && (
         <div>
-          <p className={styles.errorNote}>edit success!</p>
+          <p className={styles.successNote}>edit success!</p>
         </div>
       )}
     </form>

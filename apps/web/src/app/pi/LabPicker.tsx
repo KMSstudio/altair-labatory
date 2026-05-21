@@ -1,22 +1,25 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { GetLabResult, SearchLabs } from "./actions";
 import styles from "./pi.module.css";
+import { LabDTO } from "@/repository/dto/labatory";
 
 export function LabPicker({
   selectedLab,
   setLabId,
+  labs,
 }: {
-  selectedLab?: GetLabResult | null;
-  setLabId: (labId: bigint | null) => void;
+  selectedLab?: LabDTO | null;
+  setLabId: (labId: string | null) => void;
+  labs: LabDTO[];
 }) {
   const isComposing = useRef(false);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [labs, setLabs] = useState<GetLabResult[] | null>(null);
-  const [selectedLabs, setSelectedLabs] = useState<GetLabResult | null>(selectedLab ?? null);
+  const [filteredLabs, setFilteredLabs] = useState<LabDTO[] | null>(null);
+  const [selectedLabs, setSelectedLabs] = useState<LabDTO | null>(selectedLab ?? null);
+
   async function SearchLab() {
     setError(null);
     setLoading(true);
@@ -29,7 +32,24 @@ export function LabPicker({
       return;
     }
     try {
-      setLabs(await SearchLabs(trimmedQuery));
+      if (!trimmedQuery) {
+        throw Error("query is required");
+      }
+
+      const needle = trimmedQuery.toLowerCase();
+      const isUrlQuery = /^https?:\/\//i.test(query);
+
+      const filtered = labs.filter((lab) => {
+        if (isUrlQuery) {
+          return lab.websiteUrl?.toLowerCase().includes(needle) ?? false;
+        }
+        return (
+          lab.nameKo.toLowerCase().includes(needle) ||
+          (lab.nameEn?.toLowerCase().includes(needle) ?? false)
+        );
+      });
+
+      setFilteredLabs(filtered);
     } catch (e) {
       if (e instanceof Error) setError(e.message);
       else setError("Unknown error");
@@ -38,16 +58,18 @@ export function LabPicker({
     setLoading(false);
   }
 
-  function onSelect(lab: GetLabResult | null) {
+  function onSelect(lab: LabDTO | null) {
+    console.log(lab);
     if (!lab) {
       setLabId(null);
       setSelectedLabs(null);
     } else {
       setLabId(lab.id);
+      console.log(1);
       setSelectedLabs(lab);
     }
     setQuery("");
-    setLabs(null);
+    setFilteredLabs(null);
   }
 
   return (
@@ -87,7 +109,7 @@ export function LabPicker({
       </label>
       {error ? <p className={styles.errorNote}>{error}</p> : null}
       <LabSearchItem lab={selectedLabs} onSelect={(selectedLabs) => onSelect(selectedLabs)} />
-      <LabSearchList labs={labs} onSelect={(lab) => onSelect(lab)} />
+      <LabSearchList labs={filteredLabs} onSelect={(lab) => onSelect(lab)} />
     </section>
   );
 }
@@ -96,8 +118,8 @@ export default function LabSearchList({
   labs,
   onSelect,
 }: {
-  labs: GetLabResult[] | null;
-  onSelect: (lab: GetLabResult) => void;
+  labs: LabDTO[] | null;
+  onSelect: (lab: LabDTO) => void;
 }) {
   if (!labs) return <p className={styles.searchHint}>Please input Lab name</p>;
   if (labs.length === 0) return <p className={styles.searchHint}>No search result.</p>;
@@ -105,7 +127,7 @@ export default function LabSearchList({
   return (
     <ul className={styles.labList}>
       {labs.map((lab) => (
-        <li key={lab.id.toString()}>
+        <li key={lab.id}>
           <LabSearchItem lab={lab} onSelect={onSelect} />
         </li>
       ))}
@@ -113,10 +135,7 @@ export default function LabSearchList({
   );
 }
 
-function LabSearchItem(params: {
-  lab: GetLabResult | null;
-  onSelect: (lab: GetLabResult) => void;
-}) {
+function LabSearchItem(params: { lab: LabDTO | null; onSelect: (lab: LabDTO) => void }) {
   if (!params.lab) return <></>;
   const lab = params.lab;
   return (

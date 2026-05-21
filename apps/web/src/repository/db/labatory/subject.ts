@@ -39,14 +39,19 @@ export async function getSubjectCore({
  *
  * This is a DB-only function. No authentication/authorization is performed here.
  *
+ * @param where - Prisma `where` clause to filter results. Omit to fetch all.
  * @param db - Client where query will be performed. Default is prisma.
  * @returns List of subject DB shape.
  */
-export async function getSubjects({ db = prisma }: { db?: DbClient }): Promise<SubjectDTO[]> {
+export async function getSubjects({
+  where = { isDeleted: false },
+  db = prisma,
+}: {
+  where?: Prisma.SubjectWhereInput;
+  db?: DbClient;
+}): Promise<SubjectDTO[]> {
   const subjects = (await db.subject.findMany({
-    where: {
-      isDeleted: false,
-    },
+    where,
     select: getSubjectSelect,
   })) as SubjectDbShape[];
   return subjects.map(serializeSubject);
@@ -229,9 +234,6 @@ export async function mergeSubjectCore({
   sourceSubjectId: bigint;
   destinationSubjectId: bigint;
 }): Promise<SubjectDTO | null> {
-  if (sourceSubjectId == destinationSubjectId) {
-    throw new Error("You cannot merge same subjects.");
-  }
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const fromSubj = await tx.subject.findUnique({
       where: {

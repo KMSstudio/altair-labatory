@@ -1,18 +1,12 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { prisma } from "@labatory/db";
-import { deleteUniversity } from "./actions";
 import styles from "./univ.module.css";
-
-async function getUniversities() {
-  return prisma.university.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-}
+import UnivDeleteButton from "./UnivDeleteForm";
+import { getUniversityLists } from "@/repository/db/labatory/university";
 
 export default async function UniversityListPage() {
-  const universities = await getUniversities();
+  const universities = await getUniversityLists({});
 
   return (
     <main className={styles.univShell}>
@@ -36,10 +30,10 @@ export default async function UniversityListPage() {
         ) : (
           <ul className={styles.univGrid}>
             {universities.map((univ) => (
-              <li key={univ.id.toString()} className={styles.card}>
+              <li key={univ.id} className={styles.card}>
                 <div className={styles.cardHead}>
                   <div>
-                    <p className={styles.eyebrow}>ID {univ.id.toString()}</p>
+                    <p className={styles.eyebrow}>ID {univ.id}</p>
                     <h3>{univ.nameKo}</h3>
                     {univ.nameEn && <p className={styles.muted}>{univ.nameEn}</p>}
                   </div>
@@ -47,14 +41,9 @@ export default async function UniversityListPage() {
                 </div>
                 <p className={styles.muted}>{univ.websiteUrl ?? "No website"}</p>
                 <div className={styles.actions}>
-                  <Link href={`/univ/${univ.id.toString()}`}>View</Link>
-                  <Link href={`/univ/edit/${univ.id.toString()}`}>Edit</Link>
-                  <form action={deleteUniversity}>
-                    <input type="hidden" name="id" value={univ.id.toString()} />
-                    <button type="submit" className={styles.ghost}>
-                      Delete
-                    </button>
-                  </form>
+                  <Link href={`/univ/${univ.id}`}>View</Link>
+                  <Link href={`/univ/edit/${univ.id}`}>Edit</Link>
+                  <UnivDeleteButton universityId={univ.id} />
                 </div>
               </li>
             ))}

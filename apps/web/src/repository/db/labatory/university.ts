@@ -34,6 +34,30 @@ export async function getUniversityCore({
 }
 
 /**
+ * Retrieve entire (not deleted) university data.
+ *
+ * This is a DB-only function. No authentication/authorization is performed here.
+ *
+ * @param where - Prisma `where` clause to filter results. Omit to fetch all.
+ * @param db - Client where query will be performed. Default is prisma.
+ * @returns List of university DB shape.
+ */
+export async function getUniversityLists({
+  where = {},
+  db = prisma,
+}: {
+  where?: Prisma.UniversityWhereInput;
+  db?: DbClient;
+}): Promise<UniversityDTO[]> {
+  const subjects = (await db.university.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    select: getUniversitySelect,
+  })) as UniversityDbShape[];
+  return subjects.map(serializeUniversity);
+}
+
+/**
  * Create new University.
  *
  * The create runs in a single transaction:

@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 import { CreateArticleViewLog } from "@/repository/db/article/view";
-import { getClientIp } from "@/util/util";
+import { getClientIp } from "@/util/util.server";
 
 type Body = {
   articleId: string;

@@ -1,29 +1,26 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { prisma } from "@labatory/db";
-import { updateUniversity, deleteUniversity } from "../../actions";
+import { getUniversityCore } from "@/repository/db/labatory/university";
 import styles from "../../univ.module.css";
+import UnivEditForm from "./UnivEditForm";
+import UnivDeleteButton from "../../UnivDeleteForm";
 
 type EditPageProps = {
   params: { univ_id: string };
 };
 
-async function getUniversity(univId: bigint) {
-  return prisma.university.findUnique({
-    where: { id: univId },
-  });
-}
-
 export default async function EditUniversityPage({ params }: EditPageProps) {
   params = await params;
-  let id: bigint;
+
+  let universityId: bigint;
   try {
-    id = BigInt(params.univ_id);
+    universityId = BigInt(params.univ_id);
   } catch {
     notFound();
   }
-  const university = await getUniversity(id);
-  if (!university) {
+
+  const univ = await getUniversityCore({ universityId });
+  if (!univ) {
     notFound();
   }
 
@@ -46,43 +43,10 @@ export default async function EditUniversityPage({ params }: EditPageProps) {
           </Link>
         </div>
       </header>
-      <form action={updateUniversity} className={styles.form}>
-        <input type="hidden" name="id" value={university.id.toString()} />
-        <label>
-          Korean name *
-          <input name="nameKo" defaultValue={university.nameKo} required />
-        </label>
-        <label>
-          English name
-          <input name="nameEn" defaultValue={university.nameEn ?? ""} />
-        </label>
-        <label>
-          Country
-          <input name="country" defaultValue={university.country ?? ""} />
-        </label>
-        <label>
-          Website URL
-          <input name="websiteUrl" type="url" defaultValue={university.websiteUrl ?? ""} />
-        </label>
-        <label>
-          Domain
-          <input name="domain" defaultValue={university.domain ?? ""} />
-        </label>
-
-        <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
-          <button type="submit" className={styles.primary}>
-            Save changes
-          </button>
-        </div>
-      </form>
-      <form action={deleteUniversity} className={`${styles.form} ${styles.dangerZone}`}>
-        <input type="hidden" name="id" value={university.id.toString()} />
-        <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
-          <button type="submit" className={styles.danger}>
-            Delete university
-          </button>
-        </div>
-      </form>
+      <UnivEditForm univ={univ} />
+      <div className={`${styles.actions} ${styles.actionsEnd} ${styles.space}`}>
+        <UnivDeleteButton universityId={params.univ_id} />
+      </div>
     </main>
   );
 }

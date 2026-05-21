@@ -1,70 +1,101 @@
 "use client";
 
 import { useState } from "react";
-import { type GetLabResult, type GetPIResult, UpdatePI } from "../../actions";
 import { LabPicker } from "../../LabPicker";
 import { useRouter } from "next/navigation";
 import styles from "../../pi.module.css";
+import { LabDTO, PiDTO } from "@/repository/dto/labatory";
+import { FormState, normalizeText2String } from "@/util/util";
+import { parsePiInput } from "@/util/pi";
 
-export function PIEditFormClient({ pi, lab }: { pi: GetPIResult; lab: GetLabResult | null }) {
-  const [name, setName] = useState(pi.name);
-  const [email, setEmail] = useState(pi.email);
-  const [scholarUrl, setScholarUrl] = useState(pi.scholarUrl);
-  const [labId, setLabId] = useState(pi.labId);
-  const [error, setError] = useState("");
+export function PIEditFormClient({ pi, labs }: { pi: PiDTO; labs: LabDTO[] }) {
   const router = useRouter();
+  const [state, setState] = useState<FormState>({ status: "idle" });
+  const [submitting, setSubmitting] = useState(false);
+  const [labId, setLabId] = useState<string | null>(null);
 
-  async function TryUpdatePI(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  const selectedLab = pi.labId ? (labs.find((lab) => lab.id === pi.labId) ?? null) : null;
 
-    if (!email || !name) {
-      setError("Email and name are required.");
+  async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    let body;
+    try {
+      body = {
+        piId: normalizeText2String(pi.id),
+        labId: normalizeText2String(labId),
+        userId: pi.userId,
+        ...parsePiInput(formData),
+      };
+    } catch (err) {
+      setState({
+        status: "error",
+        error: err instanceof Error ? err.message : "Invalid input.",
+      });
       return;
     }
 
     try {
-      await UpdatePI(pi.id, { name, email, labId, scholarUrl });
-    } catch (e) {
-      if (e instanceof Error) setError(e.message);
-      else setError("Unknown error");
-      return;
+      setSubmitting(true);
+      const res = await fetch("/api/labaratory/pi/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        let error = `Request failed (${res.status})`;
+        if (typeof data?.error === "string") error = data.error;
+
+        setState({ status: "error", error });
+        return;
+      }
+
+      setState({ status: "success" });
+      router.refresh();
+    } catch (err) {
+      setState({
+        status: "error",
+        error: err instanceof Error ? err.message : "Network error.",
+      });
+    } finally {
+      setSubmitting(false);
     }
-    router.push(`/pi/${pi.id}`);
   }
   return (
-    <form onSubmit={TryUpdatePI} className={styles.formPanel}>
+    <form onSubmit={handleSubmit} className={styles.formPanel}>
       <label>
         Name *
-        <input name="name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <input name="name" defaultValue={pi.name} required />
       </label>
 
       <label>
         Email *
-        <input
-          name="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <input name="email" type="email" defaultValue={pi.email} required />
       </label>
 
       <label>
         Google Scholar URL *
-        <input
-          name="scholarUrl"
-          value={scholarUrl}
-          onChange={(e) => setScholarUrl(e.target.value)}
-          required
-        />
+        <input name="scholarUrl" defaultValue={pi.scholarUrl} required />
       </label>
-      <LabPicker selectedLab={lab} setLabId={setLabId} />
+      <LabPicker selectedLab={selectedLab} setLabId={setLabId} labs={labs} />
       <div className={styles.formActions}>
         <button type="submit" className={styles.primary}>
-          Save changes
+          {submitting ? "Saving.." : "Save change"}
         </button>
       </div>
-      <div>{error ? <p className={styles.errorNote}>{error}</p> : <></>}</div>
+      {state.status === "error" && (
+        <div>
+          <p className={styles.errorNote}>{state.error}</p>
+        </div>
+      )}
+      {state.status === "success" && (
+        <div>
+          <p className={styles.errorNote}>edit success!</p>
+        </div>
+      )}
     </form>
   );
 }

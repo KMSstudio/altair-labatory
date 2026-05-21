@@ -1,65 +1,96 @@
 "use client";
 
 import { useState } from "react";
-import { submitPIApplicationAction } from "../actions";
 import { useRouter } from "next/navigation";
 import { LabPicker } from "../LabPicker";
 import styles from "../pi.module.css";
+import { LabDTO } from "@/repository/dto/labatory";
+import { FormState, normalizeText2String } from "@/util/util";
+import { parsePiApplicationInput } from "@/util/pi";
 
-export function PIApplicationForm() {
-  const [submitting, setSubmitting] = useState(false);
-
-  const [requestedName, SetRequestedName] = useState("");
-  const [labId, SetLabId] = useState<bigint | null>(null);
-  const [scholarUrl, SetScholarUrl] = useState("");
-  const [note, SetNote] = useState("");
-
+export function PIApplicationForm({ labs }: { labs: LabDTO[] }) {
   const router = useRouter();
+  const [state, setState] = useState<FormState>({ status: "idle" });
+  const [submitting, setSubmitting] = useState(false);
+  const [labId, setLabId] = useState<string | null>(null);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    setSubmitting(true);
-    e.preventDefault();
+  async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    let body;
     try {
-      await submitPIApplicationAction({ requestedName, labId, scholarUrl, note });
-    } catch (error) {
-      if (error instanceof Error) alert(error.message);
-      setSubmitting(false);
+      body = {
+        labId: normalizeText2String(labId),
+        ...parsePiApplicationInput(formData),
+      };
+    } catch (err) {
+      setState({
+        status: "error",
+        error: err instanceof Error ? err.message : "Invalid input.",
+      });
       return;
     }
-    router.push("/auth/me");
+
+    try {
+      setSubmitting(true);
+      const res = await fetch("/api/labaratory/pi/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        let error = `Request failed (${res.status})`;
+        if (typeof data?.error === "string") error = data.error;
+
+        setState({ status: "error", error });
+        return;
+      }
+
+      setState({ status: "success" });
+      router.push(``);
+    } catch (err) {
+      setState({
+        status: "error",
+        error: err instanceof Error ? err.message : "Network error.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
-    <form onSubmit={onSubmit} className={styles.formPanel}>
+    <form onSubmit={handleSubmit} className={styles.formPanel}>
       <label>
         Requested Name
-        <input
-          name="requestedName"
-          value={requestedName}
-          onChange={(e) => SetRequestedName(e.target.value)}
-          required
-        />
+        <input name="requestedName" required />
       </label>
-      <LabPicker setLabId={SetLabId} />
+      <LabPicker setLabId={setLabId} labs={labs} />
       <label>
         Scholar URL
-        <input
-          name="scholarUrl"
-          value={scholarUrl}
-          onChange={(e) => SetScholarUrl(e.target.value)}
-          placeholder="https://scholar.google.com/..."
-          required
-        />
+        <input name="scholarUrl" placeholder="https://scholar.google.com/..." required />
       </label>
       <label>
         Note (optional)
-        <textarea name="note" value={note} onChange={(e) => SetNote(e.target.value)} />
+        <textarea name="note" />
       </label>
       <div className={styles.formActions}>
         <button type="submit" disabled={submitting} className={styles.primary}>
           {submitting ? "Submitting..." : "Submit"}
         </button>
       </div>
+      {state.status === "error" && (
+        <div>
+          <p className={styles.errorNote}>{state.error}</p>
+        </div>
+      )}
+      {state.status === "success" && (
+        <div>
+          <p className={styles.errorNote}>apply success!</p>
+        </div>
+      )}
     </form>
   );
 }

@@ -142,7 +142,7 @@ model PIApplication {
   requestedName   String  @db.VarChar(100) @map("requested_name")
   labId           BigInt? @map("lab_id")
   schoolEmail     String  @db.VarChar(255) @map("school_email")
-  ScholarUrl      String  @db.Text @map("scholar_url")
+  scholarUrl      String  @db.Text @map("scholar_url")
   note            String? @db.Text
 
   status    PIApplicationStatus @default(PENDING)

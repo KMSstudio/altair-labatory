@@ -59,13 +59,11 @@ export function LabPicker({
   }
 
   function onSelect(lab: LabDTO | null) {
-    console.log(lab);
     if (!lab) {
       setLabId(null);
       setSelectedLabs(null);
     } else {
       setLabId(lab.id);
-      console.log(1);
       setSelectedLabs(lab);
     }
     setQuery("");

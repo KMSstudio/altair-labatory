@@ -1,4 +1,4 @@
-// @/app/api/labaratory/pi/apply/route.ts
+// @/app/api/labaratory/pi/decide/route.ts
 
 import { parseBigInt } from "@/app/api/_util/parse";
 import { authOptions } from "@/lib/auth";

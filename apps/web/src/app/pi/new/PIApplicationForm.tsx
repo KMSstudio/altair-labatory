@@ -50,7 +50,7 @@ export function PIApplicationForm({ labs }: { labs: LabDTO[] }) {
       }
 
       setState({ status: "success" });
-      router.push(``);
+      router.push("/auth/me");
     } catch (err) {
       setState({
         status: "error",
@@ -88,7 +88,7 @@ export function PIApplicationForm({ labs }: { labs: LabDTO[] }) {
       )}
       {state.status === "success" && (
         <div>
-          <p className={styles.errorNote}>apply success!</p>
+          <p className={styles.successNote}>apply success!</p>
         </div>
       )}
     </form>
